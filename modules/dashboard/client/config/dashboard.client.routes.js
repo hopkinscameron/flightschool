@@ -9,6 +9,7 @@ dashboardRoutesModule.config(['$routeProvider', function($routeProvider) {
     $routeProvider
         .when('/admin/dashboard', {
             templateUrl: '/modules/dashboard/client/views/admin/dashboard.client.view.html',
-            authenticated: true
+            authenticated: true,
+            role: 'admin'
         })
 }]);

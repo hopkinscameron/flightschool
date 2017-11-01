@@ -69,6 +69,20 @@ angular.module(ApplicationConfiguration.applicationModuleName).run(['$rootScope'
                     //next.$$route.controller = 'ErrorController';
                     //next.$$route.templateUrl = '/modules/core/client/views/error.client.view.html';
                 }
+                // if user is logged in and the route needs an admin view
+                else if(next.$$route.role == 'admin' && $rootScope.$root.isLoggedIn) {
+                    // if the role is not an admin
+                    if(!window.user || window.user.role != 'admin') {
+
+                    }
+                }
+                // if user is logged in and the route needs a user view
+                else if(next.$$route.role == 'user' && $rootScope.$root.isLoggedIn) {
+                    // if the role is not a user
+                    if(!window.user || window.user.role != 'user') {
+                        
+                    }
+                }
             }
         });
     })

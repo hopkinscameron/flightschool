@@ -7,6 +7,7 @@ Next
 - add an "error dashboard" so if there are errors in server, we can view them
 - read from DB always instead of reading only on start of server
 - make sure all authenticated routes get authenticated before logging
+- add roles to user
 
 Future
 

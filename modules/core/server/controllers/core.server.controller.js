@@ -29,7 +29,8 @@ exports.renderIndex = function (req, res) {
     if (req.user) {
         // create the safe object
         safeUserObject = {
-            username: validator.escape(req.user.username)
+            username: validator.escape(req.user.username),
+            role: validator.escape(req.user.role)
         };
     }
 
