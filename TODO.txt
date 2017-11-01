@@ -1,0 +1,28 @@
+﻿In Progress
+
+
+Next
+- create each module necessary
+- make an admin folder and move dashboard under that
+- add an "error dashboard" so if there are errors in server, we can view them
+- read from DB always instead of reading only on start of server
+- make sure all authenticated routes get authenticated before logging
+
+Future
+
+Done
+
+Testing
+
+Browser Fixes
+
+Mobile Fixes
+
+
+Ideas
+- make login a popup from the top (like southwest.com)
+    - remove the errors when a user leaves the form, only show error if the submit button is hit
+    - when logging in, remove form and put a spinner instead
+    - when correct login, login like normal
+    - when incorrect login, show form with error
+- User can only change Hubs every so often (to prevent people from continuously changing)

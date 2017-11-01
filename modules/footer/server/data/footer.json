@@ -1,0 +1,17 @@
+{
+    "footerNote": "Copyright &copy; 2017 Wander Lust LLC",
+    "navigation": [
+        {
+            "title": "About Us",
+            "pageLink": "about-us"
+        },
+        {
+            "title": "Privacy",
+            "pageLink": "privacy"
+        },
+        {
+            "title": "Terms",
+            "pageLink": "terms-and-conditions"
+        }
+    ]
+}

@@ -1,0 +1,33 @@
+{
+    "headliner": "Wander Lust",
+    "headlinerLink": "/",
+    "headlinerImage": "",
+    "navigation": 
+    [
+        {
+            "title": "Home",
+            "pageLink": ""
+        },
+        {
+            "title": "Upcoming Trips",
+            "pageLink": "upcoming-trips"
+        }
+    ],
+    "secondaryNavigation": 
+    [
+        {
+			"title": "Profile",
+			"pageLink": "account",
+			"dropdown": [
+                {
+                    "title": "Edit Profile",
+					"pageLink": "edit"
+                },
+				{
+					"title": "Sign Out",
+					"pageLink": "logout"
+				}
+			]
+		}
+    ]
+}

@@ -1,0 +1,56 @@
+/* Begin Custom Cards */
+.card {
+    &--transparent {
+        background-color: $transparent;
+        border-radius: 0;
+    }
+    &--light {
+        background-color: $light;
+    }
+    &--dark {
+        background-color: $dark;
+
+        & .card-title {
+            color: $text-color;
+        }
+        & .card-text {
+            color: $text-color;
+        }
+    }
+    &--border {
+        &--none {
+            border: 0;
+        }
+        &--all {
+            border-style: solid;
+            border-width: $border-size-normal;
+        }
+        &--top {
+            border-style: solid;
+            border-top-width: $border-size-normal;
+        }
+        &--right {
+            border-style: solid;
+            border-right-width: $border-size-normal;
+        }
+        &--bottom {
+            border-style: solid;
+            border-bottom-width: $border-size-normal;
+        }
+        &--left {
+            border-style: solid;
+            border-left-width: $border-size-normal;
+        }
+        &--theme {
+            border-color: $brand-theme-main;
+        }
+    }
+}
+.card-link {
+    color: $text-color;
+
+    &:hover {
+        color: $brand-theme-main;
+    }
+}
+/* End Custom Cards */

@@ -1,0 +1,15 @@
+/* Begin Custom Google Maps Styles */
+#google-map, .google-map {
+    margin: 0;
+    padding: 0;
+    width: $google-map-width;
+    height: $google-map-height;
+}
+/* If [device width] is less than or equal to 425px */
+@media (max-width: 425px) { 
+    #google-map, .google-map {
+        height: $google-map-height--sm;
+    }
+}
+/* End Media Queries */
+/* End Custom Google Maps Styles */

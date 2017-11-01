@@ -1,0 +1,23 @@
+/* Begin Custom Link Styles */
+a {
+	color: $text-color;
+	text-decoration: underline;
+
+	&.decoration--never {
+		text-decoration: none!important;	
+	}
+	&:hover, &:active, &:focus {
+		color: $brand-theme-main;
+	}
+	&.highlight--never {
+		&:hover, &:active, &:focus {
+			color: $text-color!important;
+		}
+	}
+	&.highlight--danger {
+		&:hover, &:active, &:focus {
+			color: $color-red-accent!important;
+		}
+	}
+}
+/* End Custom Link Styles */

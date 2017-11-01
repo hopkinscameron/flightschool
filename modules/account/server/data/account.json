@@ -1,0 +1,22 @@
+[
+    {
+        "title": "Edit Profile",
+        "pageLink": "edit"
+    },
+    {
+        "title": "Change Password",
+        "pageLink": "password"
+    },
+    {
+        "title": "Edit Hubs",
+        "pageLink": "hubs"
+    },
+    {
+        "title": "Email and SMS",
+        "pageLink": "notifications"
+    },
+    {
+        "title": "Sign Out",
+        "pageLink": "logout"
+    }
+]
