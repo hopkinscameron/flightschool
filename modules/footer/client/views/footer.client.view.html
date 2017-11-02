@@ -1,52 +1,28 @@
 ﻿<!-- Begin Footer -->
 <section ng-controller="FooterController">
     <!-- Begin Footer Container -->
-    <footer ng-if="$root.showFooter">
+    <footer class="footer-theme-primary" ng-if="$root.showFooter">
         <!-- Begin Container -->
-        <div class="container text-center pt-4 pb-4">
+        <div class="container text-center pt-3 pb-2">
             <!-- Begin Footer Wrapper -->
-            <div class="footer-wrapper pt-3">
-                <!-- Begin Company Details -->
-                <div class="container-fluid footer-content mb-3" ng-if="footer.core.companyDetails">
+            <div class="footer-wrapper">
+                <!-- Begin Navigation -->
+                <div class="container-fluid footer-content mb-3" ng-if="footer.navigation.length > 0">
                     <div class="justify-content-sm-center" ng-class="{'col-md-12 row': $root.isDeviceWidthLargerThan(575)}">
-                        <!-- Begin Address -->
-                        <div class="col-md-4 card card--transparent card--border--none mb-1" ng-class="{'w-100': $root.isDeviceWidthSmallerThan(576), 'card--border--right card--border--theme': $root.isDeviceWidthLargerThan(575) }">
+                        <div class="col-md-4 card card--transparent card--border--none mb-1" ng-class="{'w-100': $root.isDeviceWidthSmallerThan(576)}" ng-repeat="navigation in footer.navigation">
                             <div class="card-body p-0 responsive-text--sm">
-                                <h4 class="card-title highlight-text-foreground">Address</h4>
-                                <p class="card-text">{{footer.core.companyDetails.address}}</p>
+                                <h5 class="card-title font-fancy--2 mb-0">{{navigation.title}}</h5>
+                                <div class="card--border--bottom card--border----quadruple card--border--light-light mt-2 mb-2"></div>
+                                <ul class="list-group">
+                                    <li class="list-group-item list-group-item--transparent pt-1 pb-1" ng-repeat="dropdown in navigation.dropdown">{{dropdown.title}}</li>
+                                </ul>
                             </div>
                         </div>
-                        <!-- End Address -->  
-                        <!-- Begin Contact ->
-                        <div class="col-md-4 card card--transparent card--border--none mb-1" ng-class="{'w-100': $root.isDeviceWidthSmallerThan(576), 'card--border--right card--border--theme': $root.isDeviceWidthLargerThan(575) }">
-                            <div class="card-body p-0 responsive-text--sm">
-                                <h4 class="card-title highlight-text-foreground">Contact</h4>
-                                <p class="card-text mb-1">{{footer.core.companyDetails.contact.phone}}</p>
-                            </div>
-                        </div>
-                        <!-- End Contact -->  
-                        <!-- Begin Hours of Operation -->
-                        <div class="col-md-4 card card--transparent card--border--none mb-1" ng-class="{'w-100': $root.isDeviceWidthSmallerThan(576) }">
-                            <div class="card-body p-0 responsive-text--sm">
-                                <h4 class="card-title highlight-text-foreground">Hours of Operation</h4>
-                                <p class="card-text">{{footer.core.companyDetails.hours}}</p>
-                            </div>
-                        </div>
-                        <!-- End Hours of Operation -->  
                     </div>
                 </div>
-                <!-- End Company Details -->
-                <!-- Begin Social Media -->
-                <div class="container-fluid footer-content mb-3" ng-if="footer.socialMediaLinks">
-                    <span ng-repeat="socialMedia in footer.socialMediaLinks">
-                        <a class="decoration--never d-inline-block" ng-class="{'mr-2': $index != footer.socialMediaLinks.length - 1}" ng-href="{{socialMedia.link}}" target="_blank">
-                            <div class="footer-svg img-zoom--sm" style="background: url({{socialMedia.img}}); background-size: contain; background-position: center center; background-repeat: no-repeat;"></div>
-                        </a>
-                    </span>
-                </div>
-                <!-- End Social Media -->
+                <!-- End Navigation-->
                 <!-- Begin Note -->
-                <div class="container-fluid footer-content">
+                <div class="container-fluid footer-content mt-2">
                     <p class="mb-1 responsive-text--sm">
                         <span ng-bind-html="footer.footerNote | trustHTML"></span>
                     </p>

@@ -1,11 +1,14 @@
 /* Begin Custom Footer Styles */
+.footer-theme-primary {
+    background-color: $brand-theme-main !important;
+    color: $light-light;
+}
 .footer--sticky {
     position: absolute;
     bottom: 0;
     width: 100%;
     height: 60px;
     line-height: 60px;
-    background-color: $light;
 }
 .footer-wrapper {
     border-style: solid;
@@ -14,15 +17,8 @@
     border-top-color: $brand-theme-main;
 }
 .footer-content {
-    color: $text-color;
-    
-    /*
-    & img {
-        height: 30px;
-        width: 30px;
-        border-radius: 2.5px;
-    }
-    */
+    color: $light-light;
+
     & .footer-svg {
         width: 30px;
         height: 30px;

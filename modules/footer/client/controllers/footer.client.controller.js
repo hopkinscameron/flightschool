@@ -4,7 +4,7 @@
 var footerModule = angular.module('footer');
 
 // create the controller
-footerModule.controller('FooterController', ['$scope', '$rootScope', 'CoreFactory', 'FooterFactory', function ($scope, $rootScope, CoreFactory, FooterFactory) {
+footerModule.controller('FooterController', ['$scope', '$rootScope', 'FooterFactory', function ($scope, $rootScope, FooterFactory) {
     // initialize variables
     initializeVariables() ;
 
@@ -33,19 +33,11 @@ footerModule.controller('FooterController', ['$scope', '$rootScope', 'CoreFactor
     function getFooterInformation() {
         // get the footer information
         FooterFactory.getFooterInformation().then(function (responseF) {
-            // get the core information
-            CoreFactory.getCoreInformation().then(function (responseC) {
-                // set the footer
-                $scope.footer = responseF;
-                $scope.footer.core = responseC;
+             // set the footer
+            $scope.footer = responseF;
 
-                // footer refreshed
-                $rootScope.$emit('footerRefreshed', {});
-            })
-            .catch(function (responseC) {
-                // footer refreshed with error
-                $rootScope.$emit('footerRefreshed', {'error': true, 'message': responseC.message});
-            });
+            // footer refreshed
+            $rootScope.$emit('footerRefreshed', {});
         })
         .catch(function (responseF) {
             // footer refreshed with error

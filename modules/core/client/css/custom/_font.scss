@@ -1,7 +1,8 @@
 /* Begin Custom Fonts */
-@import url('https://fonts.googleapis.com/css?family=Pacifico');
-@import url('https://fonts.googleapis.com/css?family=Bree+Serif');
+@import url('https://fonts.googleapis.com/css?family=Marck+Script');
+@import url('https://fonts.googleapis.com/css?family=Audiowide');
 
+/*
 @font-face {
     font-family: 'Pacifico Local';
     src: url(#{$font-path}/Pacifico-Regular.ttf);
@@ -10,13 +11,14 @@
     font-family: 'Bree Serif Local';
     src: url(#{$font-path}/BreeSerif-Regular.ttf);
 }
+*/
 
 .font-fancy {
     &--1 {
-        font-family: 'Pacifico Local', cursive;
+        font-family: 'Marck Script', cursive;
     }
     &--2 {
-        font-family: 'Bree Serif Local', serif;
+        font-family: 'Audiowide', cursive;
     }
 }
 /* End Custom Fonts */

@@ -18,4 +18,12 @@
         }
     }
 }
+.list-group-item--transparent {
+    background-color: transparent;
+    border: $border-size-normal solid transparent;
+    
+    &:hover {
+        background-color: transparent;
+    }
+}
 /* End Custom List Groups */

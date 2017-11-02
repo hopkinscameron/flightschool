@@ -4,7 +4,7 @@
 var homeModule = angular.module('home');
 
 // create the controller
-homeModule.controller('HomeController', ['$scope', '$rootScope', '$compile', '$location', '$timeout', '$window', 'Service', 'ServiceFactory', 'HomeFactory', function ($scope, $rootScope, $compile, $location, $timeout, $window, Service, ServiceFactory, HomeFactory) {
+homeModule.controller('HomeController', ['$scope', '$rootScope', '$compile', '$location', '$timeout', '$window', 'Service', 'HomeFactory', function ($scope, $rootScope, $compile, $location, $timeout, $window, Service, HomeFactory) {
     // determines if a page has already sent a request for load
     var pageRequested = false;
     
@@ -126,15 +126,6 @@ homeModule.controller('HomeController', ['$scope', '$rootScope', '$compile', '$l
             // setup page
             setUpPage();
         });
-
-        // get service type list
-        ServiceFactory.getServiceTypeList().then(function (responseST) {
-            // if returned a valid response
-            if (!responseST.error) {
-                $scope.home.services = responseST;
-            }
-        })
-        .catch(function (responseST) {});
     };
 
     // sets up the page

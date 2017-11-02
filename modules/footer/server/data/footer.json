@@ -3,15 +3,29 @@
     "navigation": [
         {
             "title": "About Us",
-            "pageLink": "about-us"
+            "dropdown": [
+                {
+                    "title": "Who are we?",
+					"pageLink": "about-us"
+                },
+				{
+					"title": "What do we do?",
+					"pageLink": "about-us"
+				}
+			]
         },
         {
-            "title": "Privacy",
-            "pageLink": "privacy"
-        },
-        {
-            "title": "Terms",
-            "pageLink": "terms-and-conditions"
+            "title": "Legal",
+            "dropdown": [
+                {
+                    "title": "Privacy",
+					"pageLink": "privacy"
+                },
+				{
+					"title": "Terms",
+                    "pageLink": "terms-and-conditions"
+				}
+			]
         }
     ]
 }

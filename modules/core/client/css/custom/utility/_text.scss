@@ -72,19 +72,19 @@
 /* If [device width] is less than or equal to 425px */
 @media (max-width: 425px) {
     .responsive-text {
-        &--xs {
+        &--xs:not(.responsive-text--dont-change-size) {
             font-size: $font-size-sm * 0.85 * 0.85;
         }
-        &--sm {
+        &--sm:not(.responsive-text--dont-change-size) {
             font-size: $font-size-sm * 0.85;
         }
-        &--md {
+        &--md:not(.responsive-text--dont-change-size) {
             font-size: $font-size-md * 0.85;
         }
-        &--lg {
+        &--lg:not(.responsive-text--dont-change-size) {
             font-size: $font-size-lg * 0.85;
         }
-        &--xl {
+        &--xl:not(.responsive-text--dont-change-size) {
             font-size: $font-size-xl * 0.85;
         }
     }

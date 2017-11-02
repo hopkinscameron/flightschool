@@ -1,5 +1,5 @@
 {
-    "headliner": "Wander Lust",
+    "headliner": "Bootstrap",
     "headlinerLink": "/",
     "headlinerImage": "",
     "navigation": 
@@ -7,6 +7,10 @@
         {
             "title": "Home",
             "pageLink": ""
+        },
+        {
+            "title": "Home Test",
+            "pageLink": "home-test"
         }
     ],
     "secondaryNavigation": 

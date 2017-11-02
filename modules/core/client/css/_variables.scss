@@ -55,8 +55,8 @@ $loading-bar-height: 5px;
 /* Begin Body Variables */
 $body-top-buffer: 10px;
 $body-padding-top: $navbar-bottom + $loading-bar-height + $body-top-buffer;
-$body-min-height: 200px;
-$body-main-min-height: 200px;
+$body-min-height: 550px;
+$body-main-min-height: 550px;
 /* End Body Variables */
 
 /* Begin Border Sizes Variables */
@@ -227,7 +227,7 @@ $scale--lg: 1.25;
 /* 
     Typography + Links 
 */
-$text-color:              $light-light;
+$text-color:        $dark;
 
 $font-size-base:    18px;
 $font-size-sm:      14px;

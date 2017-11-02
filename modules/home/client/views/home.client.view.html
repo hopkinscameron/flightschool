@@ -13,25 +13,7 @@
         <div id="pageShow" class="animated animation-delay--md fadeIn collapse" ng-if="pageFullyLoaded && !error.error">
             <!-- Begin Content Body -->
             <div class="card card--transparent card--border--none card-body">
-                <!-- Begin Services -->
-                <div id="home-services" class="container-fluid">
-                    <div class="row justify-content-center">
-                        <div class="text-center mb-2 pl-2 pr-2" ng-repeat="type in home.services">
-                            <a ng-href="/services?s={{type.displayName}}" class="decoration--never"><img class="card-img-top img-round--circle img-border-size img-border-size--md img-border-color--theme img-service-type" ng-src="{{type.img}}"></a>
-                            <p class="mt-2 mb-0 fancy-font--2 font-weight-bold text-uppercase" ng-class="{'h4': $root.isDeviceWidthLargerThan(575), 'h6': $root.isDeviceWidthSmallerThan(576)}">{{type.displayName}}</p>
-                        </div>
-                    </div>
-                </div>
-                <!-- End Services -->
-                <!-- Begin Image Slider -->
-                <div id="home-slider" class="carousel slide mt-3" data-ride="carousel">
-                    <div class="carousel-inner text-center">
-                        <div id="{{$index}}" class="carousel-item" ng-class="{'active': $index == 0}" ng-repeat="img in home.slider track by $index">
-                            <img class="img-slider" ng-src="{{img}}">
-                        </div>
-                    </div>
-                </div>
-                <!-- End Image Slider -->
+                
             </div>
             <!-- End Content Body -->
         </div>
