@@ -27,9 +27,9 @@ module.exports = function (app) {
 
     // GET gets core information
 	// format /api/core
-    app.route('/api/core').post(ipLogger.log, coreController.getCoreData);
+    app.route('/api/core').post([ipLogger.log, coreController.readDB], coreController.getCoreData);
 
     // POST shortens the url
     // format /api/shortenUrl
-    app.route('/api/shortenUrl').post([ipLogger.log, corePolicy.isAllowed], coreController.shortenUrl);
+    app.route('/api/shortenUrl').post([corePolicy.isAllowed, ipLogger.log], coreController.shortenUrl);
 };

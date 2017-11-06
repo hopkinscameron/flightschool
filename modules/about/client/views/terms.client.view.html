@@ -1,0 +1,28 @@
+<!-- Begin Terms and Conditions Page -->
+<section ng-controller="TermsController">
+    <!-- Begin Container -->
+    <div class="container">
+        <!-- Begin Page Fully Loaded With Errors -->
+        <div id="pageShow" class="collapse" ng-if="pageFullyLoaded && error.error">
+            <div ng-controller="ErrorController" ng-init="init(error.title, error.status, error.message)">
+                <div ng-include="'/modules/core/client/views/error.client.view.html'"></div>
+            </div>
+        </div>
+        <!-- End Page Fully Loaded With Errors -->
+        <!-- Begin Page Fully Loaded With No Errors -->
+        <div id="pageShow" class="animated animation-delay--md fadeIn collapse" ng-if="pageFullyLoaded && !error.error">
+            <!-- Begin Content Body -->
+            <div class="card card--transparent card--border--none card-body">
+                <!-- Begin Body -->
+                <div id="terms-body" class="col-md-6" ng-style="animationStyle" style="visibility: hidden;">
+                    Here's the terms and conditions
+                </div>
+                <!-- End Body -->
+            </div>
+            <!-- End Content Body -->
+        </div>
+        <!-- End Page Fully Loaded With No Errors -->
+    </div>
+    <!-- End Container -->
+</section>
+<!-- End Terms and Conditions Page -->

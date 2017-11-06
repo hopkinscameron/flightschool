@@ -13,16 +13,32 @@ body {
   	image-rendering: crisp-edges;
   	image-rendering: optimizeSpeed;
   	image-rendering: optimize-contrast;
-    background-image: url('/modules/core/client/img/background/background.png'); /* '/dist/img/background.png' */
+    background-image: url('/modules/core/client/img/background/background.png');  /*'/dist/img/background.png' */
     background-position: center top;
     background-attachment: fixed;
-    background-position-y: 76px;
+    background-position-y: $navbar-bottom;
     margin: 0;
 	padding: 0;
 	border: 0;
     padding-top: $body-padding-top; 
     min-height: $body-min-height;
 
+    &::after {
+        content: "";
+        background-color: $light-light;
+        min-height: $body-min-height;
+        background-repeat: repeat;
+        background-image: url('/modules/core/client/img/background/background-overlay.png'); 
+        background-position: center top;
+        background-position-y: $navbar-bottom;
+        opacity: 0;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        position: absolute;
+        z-index: -1;   
+    }
     & > #main {
         min-height: $body-main-min-height;
     }
@@ -37,7 +53,7 @@ body {
     }
 }
 .body-error {
-    background-color: $brand-theme-main;
+    background-color: $light-light;
     background-image: url('');
 }
 body {

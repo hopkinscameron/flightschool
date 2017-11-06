@@ -9,5 +9,5 @@ var // the footer controller to handle routes
 module.exports = function (app) {
     // GET gets footer information
 	// format /api/footer
-    app.route('/api/footer').get(footerController.read);
+    app.route('/api/footer').get(footerController.readDB, footerController.read);
 };

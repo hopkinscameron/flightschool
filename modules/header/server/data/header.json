@@ -7,10 +7,6 @@
         {
             "title": "Home",
             "pageLink": ""
-        },
-        {
-            "title": "Home Test",
-            "pageLink": "home-test"
         }
     ],
     "secondaryNavigation": 

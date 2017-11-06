@@ -9,12 +9,12 @@
                 <!-- Begin Navigation -->
                 <div class="container-fluid footer-content mb-3" ng-if="footer.navigation.length > 0">
                     <div class="justify-content-sm-center" ng-class="{'col-md-12 row': $root.isDeviceWidthLargerThan(575)}">
-                        <div class="col-md-4 card card--transparent card--border--none mb-1" ng-class="{'w-100': $root.isDeviceWidthSmallerThan(576)}" ng-repeat="navigation in footer.navigation">
+                        <div class="col-md-3 card card--transparent card--border--none mb-1" ng-class="{'w-100': $root.isDeviceWidthSmallerThan(576)}" ng-repeat="navigation in footer.navigation">
                             <div class="card-body p-0 responsive-text--sm">
                                 <h5 class="card-title font-fancy--2 mb-0">{{navigation.title}}</h5>
                                 <div class="card--border--bottom card--border----quadruple card--border--light-light mt-2 mb-2"></div>
                                 <ul class="list-group">
-                                    <li class="list-group-item list-group-item--transparent pt-1 pb-1" ng-repeat="dropdown in navigation.dropdown">{{dropdown.title}}</li>
+                                    <li class="list-group-item list-group-item--transparent pt-1 pb-1" ng-repeat="dropdown in navigation.dropdown"><a class="decoration--never" ng-href="{{dropdown.pageLink}}" target="{{dropdown.openNewTab ? '_blank' : '_self'}}">{{dropdown.title}}</a></li>
                                 </ul>
                             </div>
                         </div>

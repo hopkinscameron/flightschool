@@ -51,6 +51,11 @@
             border-width: $border-size-quadruple * 4;
         }
     }
+    &--radius{
+        &--none {
+            border-radius: 0;
+        }
+    }
 }
 .card-link {
     color: $text-color;

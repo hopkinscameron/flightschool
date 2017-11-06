@@ -386,18 +386,30 @@ exports.readDB = function (dbPath, callback) {
     // the error to return
     var err = null;
 
-    try {
-        // read the db
-        db = require(dbPath);
-    }
-    catch (e) {
-        err = e;
-    }
+    // read db
+    fs.readFile(dbPath, 'utf8', (err, data) => {
+        // if error occurred
+        if (err) {
+            // if callback
+            if(callback) {
+                callback(err, db);
+            }
+        }
+        else {
+            try {
+                // read db
+                db = JSON.parse(data);
+            }
+            catch (e) {
+                err = e;
+            }
 
-    // if callback
-    if(callback) {
-        callback(err, db);
-    }
+            // if callback
+            if(callback) {
+                callback(err, db);
+            }
+        }
+    });
 };
 
 /**
@@ -408,6 +420,7 @@ exports.updateDB = function(dbPath, dbData, callback) {
     var err = null;
 
     try {
+        // write to the file
         fs.writeFileSync(dbPath, JSON.stringify(dbData), 'utf8');
     }
     catch (e) {

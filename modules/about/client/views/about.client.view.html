@@ -1,4 +1,4 @@
-<!-- Begin About Me Page -->
+<!-- Begin About Page -->
 <section ng-controller="AboutController">
     <!-- Begin Container -->
     <div class="container">
@@ -12,12 +12,37 @@
         <!-- Begin Page Fully Loaded With No Errors -->
         <div id="pageShow" class="animated animation-delay--md fadeIn collapse" ng-if="pageFullyLoaded && !error.error">
             <!-- Begin Content Body -->
-            <div class="card card--transparent card--border--none card-body">
-                <!-- Begin Bio -->
-                <div id="about-bio" class="col-md-6" ng-style="animationStyle" style="visibility: hidden;">
-                    Here's a bio about the company
+            <div class="card card--border--none card--radius--none card-body box-shadow--sm">
+                <!-- Begin Who -->
+                <div id="about-who" class="col-md-6" ng-style="animationStyle" style="visibility: hidden;">
+                    <h3 class="text-uppercase font-weight-bold highlight-text-foreground font-fancy--2">Who</h3>
+                    <p class="pl-3">{{about.who}}</p>
                 </div>
-                <!-- End Bio -->
+                <!-- End Who -->
+                <!-- Begin What -->
+                <div id="about-what" class="col-md-6" ng-style="animationStyle" style="visibility: hidden;">
+                    <h3 class="text-uppercase font-weight-bold highlight-text-foreground font-fancy--2">What</h3>
+                    <p class="pl-3">{{about.what}}</p>
+                </div>
+                <!-- End What -->
+                <!-- Begin When -->
+                <div id="about-when" class="col-md-6" ng-style="animationStyle" style="visibility: hidden;">
+                    <h3 class="text-uppercase font-weight-bold highlight-text-foreground font-fancy--2">When</h3>
+                    <p class="pl-3">{{about.when}}</p>
+                </div>
+                <!-- End When -->
+                <!-- Begin Where -->
+                <div id="about-where" class="col-md-6" ng-style="animationStyle" style="visibility: hidden;">
+                    <h3 class="text-uppercase font-weight-bold highlight-text-foreground font-fancy--2">Where</h3>
+                    <p class="pl-3">{{about.where}}</p>
+                </div>
+                <!-- End Where -->
+                <!-- Begin Why -->
+                <div id="about-why" class="col-md-6" ng-style="animationStyle" style="visibility: hidden;">
+                    <h3 class="text-uppercase font-weight-bold highlight-text-foreground font-fancy--2">Why</h3>
+                    <p class="pl-3">{{about.why}}</p>
+                </div>
+                <!-- End Why -->
             </div>
             <!-- End Content Body -->
         </div>
@@ -25,4 +50,4 @@
     </div>
     <!-- End Container -->
 </section>
-<!-- End About Me Page -->
+<!-- End About Page -->

@@ -15,5 +15,5 @@ var // the path
 module.exports = function (app) {
     // GET gets trips navigation
 	// format /api/trips
-    app.route('/api/trips').get([tripsPolicy.isAllowed, ipLogger.log], tripsController.read);
+    app.route('/api/trips').get([tripsPolicy.isAllowed, ipLogger.log, tripsController.readDB], tripsController.read);
 };

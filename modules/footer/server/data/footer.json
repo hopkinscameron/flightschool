@@ -5,13 +5,9 @@
             "title": "About Us",
             "dropdown": [
                 {
-                    "title": "Who are we?",
-					"pageLink": "about-us"
-                },
-				{
-					"title": "What do we do?",
-					"pageLink": "about-us"
-				}
+                    "title": "Who are we? What do we do?",
+					"pageLink": "about"
+                }
 			]
         },
         {
@@ -19,11 +15,39 @@
             "dropdown": [
                 {
                     "title": "Privacy",
-					"pageLink": "privacy"
+					"pageLink": "about/privacy"
                 },
 				{
 					"title": "Terms",
-                    "pageLink": "terms-and-conditions"
+                    "pageLink": "about/terms-and-conditions"
+				}
+			]
+        },
+        {
+            "title": "Support",
+            "dropdown": [
+                {
+                    "title": "FAQ",
+					"pageLink": "support/faq"
+                },
+				{
+					"title": "Contact",
+                    "pageLink": "support/contact"
+				}
+			]
+        },
+        {
+            "title": "Social Life",
+            "dropdown": [
+                {
+                    "title": "Twitter",
+                    "pageLink": "https://twitter.com/",
+                    "openNewTab": true
+                },
+				{
+					"title": "YouTube",
+                    "pageLink": "https://www.youtube.com/",
+                    "openNewTab": true
 				}
 			]
         }

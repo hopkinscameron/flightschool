@@ -1,10 +1,10 @@
 ﻿'use strict';
 
 // set up the module
-var aboutModule = angular.module('about');
+var tripsModule = angular.module('trips');
 
 // create the controller
-aboutModule.controller('AboutController', ['$scope', '$rootScope', '$compile', '$location', '$window', '$timeout', 'Service', 'AboutFactory', function ($scope, $rootScope, $compile, $location, $window, $timeout, Service, AboutFactory) {
+tripsModule.controller('TripsController', ['$scope', '$rootScope', '$compile', '$location', '$window', '$timeout', 'Service', 'TripsFactory', function ($scope, $rootScope, $compile, $location, $window, $timeout, Service, TripsFactory) {
     // determines if a page has already sent a request for load
     var pageRequested = false;
 
@@ -88,19 +88,19 @@ aboutModule.controller('AboutController', ['$scope', '$rootScope', '$compile', '
 
     // gets the page data
     function getPageData() {
-        // get about us page data
-        AboutFactory.getAboutUsPageInformation().then(function (responseAU) {
+        // get trips us page data
+        TripsFactory.getTripsUsPageInformation().then(function (responseAU) {
             // if returned a valid response
             if (!responseAU.error) {
                 // set the data
-                $scope.about = responseAU;
-                $scope.about.title = 'About Us';
+                $scope.trips = responseAU;
+                $scope.trips.title = 'Trips Us';
 
                 // holds the animation time
                 $scope.animationStyle = $rootScope.$root.getAnimationDelay();
 
                 // holds the page title
-                $scope.pageTitle = $scope.about.title + ' | ' + ApplicationConfiguration.applicationName;
+                $scope.pageTitle = $scope.trips.title + ' | ' + ApplicationConfiguration.applicationName;
                 
                 // setup page
                 setUpPage();
@@ -167,7 +167,7 @@ aboutModule.controller('AboutController', ['$scope', '$rootScope', '$compile', '
 
         // initialize the waypoint list
         var waypointList = [
-            { id: 'about-bio', offset: startOffset, class: 'animated fadeIn' }
+            { id: 'trips-bio', offset: startOffset, class: 'animated fadeIn' }
         ];
 
         // set up waypoints

@@ -1,24 +1,21 @@
 ﻿In Progress
 
-
 Next
 - create each module necessary
-- make an admin folder and move dashboard under that
 - add an "error dashboard" so if there are errors in server, we can view them
-- read from DB always instead of reading only on start of server
-- make sure all authenticated routes get authenticated before logging
 - add roles to user
+- if I have the html editor up on page load, and I exit out, I can't get the other content to show
 
 Future
 
 Done
+
 
 Testing
 
 Browser Fixes
 
 Mobile Fixes
-
 
 Ideas
 - make login a popup from the top (like southwest.com)

@@ -30,7 +30,7 @@ nav {
     & .navbar-nav .nav-link {
         color: $light;
 
-        &.active {
+        &.active, :hover {
             color: $light-light !important;
         }
     }

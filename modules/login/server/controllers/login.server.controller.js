@@ -70,7 +70,7 @@ exports.signUp = function (req, res, next) {
         else {
             // authenticate the user with a signup
             passport.authenticate('local-signup', { successRedirect : '/about', failureRedirect : '/login', failureFlash : true }, function (err, user) {
-                // if error
+                // if error occurred
                 if(err) {
                     // send internal error
                     res.status(500).send({ error: true, title: errorHandler.getErrorTitle(err), message: errorHandler.getGenericErrorMessage(err) });
@@ -96,7 +96,7 @@ exports.signUp = function (req, res, next) {
 exports.login = function (req, res, next) {
     // authenticate user login
     passport.authenticate('local-login', function (err, user, info) {
-        // if error
+        // if error occurred
         if(err) {
             // send internal error
             res.status(500).send({ error: true, title: errorHandler.getErrorTitle(err), message: errorHandler.getGenericErrorMessage(err) });
@@ -153,7 +153,7 @@ exports.changePassword = function (req, res, next) {
 
         // update user
         User.update(user, updatedValues, function(err, updatedUser) {
-            // if error occurred
+            // if error occurred occurred
             if (err) {
                 // send internal error
                 res.status(500).send({ error: true, title: errorHandler.getErrorTitle(err), message: errorHandler.getGenericErrorMessage(err) });
@@ -214,7 +214,7 @@ exports.userById = function (req, res, next, id) {
 
                 // find user based on id
                 User.findOne({ 'username': id }, function(err, foundUser) {
-                    // if error occurred
+                    // if error occurred occurred
                     if (err) {
                         // return error
                         return next(err);
@@ -223,7 +223,7 @@ exports.userById = function (req, res, next, id) {
                     else if(foundUser) {
                         // compare equality
                         foundUser.comparePassword(req.body.oldpassword, function(err, isMatch) {
-                            // if error occurred
+                            // if error occurred occurred
                             if (err) {
                                 // send internal error
                                 res.status(500).send({ error: true, title: errorHandler.getErrorTitle(err), message: errorHandler.getGenericErrorMessage(err) });

@@ -1,0 +1,28 @@
+{
+	"headliner": "Wander Lust",
+	"headlinerLink": "/",
+	"headlinerImage": "",
+	"navigation": [
+        {
+            "title": "Home",
+            "pageLink": ""
+        }
+	],
+    "secondaryNavigation": 
+    [
+        {
+			"title": "Admin",
+			"pageLink": "admin",
+			"dropdown": [
+                {
+					"title": "Dashboard",
+					"pageLink": "dashboard"
+                },
+				{
+					"title": "Sign Out",
+					"pageLink": "logout"
+				}
+			]
+		}
+    ]
+}

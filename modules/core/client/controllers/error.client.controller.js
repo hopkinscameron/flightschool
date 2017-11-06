@@ -20,9 +20,9 @@ coreModule.controller('ErrorController', ['$scope', '$compile', '$route', 'Servi
     initialize(title, $scope.status, $scope.message);
 
     // initialization of controller
-    $scope.init = function(title, status, message)
+    $scope.init = function(t, s, m)
     {
-        initialize(title, status, message);
+        initialize(t ? t : title, s ? s : status, m ? m : message);
     };
 
     // on the destruction of the controller

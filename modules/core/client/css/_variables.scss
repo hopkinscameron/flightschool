@@ -54,9 +54,9 @@ $loading-bar-height: 5px;
 
 /* Begin Body Variables */
 $body-top-buffer: 10px;
-$body-padding-top: $navbar-bottom + $loading-bar-height + $body-top-buffer;
-$body-min-height: 550px;
-$body-main-min-height: 550px;
+$body-padding-top: $navbar-bottom; /* + $loading-bar-height + $body-top-buffer;*/
+$body-min-height: 501px;
+$body-main-min-height: 501px;
 /* End Body Variables */
 
 /* Begin Border Sizes Variables */
@@ -88,7 +88,7 @@ $box-shadow-xl: 75px;
 /* Begin Colors */
 $brand-theme-main: #0076FF;
 $brand-theme-secondary: #FFFFFF;
-$brand-theme-main-rgb: 41, 168, 214;
+$brand-theme-main-rgb: 0, 118, 255;
 
 $color-blue:       #346094;
 $color-blue-muted: #6aa2b7;

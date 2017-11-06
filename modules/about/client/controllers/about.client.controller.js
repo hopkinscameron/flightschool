@@ -167,7 +167,11 @@ aboutModule.controller('AboutController', ['$scope', '$rootScope', '$compile', '
 
         // initialize the waypoint list
         var waypointList = [
-            { id: 'about-bio', offset: startOffset, class: 'animated fadeIn' }
+            { id: 'about-who', offset: startOffset, class: 'animated fadeIn' },
+            { id: 'about-what', offset: startOffset, class: 'animated fadeIn' },
+            { id: 'about-when', offset: startOffset, class: 'animated fadeIn' },
+            { id: 'about-where', offset: startOffset, class: 'animated fadeIn' },
+            { id: 'about-why', offset: startOffset, class: 'animated fadeIn' }
         ];
 
         // set up waypoints

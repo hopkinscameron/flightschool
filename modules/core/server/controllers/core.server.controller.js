@@ -8,12 +8,16 @@ var // the path
     errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller')),
     // chalk for console logging
     clc = require(path.resolve('./config/lib/clc')),
+    // the file system reader
+    fs = require('fs'),
     // the ability to create requests/promises
     requestPromise = require('request-promise'),
     // for validators and sanitizers
     validator = require('validator'),
+    // the path to the file details for this view
+    coreDetailsPath = path.join(__dirname, '../data/core.json'),
     // the file details for this view
-    coreDetails = require('../data/core');
+    coreDetails = {};
 
 /**
  * Render the main application page
@@ -152,4 +156,46 @@ exports.shortenUrl = function (req, res) {
 exports.testBasicHelloWorld = function (req, res) {
     res.writeHead(200, {"Content-Type": "text/plain"});
     res.end("Hello World!");
+};
+
+/**
+ * Read the DB middleware
+ */
+exports.readDB = function (req, res, next) {
+    // check if file exists
+    fs.exists(coreDetailsPath, (exists) => {
+        // if the file exists
+        if(exists) {
+            // read content
+            fs.readFile(coreDetailsPath, 'utf8', (err, data) => {
+                // if error occurred
+                if (err) {
+                    // send internal error
+                    res.status(500).send({ error: true, title: errorHandler.getErrorTitle(err), message: errorHandler.getGenericErrorMessage(err) });
+                    console.log(clc.error(errorHandler.getDetailedErrorMessage(err)));
+                }
+                else {
+                    try {
+                        // read content
+                        coreDetails = JSON.parse(data);
+
+                        // go to next
+                        next();
+                    }
+                    catch (e) {
+                        // set error
+                        err = e;
+
+                        // send internal error
+                        res.status(500).send({ error: true, title: errorHandler.getErrorTitle(err), message: errorHandler.getGenericErrorMessage(err) });
+                        console.log(clc.error(errorHandler.getDetailedErrorMessage(err)));
+                    }
+                }
+            });
+        }
+        else {
+            // reinitialize
+            coreDetails = {};
+        }
+    });
 };
