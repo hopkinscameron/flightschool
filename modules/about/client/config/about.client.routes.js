@@ -10,10 +10,10 @@ aboutRoutesModule.config(['$routeProvider', function($routeProvider) {
         .when('/about', {
             templateUrl: '/modules/about/client/views/about.client.view.html'
         })
-        .when('/about/privacy', {
+        .when('/about/legal/privacy', {
             templateUrl: '/modules/about/client/views/privacy.client.view.html'
         })
-        .when('/about/terms-and-conditions', {
+        .when('/about/legal/terms-and-conditions', {
             templateUrl: '/modules/about/client/views/terms.client.view.html'
         })
 }]);

@@ -89,41 +89,46 @@ supportModule.controller('FAQController', ['$scope', '$rootScope', '$compile', '
     // gets the page data
     function getPageData() {
         // get support page data
-        SupportFactory.getFAQPageInformation().then(function (responseS) {
+        SupportFactory.getFAQPageInformation().then(function (responseF) {
             // if returned a valid response
-            if (!responseS.error) {
+            if (!responseF.error) {
                 // set the data
-                $scope.support = responseS;
-                $scope.support.title = 'FAQ';
+                $scope.faq = responseF;
+                $scope.faq.title = 'FAQ';
 
                 // holds the animation time
                 $scope.animationStyle = $rootScope.$root.getAnimationDelay();
 
                 // holds the page title
-                $scope.pageTitle = $scope.support.title + ' | ' + ApplicationConfiguration.applicationName;
+                $scope.pageTitle = $scope.faq.title + ' | ' + ApplicationConfiguration.applicationName;
+
+                // go through all faq's and add an open/close attribute
+                _.forEach($scope.faq.faqs, function(value) {
+                    value.open = true;
+                });
                 
                 // setup page
                 setUpPage();
             }
             else {
                 // set error
-                $scope.pageTitle = responseS.title;
+                $scope.pageTitle = responseF.title;
                 $scope.error.error = true;
-                $scope.error.title = responseS.title;
-                $scope.error.status = responseS.status;
-                $scope.error.message = responseS.message;
+                $scope.error.title = responseF.title;
+                $scope.error.status = responseF.status;
+                $scope.error.message = responseF.message;
 
                 // setup page
                 setUpPage();
             }
         })
-        .catch(function (responseS) {
+        .catch(function (responseF) {
             // set error
-            $scope.pageTitle = responseS.title;
+            $scope.pageTitle = responseF.title;
             $scope.error.error = true;
-            $scope.error.title = responseS.title;
-            $scope.error.status = responseS.status;
-            $scope.error.message = responseS.message;
+            $scope.error.title = responseF.title;
+            $scope.error.status = responseF.status;
+            $scope.error.message = responseF.message;
 
             // setup page
             setUpPage();
@@ -166,9 +171,12 @@ supportModule.controller('FAQController', ['$scope', '$rootScope', '$compile', '
         var startOffset = $rootScope.$root.getWaypointStart();
 
         // initialize the waypoint list
-        var waypointList = [
-            { id: 'faq-list', offset: startOffset, class: 'animated fadeIn' }
-        ];
+        var waypointList = [];
+
+        // go through all faq's and add an open/close attribute
+        for(var x = 0; x < $scope.faq.faqs.length; x++) {
+            waypointList.push({ id: 'faq-list-item-' + x, offset: startOffset, class: 'animated fadeInUp' })
+        };
 
         // set up waypoints
         $rootScope.$root.setUpWaypoints(waypointList);

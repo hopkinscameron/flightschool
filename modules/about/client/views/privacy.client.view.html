@@ -12,10 +12,12 @@
         <!-- Begin Page Fully Loaded With No Errors -->
         <div id="pageShow" class="animated animation-delay--md fadeIn collapse" ng-if="pageFullyLoaded && !error.error">
             <!-- Begin Content Body -->
-            <div class="card card--transparent card--border--none card-body">
+            <div class="card card--border--none card--radius--none card-body box-shadow--sm">
                 <!-- Begin Body -->
-                <div id="privacy-body" class="col-md-6" ng-style="animationStyle" style="visibility: hidden;">
-                    Here's the privacy stuff
+                <div id="privacy-body" class="col-md-12" ng-style="animationStyle" style="visibility: hidden;">
+                    <h2 class="pt-3 pb-3 mb-0 font-weight-bold">Privacy Policy</h2>
+                    <p class="text-right">Effective as of: {{privacy.effectiveDate}}</p>
+                    <span ng-bind-html="privacy.body | trustHTML"></span>
                 </div>
                 <!-- End Body -->
             </div>

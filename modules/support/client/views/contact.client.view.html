@@ -12,10 +12,17 @@
         <!-- Begin Page Fully Loaded With No Errors -->
         <div id="pageShow" class="animated animation-delay--md fadeIn collapse" ng-if="pageFullyLoaded && !error.error">
             <!-- Begin Content Body -->
-            <div class="card card--transparent card--border--none card-body">
+            <div class="card card--border--none card--radius--none card-body box-shadow--sm">
                 <!-- Begin Body -->
-                <div id="contact-body" class="col-md-6" ng-style="animationStyle" style="visibility: hidden;">
+                <div id="contact-body" class="col-md-12" ng-style="animationStyle" style="visibility: hidden;">
                     If you don’t find your question answered on our <a href="/about/faq">FAQ page</a>, or if you have suggestions or feedback, please contact us by e-mail (support@wanderlust.com). We will answer your question as soon as possible.
+                </div>
+                <!-- End Body -->
+                <!-- Begin Body -->
+                <div id="contact-customer-service" class="col-md-12 text-center mt-3" ng-style="animationStyle" style="visibility: hidden;">
+                    <i class="fa fa-headphones fa-3x" aria-hidden="true"></i>
+                    <p class="mb-1">Need some help?</p>
+                    <button class="btn btn-theme-primary" style="cursor: pointer;" ng-click="showPhoneNumber()">Contact Us Directly</button>
                 </div>
                 <!-- End Body -->
             </div>

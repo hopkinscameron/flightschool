@@ -12,10 +12,12 @@
         <!-- Begin Page Fully Loaded With No Errors -->
         <div id="pageShow" class="animated animation-delay--md fadeIn collapse" ng-if="pageFullyLoaded && !error.error">
             <!-- Begin Content Body -->
-            <div class="card card--transparent card--border--none card-body">
+            <div class="card card--border--none card--radius--none card-body box-shadow--sm">
                 <!-- Begin FAQ List -->
-                <div id="faq-list" class="col-md-6" ng-style="animationStyle" style="visibility: hidden;">
-                    Here's a list of faq's
+                <div id="faq-list-item-{{$index}}" class="col-md-12" ng-style="animationStyle" style="visibility: hidden;" ng-repeat="faq in faq.faqs">
+                    <h5 style="cursor: pointer;" class="font-weight-bold" ng-click="faq.open = !faq.open">{{faq.q}}</h5>
+                    <i class="fa" ng-class="{'fa-caret-up': faq.open, 'fa-caret-down': !faq.open}" aria-hidden="true" style="cursor: pointer; position: absolute; right: 20px; top: 3px;" ng-click="faq.open = !faq.open"></i>
+                    <p class="pl-3 pr-3" ng-hide="!faq.open">{{faq.a}}</p>
                 </div>
                 <!-- End FAQ List -->
             </div>

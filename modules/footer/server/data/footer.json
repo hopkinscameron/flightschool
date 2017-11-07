@@ -15,11 +15,11 @@
             "dropdown": [
                 {
                     "title": "Privacy",
-					"pageLink": "about/privacy"
+					"pageLink": "about/legal/privacy"
                 },
 				{
 					"title": "Terms",
-                    "pageLink": "about/terms-and-conditions"
+                    "pageLink": "about/legal/terms-and-conditions"
 				}
 			]
         },

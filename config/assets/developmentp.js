@@ -12,7 +12,8 @@ module.exports = {
                 'public/lib/font-awesome/font-awesome.min.css',
                 'public/lib/ng-dialog/ngDialog-theme-default.min.css',
                 'public/lib/ng-dialog/ngDialog-theme-plain.min.css',
-                'public/lib/ng-dialog/ngDialog.min.css'
+                'public/lib/ng-dialog/ngDialog.min.css',
+                'public/lib/sweet-alert-2/sweetalert2.min.css'
                 // endbower
             ],
             js: [
@@ -36,8 +37,8 @@ module.exports = {
                 'public/lib/chart.js/Chart.bundle.min.js',
                 'public/lib/angular-chart/angular-chart.min.js',
                 'public/lib/lodash/lodash.min.js',
-                'public/lib/waypoints/jquery.waypoints.min.js'
-                //, 'public/lib/waypoints/noframework.waypoints.min.js'
+                'public/lib/waypoints/jquery.waypoints.min.js',
+                'public/lib/sweet-alert-2/sweetalert2.min.js'
                 // endbower
             ]
         },

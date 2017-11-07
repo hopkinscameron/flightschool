@@ -12,10 +12,83 @@
         <!-- Begin Page Fully Loaded With No Errors -->
         <div id="pageShow" class="animated animation-delay--md fadeIn collapse" ng-if="pageFullyLoaded && !error.error">
             <!-- Begin Content Body -->
-            <div class="card card--transparent card--border--none card-body">
+            <div class="card card--border--none card--radius--none card-body box-shadow--sm">
                 <!-- Begin Body -->
-                <div id="terms-body" class="col-md-6" ng-style="animationStyle" style="visibility: hidden;">
-                    Here's the terms and conditions
+                <div id="terms-body" class="col-md-12" ng-style="animationStyle" style="visibility: hidden;">
+                    <h2 class="pt-3 pb-3 mb-0 font-weight-bold">Terms of Use</h2>
+                    <p class="text-right">Effective as of: {{terms.effectiveDate}}</p>
+                    <!-- Begin Terms of Use -->
+                    <div>
+                        <!-- Begin About -->
+                        <h3 class="text-uppercase font-weight-bold">{{terms.about.title}}</h3>
+                        <span ng-bind-html="terms.about.body | trustHTML"></span>
+                        <!-- End About -->
+                        <!-- Begin Using -->
+                        <h3 class="text-uppercase font-weight-bold">{{terms.using.title}}</h3>
+                        <span ng-bind-html="terms.using.body | trustHTML"></span>
+                        <!-- End Using -->
+                        <!-- Begin Credit Policy -->
+                        <h3 class="text-uppercase font-weight-bold">{{terms.credit.title}}</h3>
+                        <span ng-bind-html="terms.credit.body | trustHTML"></span>
+                        <!-- End Credit Policy -->
+                        <!-- Begin Materials -->
+                        <h3 class="text-uppercase font-weight-bold">{{terms.materials.title}}</h3>
+                        <span ng-bind-html="terms.materials.body | trustHTML"></span>
+                        <!-- End Materials -->
+                        <!-- Begin Content and Conduct -->
+                        <h3 class="text-uppercase font-weight-bold">{{terms.conduct.title}}</h3>
+                        <span ng-bind-html="terms.conduct.body | trustHTML"></span>
+                        <!-- End Content and Conduct -->
+                        <!-- Begin Alerts -->
+                        <h3 class="text-uppercase font-weight-bold">{{terms.alerts.title}}</h3>
+                        <span ng-bind-html="terms.alerts.body | trustHTML"></span>
+                        <!-- End Alerts -->
+                        <!-- Begin Disclaimer -->
+                        <h3 class="text-uppercase font-weight-bold">{{terms.disclaimer.title}}</h3>
+                        <span ng-bind-html="terms.disclaimer.body | trustHTML"></span>
+                        <!-- End Disclaimer -->
+                        <!-- Begin Limitation of Liability -->
+                        <h3 class="text-uppercase font-weight-bold">{{terms.liability.title}}</h3>
+                        <span ng-bind-html="terms.liability.body | trustHTML"></span>
+                        <!-- End Limitation of Liability -->
+                        <!-- Begin Third Party Links -->
+                        <h3 class="text-uppercase font-weight-bold">{{terms.thirdPartyLinks.title}}</h3>
+                        <span ng-bind-html="terms.thirdPartyLinks.body | trustHTML"></span>
+                        <!-- End Third Party Links -->
+                        <!-- Begin Additional Terms -->
+                        <h3 class="text-uppercase font-weight-bold">{{terms.additionalTerms.title}}</h3>
+                        <span ng-bind-html="terms.additionalTerms.body | trustHTML"></span>
+                        <!-- End Additional Terms -->
+                        <!-- Begin Privacy Policy -->
+                        <h3 class="text-uppercase font-weight-bold">{{terms.privacyPolicy.title}}</h3>
+                        <span ng-bind-html="terms.privacyPolicy.body | trustHTML"></span>
+                        <!-- End Privacy Policy -->
+                        <!-- Begin Copyright Policy -->
+                        <h3 class="text-uppercase font-weight-bold">{{terms.copyright.title}}</h3>
+                        <span ng-bind-html="terms.copyright.body | trustHTML"></span>
+                        <!-- End Copyright Policy -->
+                        <!-- Begin Vialoations -->
+                        <h3 class="text-uppercase font-weight-bold">{{terms.violation.title}}</h3>
+                        <span ng-bind-html="terms.violation.body | trustHTML"></span>
+                        <!-- End Vialoations -->
+                        <!-- Begin Changes -->
+                        <h3 class="text-uppercase font-weight-bold">{{terms.changes.title}}</h3>
+                        <span ng-bind-html="terms.changes.body | trustHTML"></span>
+                        <!-- End Changes -->
+                        <!-- Begin Governing Law -->
+                        <h3 class="text-uppercase font-weight-bold">{{terms.governing.title}}</h3>
+                        <span ng-bind-html="terms.governing.body | trustHTML"></span>
+                        <!-- End Governing Law -->
+                        <!-- Begin Dispute Resolution -->
+                        <h3 class="text-uppercase font-weight-bold">{{terms.dispute.title}}</h3>
+                        <span ng-bind-html="terms.dispute.body | trustHTML"></span>
+                        <!-- End Dispute Resolution -->
+                        <!-- Begin Waiver and Servability -->
+                        <h3 class="text-uppercase font-weight-bold">{{terms.waiver.title}}</h3>
+                        <span ng-bind-html="terms.waiver.body | trustHTML"></span>
+                        <!-- End Waiver and Servability -->
+                    </div>
+                    <!-- End Terms of Use -->
                 </div>
                 <!-- End Body -->
             </div>

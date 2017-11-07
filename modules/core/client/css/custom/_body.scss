@@ -7,7 +7,13 @@ html, body {
 body {
 	font-family: 'Trebuchet MS', sans-serif;
     color: $text-color;
-	background-repeat: repeat;
+    background-repeat: repeat;
+    /*
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    */
     background-color: $light-light;
 	image-rendering: auto;
   	image-rendering: crisp-edges;
@@ -68,7 +74,7 @@ body {
 	}
 	&::-webkit-scrollbar-thumb
 	{
-		background-color: $brand-theme-main;
+		background-color: lighten($brand-theme-main, 15%);
 	}
 }
 /* End Custom Body Styles */

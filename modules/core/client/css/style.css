@@ -110,6 +110,12 @@ body {
   font-family: 'Trebuchet MS', sans-serif;
   color: #2C3035;
   background-repeat: repeat;
+  /*
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    */
   background-color: #F5F7F9;
   image-rendering: auto;
   image-rendering: crisp-edges;
@@ -124,11 +130,11 @@ body {
   padding: 0;
   border: 0;
   padding-top: 76px;
-  min-height: 501px; }
+  min-height: 521px; }
   body::after {
     content: "";
     background-color: #F5F7F9;
-    min-height: 501px;
+    min-height: 521px;
     background-repeat: repeat;
     background-image: url("/modules/core/client/img/background/background-overlay.png");
     background-position: center top;
@@ -141,7 +147,7 @@ body {
     position: absolute;
     z-index: -1; }
   body > #main {
-    min-height: 501px; }
+    min-height: 521px; }
 
 .body-home {
   padding-top: 0; }
@@ -161,7 +167,7 @@ body::-webkit-scrollbar-track {
   background-color: #2C3035; }
 
 body::-webkit-scrollbar-thumb {
-  background-color: #0076FF; }
+  background-color: #4d9fff; }
 
 /* End Custom Body Styles */
 /* Begin Custom Box Shadows */
@@ -261,6 +267,26 @@ body::-webkit-scrollbar-thumb {
     color: #0076FF; }
 
 /* End Custom Cards */
+/* Begin Custom Containers */
+.container-color--light-light {
+  background-color: #F5F7F9; }
+
+.container-color--white {
+  background-color: #F5F7F9; }
+
+.container-color--black {
+  background-color: #F5F7F9; }
+
+.container-color--opacity {
+  background-color: 0, 0, 0, 0.65; }
+
+.container-color--alternate:nth-of-type(odd) {
+  background-color: #C9CAC8; }
+
+.container-color--alternate:nth-of-type(even) {
+  background-color: #FFF; }
+
+/* End Custom Containers */
 /* Begin Custom Fonts */
 /*
 @font-face {
@@ -291,6 +317,10 @@ body::-webkit-scrollbar-thumb {
   height: 60px;
   line-height: 60px; }
 
+.footer--relative {
+  position: relative;
+  z-index: 100; }
+
 .footer-wrapper {
   border-style: solid;
   border-color: transparent;
@@ -320,7 +350,7 @@ body::-webkit-scrollbar-thumb {
   margin: 0px; }
 
 .form-login {
-  min-height: 501px; }
+  min-height: 521px; }
 
 /* End Forms */
 /* Begin Custom List Groups */
@@ -574,6 +604,8 @@ nav {
 
 /* End Media Queries */
 /* End Custom Selects Styles */
+/* Begin Custom Sweet Alert 2 */
+/* End Custom Sweet Alert 2 */
 /* Begin Custom Sub Portfolio Items */
 .portfolio-item-img-container-max-height {
   max-height: 232px;

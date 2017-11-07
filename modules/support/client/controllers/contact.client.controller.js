@@ -64,6 +64,11 @@ supportModule.controller('ContactController', ['$scope', '$rootScope', '$compile
         }
     });
 
+    // show contact phone number
+    $scope.showPhoneNumber =  function () {
+        swal('Phone: ' + $scope.contact.phone);
+    };
+
     // initialize page
     function initializePage() {
         // show the header if not shown     
@@ -89,41 +94,41 @@ supportModule.controller('ContactController', ['$scope', '$rootScope', '$compile
     // gets the page data
     function getPageData() {
         // get support page data
-        SupportFactory.getContactPageInformation().then(function (responseS) {
+        SupportFactory.getContactPageInformation().then(function (responseC) {
             // if returned a valid response
-            if (!responseS.error) {
+            if (!responseC.error) {
                 // set the data
-                $scope.support = responseS;
-                $scope.support.title = 'Contact';
+                $scope.contact = responseC;
+                $scope.contact.title = 'Contact';
 
                 // holds the animation time
                 $scope.animationStyle = $rootScope.$root.getAnimationDelay();
 
                 // holds the page title
-                $scope.pageTitle = $scope.support.title + ' | ' + ApplicationConfiguration.applicationName;
+                $scope.pageTitle = $scope.contact.title + ' | ' + ApplicationConfiguration.applicationName;
                 
                 // setup page
                 setUpPage();
             }
             else {
                 // set error
-                $scope.pageTitle = responseS.title;
+                $scope.pageTitle = responseC.title;
                 $scope.error.error = true;
-                $scope.error.title = responseS.title;
-                $scope.error.status = responseS.status;
-                $scope.error.message = responseS.message;
+                $scope.error.title = responseC.title;
+                $scope.error.status = responseC.status;
+                $scope.error.message = responseC.message;
 
                 // setup page
                 setUpPage();
             }
         })
-        .catch(function (responseS) {
+        .catch(function (responseC) {
             // set error
-            $scope.pageTitle = responseS.title;
+            $scope.pageTitle = responseC.title;
             $scope.error.error = true;
-            $scope.error.title = responseS.title;
-            $scope.error.status = responseS.status;
-            $scope.error.message = responseS.message;
+            $scope.error.title = responseC.title;
+            $scope.error.status = responseC.status;
+            $scope.error.message = responseC.message;
 
             // setup page
             setUpPage();
@@ -167,7 +172,8 @@ supportModule.controller('ContactController', ['$scope', '$rootScope', '$compile
 
         // initialize the waypoint list
         var waypointList = [
-            { id: 'contact-body', offset: startOffset, class: 'animated fadeIn' }
+            { id: 'contact-body', offset: startOffset, class: 'animated fadeIn' },
+            { id: 'contact-customer-service', offset: startOffset, class: 'animated fadeIn' }
         ];
 
         // set up waypoints

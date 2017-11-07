@@ -1,0 +1,24 @@
+/* Begin Custom Containers */
+.container-color {
+    &--light-light {
+        background-color: $light-light;
+    }
+    &--white {
+        background-color: $light-light;
+    }
+    &--black {
+        background-color: $light-light;
+    }
+    &--opacity {
+        background-color: (0, 0, 0, .65);
+    }
+    &--alternate {
+        &:nth-of-type(odd) {
+            background-color: $light;
+        }
+        &:nth-of-type(even) {
+            background-color: $white;
+        }
+    }
+}
+/* End Custom Containers */

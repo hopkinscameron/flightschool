@@ -10,6 +10,10 @@
     height: 60px;
     line-height: 60px;
 }
+.footer--relative {
+    position: relative;
+    z-index: 100;
+}
 .footer-wrapper {
     border-style: solid;
     border-color: transparent;
