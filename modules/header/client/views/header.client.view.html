@@ -41,15 +41,15 @@
             <!-- End Primary Navigation -->
             <!-- Begin Secondary Navigation -->
             <div class="navbar-nav">
-                <div class="nav-item" ng-class="{'dropdown': navigation.dropdown !== undefined}" ng-repeat="navigation in header.secondaryNavigation">
-                    <!-- Begin Not Dropdown -->
-                    <a class="font-fancy--2 nav-link decoration--never h5 mb-0" ng-class="{'active': isActive(navigation.pageLink)}" ng-href="/{{navigation.pageLink}}" ng-if="navigation.dropdown === undefined"><span ng-bind-html="navigation.title | trustHTML"></span></a>
-                    <!-- End Not Dropdown -->
+                <div class="nav-item" ng-class="{'dropdown': navigation.dropdown !== undefined || navigation.login}" ng-repeat="navigation in header.secondaryNavigation">
+                    <!-- Begin Non Dropdown + Not Login -->
+                    <a class="font-fancy--2 nav-link decoration--never h5 mb-0" ng-class="{'active': isActive(navigation.pageLink)}" ng-href="/{{navigation.pageLink}}" ng-if="navigation.dropdown === undefined && !navigation.login"><span ng-bind-html="navigation.title | trustHTML"></span></a>
+                    <!-- End Non Dropdown + Not Login -->
                     <!-- Begin Dropdown -->
-                    <a role="button" id="navbarDropdownMenuLink{{$index}}" class="font-fancy--2 nav-link decoration--never dropdown-toggle h5 mb-0" ng-class="{'active': isActive(navigation.pageLink)}" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ng-if="navigation.dropdown !== undefined">
+                    <a role="button" id="navbarDropdownMenuLink{{$index}}" class="font-fancy--2 nav-link decoration--never dropdown-toggle h5 mb-0" ng-class="{'active': isActive(navigation.pageLink)}" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ng-if="navigation.dropdown !== undefined && !navigation.login">
                         <span role="button" ng-bind-html="navigation.title | trustHTML"></span>
                     </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink{{$index}}" ng-if="navigation.dropdown !== undefined">
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink{{$index}}" ng-if="navigation.dropdown !== undefined && !navigation.login">
                         <!-- Begin Initial Dropdown Item (usually the dropdown home) -->
                         <a class="font-fancy--2 dropdown-item decoration--never" ng-class="{'active': isActive(navigation.pageLink)}" ng-href="/{{navigation.pageLink}}" ng-repeat="dropdown in navigation.dropdown" ng-if="dropdown.home"><span ng-bind-html="dropdown.title | trustHTML"></span></a>
                         <!-- End Initial Dropdown Item -->
@@ -58,6 +58,62 @@
                         <!-- End All Dropdown Items -->
                     </div>
                     <!-- End Dropdown -->
+                    <!-- Begin Dropdown + Login -->
+                    <a role="button" id="navbarDropdownLogin" class="font-fancy--2 nav-link decoration--never dropdown-toggle h5 mb-0 active" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ng-if="navigation.login">
+                        <span role="button" ng-bind-html="navigation.title | trustHTML"></span>
+                    </a>
+                    <div class="dropdown-menu form-login-dropdown" aria-labelledby="navbarDropdownLogin" ng-if="navigation.login">
+                        <section ng-controller="LoginController">
+                            <!-- Begin Login Form -->
+                            <div class="col" ng-if="!loginForm.formSubmitted">
+                                <div ng-if="loginForm.errors.isError">
+                                    <span style="color: red;">{{loginForm.errors.errorMessage}}</span>
+                                </div>
+                                <!-- Begin Login Form -->
+                                <form class="form-group mb-0" ng-submit="login()">
+                                    <!-- Begin Name -->
+                                    <div class="form-group">
+                                        <label class="col-form-label" for="username">Username <span style="color: red;">*</span></label>
+                                        <div class="input-group" ng-class="{'has-danger': loginForm.errors.username}">
+                                            <span class="input-group-addon">
+                                                <i class="fa fa-user" aria-hidden="true"></i>
+                                            </span>
+                                            <input class="form-control form-control-danger" type="text" name="username" placeholder="Username" id="username" ng-model="loginForm.inputs.username" ng-focus="viewFocusEnter(loginForm.views.username)" ng-blur="viewFocusLeave(loginForm.views.username)" ng-disabled="loginForm.formSubmitted">
+                                        </div>
+                                    </div>
+                                    <!-- End Name -->
+                                    <!-- Begin Password -->
+                                    <div class="form-group">
+                                        <label class="col-form-label" for="password">Password <span style="color: red;">*</span></label>
+                                        <div class="input-group" ng-class="{'has-danger': loginForm.errors.password}">
+                                            <span class="input-group-addon">
+                                                <i class="fa fa-key" aria-hidden="true"></i>
+                                            </span>
+                                            <input class="form-control form-control-danger" type="password" name="password" placeholder="Password" id="password" ng-model="loginForm.inputs.password" ng-focus="viewFocusEnter(loginForm.views.password)" ng-blur="viewFocusLeave(loginForm.views.password)" ng-disabled="loginForm.formSubmitted">
+                                        </div>
+                                    </div>
+                                    <!-- End Password -->
+                                    <!-- Begin Login Button -->
+                                    <div class="row">
+                                        <div class="col text-right">
+                                            <button type="submit" class="btn btn-theme-primary" ng-class="{'w-100': $root.isDeviceWidthSmallerThan(426)}" ng-disabled="formSubmitted || loginForm.errors.isError">Login</button>
+                                        </div>
+                                    </div>
+                                    <!-- End Login Button -->
+                                </form>
+                                <!-- End Login Form -->
+                            </div>
+                            <!-- End Login Form -->
+                            <!-- Begin Loging In Spinner -->
+                            <div class="col-auto d-flex align-items-center text-center" style="height: 218px;" ng-if="loginForm.formSubmitted">
+                                <div class="col ml-auto mr-auto d-block">
+                                    <i class="fa fa-spinner fa-3x fa-spin"></i>
+                                </div>
+                            </div>
+                            <!-- End Loging In Spinner -->
+                        </div> 
+                    </div>
+                    <!-- End Dropdown + Login -->
                 </div>
             </div>
             <!-- End Secondary Navigation -->

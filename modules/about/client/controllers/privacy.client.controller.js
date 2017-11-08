@@ -88,12 +88,15 @@ aboutModule.controller('PrivacyController', ['$scope', '$rootScope', '$compile',
 
     // gets the page data
     function getPageData() {
+        // initialize
+        $scope.privacy = {};
+
         // get privacy page data
         AboutFactory.getPrivacyPageInformation().then(function (responseP) {
             // if returned a valid response
             if (!responseP.error) {
                 // set the data
-                $scope.privacy = responseP;
+                $scope.privacy.data = responseP;
                 $scope.privacy.title = 'Privacy';
 
                 // holds the animation time

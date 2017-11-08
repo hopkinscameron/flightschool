@@ -94,11 +94,14 @@ homeModule.controller('HomeController', ['$scope', '$rootScope', '$compile', '$l
         HomeFactory.getHomePageInformation().then(function (responseH) {
             // if returned a valid response
             if (!responseH.error) {
-                // merge old data with new data
-                _.merge($scope.home, responseH);
+                // set the data
+                $scope.home.data = responseH;
+                $scope.home.title = 'Home';
+                $scope.home.pageHeader = $scope.home.title;
+                $scope.home.pageSubHeader = 'Oh no! Can\'t find what you\'re looking for?';
 
                 // holds the page title
-                $scope.pageTitle = 'Home | ' + ApplicationConfiguration.applicationName;
+                $scope.pageTitle = $scope.home.title + ' | ' + ApplicationConfiguration.applicationName;
 
                 // setup page
                 setUpPage();

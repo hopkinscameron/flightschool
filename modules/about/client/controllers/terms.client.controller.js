@@ -88,12 +88,15 @@ aboutModule.controller('TermsController', ['$scope', '$rootScope', '$compile', '
 
     // gets the page data
     function getPageData() {
+        // initialize
+        $scope.terms = {};
+
         // get terms and conditions page data
         AboutFactory.getTermsPageInformation().then(function (responseTAC) {
             // if returned a valid response
             if (!responseTAC.error) {
                 // set the data
-                $scope.terms = responseTAC;
+                $scope.terms.data = responseTAC;
                 $scope.terms.title = 'Terms and Conditions';
 
                 // holds the animation time

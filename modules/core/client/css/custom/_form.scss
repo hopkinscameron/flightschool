@@ -1,4 +1,4 @@
-/* Begin Forms */
+/* Begin Custom Forms */
 .form-control {
     &:focus {
         border: 1px solid $brand-theme-main;
@@ -13,4 +13,17 @@
 .form-login {
     min-height: $body-min-height;
 }
-/* End Forms */
+.form-login-dropdown {
+    color: $light-light
+}
+/* Begin Media Queries */
+/* If [device width] is greater than or equal to 426px */
+@media (min-width: 426px) {
+    .form-login-dropdown {
+        width: 300px;
+        left: unset;
+        right: 0;
+    }
+}
+/* End Media Queries */
+/* End Custom Forms */

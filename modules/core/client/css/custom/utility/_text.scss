@@ -67,6 +67,14 @@
         color: $brand-theme-main;
     }
 }
+.text-color {
+    &--white {
+        color: $light-light;
+    }
+    &--black {
+        color: $dark-dark;
+    }
+}
 
 /* Begin Media Queries */
 /* If [device width] is less than or equal to 425px */

@@ -119,14 +119,14 @@ nav {
     background-color: $gray-dark-dark !important;
 }
 .dropdown-item {
-    color: $text-color;
+    color: $light-light;
     
     &:hover, &:focus {
-        color: $text-color!important;
+        color: $light-light!important;
         background-color: $brand-theme-main;
     }
     &.active, &:active {
-        color: $text-color!important;
+        color: $light-light!important;
         background-color: $brand-theme-main;
     }
 }

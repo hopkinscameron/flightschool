@@ -1,15 +1,15 @@
 ﻿In Progress
 
 Next
+- rename "login" to "users" and then move "logout" under "users"
 - add an "error dashboard" so if there are errors in server, we can view them
 - add roles to user
 - if I have the html editor up on page load, and I exit out, I can't get the other content to show
-- when clicking on "sign in or sign up" have a pop up instead of going to a page (except actual sign up page)
+
 
 Future
 
 Done
-
 
 Testing
 

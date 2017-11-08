@@ -66,7 +66,7 @@ supportModule.controller('ContactController', ['$scope', '$rootScope', '$compile
 
     // show contact phone number
     $scope.showPhoneNumber =  function () {
-        swal('Phone: ' + $scope.contact.phone);
+        swal('Phone: ' + $scope.contact.data.phone);
     };
 
     // initialize page
@@ -93,13 +93,18 @@ supportModule.controller('ContactController', ['$scope', '$rootScope', '$compile
 
     // gets the page data
     function getPageData() {
+        // initialize
+        $scope.contact = {};
+
         // get support page data
         SupportFactory.getContactPageInformation().then(function (responseC) {
             // if returned a valid response
             if (!responseC.error) {
                 // set the data
-                $scope.contact = responseC;
-                $scope.contact.title = 'Contact';
+                $scope.contact.data = responseC;
+                $scope.contact.title = 'Contact Us';
+                $scope.contact.pageHeader = $scope.contact.title;
+                $scope.contact.pageSubHeader = 'Oh no! Can\'t find what you\'re looking for?';
 
                 // holds the animation time
                 $scope.animationStyle = $rootScope.$root.getAnimationDelay();

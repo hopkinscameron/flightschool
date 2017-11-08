@@ -64,4 +64,7 @@
         color: $brand-theme-main;
     }
 }
+.card-min-height {
+    min-height: calc(#{$body-min-height} - #{$body-header-height});
+}
 /* End Custom Cards */

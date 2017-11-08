@@ -88,13 +88,18 @@ supportModule.controller('FAQController', ['$scope', '$rootScope', '$compile', '
 
     // gets the page data
     function getPageData() {
+        // initialize
+        $scope.faq = {};
+
         // get support page data
         SupportFactory.getFAQPageInformation().then(function (responseF) {
             // if returned a valid response
             if (!responseF.error) {
                 // set the data
-                $scope.faq = responseF;
+                $scope.faq.data = responseF;
                 $scope.faq.title = 'FAQ';
+                $scope.faq.pageHeader = $scope.faq.title;
+                $scope.faq.pageSubHeader = 'Looks like you need some questions answered.';
 
                 // holds the animation time
                 $scope.animationStyle = $rootScope.$root.getAnimationDelay();

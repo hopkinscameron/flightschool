@@ -16,8 +16,8 @@
                 <!-- Begin Body -->
                 <div id="privacy-body" class="col-md-12" ng-style="animationStyle" style="visibility: hidden;">
                     <h2 class="pt-3 pb-3 mb-0 font-weight-bold">Privacy Policy</h2>
-                    <p class="text-right">Effective as of: {{privacy.effectiveDate}}</p>
-                    <span ng-bind-html="privacy.body | trustHTML"></span>
+                    <p class="text-right">Effective as of: {{privacy.data.effectiveDate}}</p>
+                    <span ng-bind-html="privacy.data.body | trustHTML"></span>
                 </div>
                 <!-- End Body -->
             </div>

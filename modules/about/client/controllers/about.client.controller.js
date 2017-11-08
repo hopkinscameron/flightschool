@@ -88,20 +88,25 @@ aboutModule.controller('AboutController', ['$scope', '$rootScope', '$compile', '
 
     // gets the page data
     function getPageData() {
+        // initialize
+        $scope.about = {};
+
         // get about us page data
         AboutFactory.getAboutUsPageInformation().then(function (responseAU) {
             // if returned a valid response
             if (!responseAU.error) {
                 // set the data
-                $scope.about = responseAU;
+                $scope.about.data = responseAU;
                 $scope.about.title = 'About Us';
-
-                // holds the animation time
-                $scope.animationStyle = $rootScope.$root.getAnimationDelay();
+                $scope.about.pageHeader = $scope.about.title;
+                $scope.about.pageSubHeader = 'Come take a look at what we are about!';
 
                 // holds the page title
                 $scope.pageTitle = $scope.about.title + ' | ' + ApplicationConfiguration.applicationName;
                 
+                // holds the animation time
+                $scope.animationStyle = $rootScope.$root.getAnimationDelay();
+
                 // setup page
                 setUpPage();
             }

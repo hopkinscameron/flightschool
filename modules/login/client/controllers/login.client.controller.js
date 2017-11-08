@@ -1,5 +1,5 @@
 'use strict'
-
+/*
 // set up the module
 var loginModule = angular.module('login');
 
@@ -288,3 +288,4 @@ loginModule.controller('LoginController', ['$scope', '$rootScope', '$compile', '
         }
     };
 }]);
+*/
