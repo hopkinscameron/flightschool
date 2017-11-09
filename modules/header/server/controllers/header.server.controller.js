@@ -29,7 +29,7 @@ var // the path
  */
 exports.read = function (req, res) {
     // if user is authenticated in the session get admin header
-    if (req.isAuthenticated()) {
+    if (!req.isAuthenticated()) {
         // if user role
         if(req.userRole == 'user') {
             // set authenticated
@@ -62,7 +62,7 @@ exports.read = function (req, res) {
  */
 exports.readDB = function (req, res, next) {
     // if user is authenticated in the session get admin header
-    if (req.isAuthenticated()) {
+    if (!req.isAuthenticated()) {
         // TODO: remove, used for testing
         var user = true,
             admin = false;

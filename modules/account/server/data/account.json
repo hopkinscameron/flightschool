@@ -1,22 +1,22 @@
 [
     {
         "title": "Edit Profile",
-        "pageLink": "edit"
+        "pageLink": "edit",
+        "view": "/modules/account/client/views/user/edit-profile.client.view.html"
     },
     {
         "title": "Change Password",
-        "pageLink": "password"
+        "pageLink": "password",
+        "view": "/modules/account/client/views/user/change-password.client.view.html"
     },
     {
         "title": "Edit Hubs",
-        "pageLink": "hubs"
+        "pageLink": "hubs",
+        "view": "/modules/account/client/views/user/hubs.client.view.html"
     },
     {
         "title": "Email and SMS",
-        "pageLink": "notifications"
-    },
-    {
-        "title": "Sign Out",
-        "pageLink": "logout"
+        "pageLink": "notifications",
+        "view": "/modules/account/client/views/user/notification.client.view.html"
     }
 ]

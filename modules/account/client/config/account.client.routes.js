@@ -7,6 +7,21 @@ var accountRoutesModule = angular.module('account.routes');
 accountRoutesModule.config(['$routeProvider', function($routeProvider) {
     // set up the routes
     $routeProvider
+        .when('/signup', {
+            templateUrl: '/modules/account/client/views/sign-up.client.view.html'
+        })
+        .when('/forgotpassword', {
+            templateUrl: '/modules/account/client/views/forgot-password.client.view.html'
+        })
+        .when('/logout', {
+            templateUrl: '/modules/account/client/views/logout.client.view.html'
+        })
+        .when('/account/:section', {
+            templateUrl: '/modules/account/client/views/user/account.client.view.html'/*,
+            authenticated: true,
+            role: 'user'*/
+        })
+        /*
         .when('/account/edit', {
             templateUrl: '/modules/account/client/views/user/edit-profile.client.view.html',
             authenticated: true,
@@ -26,5 +41,5 @@ accountRoutesModule.config(['$routeProvider', function($routeProvider) {
             templateUrl: '/modules/account/client/views/user/notification.client.view.html',
             authenticated: true,
             role: 'user'
-        })
+        })*/
 }]);

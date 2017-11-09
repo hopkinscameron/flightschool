@@ -1,10 +1,10 @@
-﻿'use strict';
+'use strict';
 
 // set up the module
-var supportModule = angular.module('support');
+var accountModule = angular.module('account');
 
 // create the controller
-supportModule.controller('ContactController', ['$scope', '$rootScope', '$compile', '$location', '$window', '$timeout', 'Service', 'SupportFactory', function ($scope, $rootScope, $compile, $location, $window, $timeout, Service, SupportFactory) {
+accountModule.controller('AccountController', ['$scope', '$rootScope', '$compile', '$location', '$window', '$timeout', '$routeParams', 'Service', 'AccountFactory', function ($scope, $rootScope, $compile, $location, $window, $timeout, $routeParams, Service, AccountFactory) {
     // determines if a page has already sent a request for load
     var pageRequested = false;
 
@@ -13,6 +13,9 @@ supportModule.controller('ContactController', ['$scope', '$rootScope', '$compile
 
     // set the path
     Service.afterPath = $location.path();
+
+    // set the account section
+    var section = $routeParams.section;
 
     // holds the error
     $scope.error = {
@@ -64,11 +67,19 @@ supportModule.controller('ContactController', ['$scope', '$rootScope', '$compile
         }
     });
 
-    // show contact phone number
-    $scope.showPhoneNumber =  function () {
-        swal({
-            text: 'Phone: ' + $scope.contact.data.phone
-        });
+    // checks if the page is active
+    $scope.isActive = function (page) {
+        // get the third index of forward slash
+        var index = nthIndexOf($window.location.href, '/', 3);
+        var link = $window.location.href.substring(index + 1);
+        
+        // check if on page
+        if (link == page) {
+            // set the class as active
+            return true;
+        }
+
+        return false;
     };
 
     // initialize page
@@ -96,46 +107,66 @@ supportModule.controller('ContactController', ['$scope', '$rootScope', '$compile
     // gets the page data
     function getPageData() {
         // initialize
-        $scope.contact = {};
+        $scope.account = {};
 
-        // get support page data
-        SupportFactory.getContactPageInformation().then(function (responseC) {
+        // get account navigation data
+        AccountFactory.getAccountNavigation().then(function (responseAN) {
             // if returned a valid response
-            if (!responseC.error) {
+            if (!responseAN.error) {
                 // set the data
-                $scope.contact.data = responseC;
-                $scope.contact.title = 'Contact Us';
-                $scope.contact.pageHeader = $scope.contact.title;
-                $scope.contact.pageSubHeader = 'Oh no! Can\'t find what you\'re looking for?';
+                $scope.account.navigation = responseAN;
+                $scope.account.title = 'Account';
 
                 // holds the animation time
                 $scope.animationStyle = $rootScope.$root.getAnimationDelay();
 
                 // holds the page title
-                $scope.pageTitle = $scope.contact.title + ' | ' + ApplicationConfiguration.applicationName;
+                $scope.pageTitle = $scope.account.title + ' | ' + ApplicationConfiguration.applicationName;
+
+                // initialize
+                $scope.partialView = undefined;
+
+                // set the correct page
+                _.forEach(responseAN, function (value) {
+                    // if matches
+                    if(value.pageLink == section) {
+                        $scope.partialView = _.cloneDeep(value);
+                        return;
+                    }
+                });
                 
+                // if there is not a correct match
+                if(!$scope.partialView) {
+                    // set error
+                    $scope.pageTitle = 'Page not found';
+                    $scope.error.error = true;
+                    $scope.error.title = 'Page not found';
+                    $scope.error.status = 404;
+                    $scope.error.message = 'Page not found';
+                }
+
                 // setup page
                 setUpPage();
             }
             else {
                 // set error
-                $scope.pageTitle = responseC.title;
+                $scope.pageTitle = responseAN.title;
                 $scope.error.error = true;
-                $scope.error.title = responseC.title;
-                $scope.error.status = responseC.status;
-                $scope.error.message = responseC.message;
+                $scope.error.title = responseAN.title;
+                $scope.error.status = responseAN.status;
+                $scope.error.message = responseAN.message;
 
                 // setup page
                 setUpPage();
             }
         })
-        .catch(function (responseC) {
+        .catch(function (responseAN) {
             // set error
-            $scope.pageTitle = responseC.title;
+            $scope.pageTitle = responseAN.title;
             $scope.error.error = true;
-            $scope.error.title = responseC.title;
-            $scope.error.status = responseC.status;
-            $scope.error.message = responseC.message;
+            $scope.error.title = responseAN.title;
+            $scope.error.status = responseAN.status;
+            $scope.error.message = responseAN.message;
 
             // setup page
             setUpPage();
@@ -163,27 +194,6 @@ supportModule.controller('ContactController', ['$scope', '$rootScope', '$compile
         if(!angular.element('#pageShow').hasClass('collapsing')) {
             // show the page
             angular.element('#pageShow').collapse('show');
-
-            // if an error does not exists
-            if(!$scope.error.error) {
-                // setup all waypoints
-                setUpWaypoints();
-            }
         }
-    };
-
-    // sets up all waypoints
-    function setUpWaypoints() {
-        // get the starting offset
-        var startOffset = $rootScope.$root.getWaypointStart();
-
-        // initialize the waypoint list
-        var waypointList = [
-            { id: 'contact-body', offset: startOffset, class: 'animated fadeIn' },
-            { id: 'contact-customer-service', offset: startOffset, class: 'animated fadeIn' }
-        ];
-
-        // set up waypoints
-        $rootScope.$root.setUpWaypoints(waypointList);
     };
 }]);

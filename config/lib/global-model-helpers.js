@@ -16,7 +16,7 @@ exports.getRequiredProperties = function (model) {
     // loop over all keys
     _.forEach(_.keys(model), function(value) {
         // check if required is true
-        if(model[value].required == true) {
+        if(model[value].required) {
             prop.push(value);
         }
     });
@@ -67,7 +67,7 @@ exports.getNonOverwritableProperties = function (model) {
  * Get default properties of model
  */
 exports.getDefaultProperties = function (model) {
-    // the properties that aren't overwritable by user
+    // the properties that are defaults
     var prop = [];
 
     // loop over all keys
@@ -115,7 +115,7 @@ exports.getSearchableProperties = function (model) {
     // loop over all keys
     _.forEach(_.keys(model), function(value) {
         // check if searchable is true
-        if(model[value].searchable == true) {
+        if(model[value].searchable) {
             prop.push(value);
         }
     });
@@ -125,11 +125,90 @@ exports.getSearchableProperties = function (model) {
 };
 
 /**
+ * Get acceptable values properties of model
+ */
+exports.getAcceptableValuesProperties = function (model) {
+    // the properties that have acceptable values
+    var prop = [];
+
+    // loop over all keys
+    _.forEach(_.keys(model), function(value) {
+        // check if required is true
+        if(model[value].enum && model[value].enum.length > 0) {
+            prop.push(value);
+        }
+    });
+
+    // return the properties
+    return prop;
+};
+
+/**
+ * Check and set acceptable values (sets default value if not acceptable)
+ */
+exports.checkAndSetAcceptableValueForProperties = function (properties, model, obj) {
+    // loop over all properties
+    _.forEach(properties, function(value) {
+        // check if value is acceptable
+        if(!_.indexOf(model[value].enum, obj[value]) == -1) {
+            // set the default
+            obj[value] = model[value].default;
+        }
+    });
+};
+
+/**
+ * Get trimmable properties of model
+ */
+exports.getTrimmableProperties = function (model) {
+    // the properties that have acceptable values
+    var prop = [];
+
+    // loop over all keys
+    _.forEach(_.keys(model), function(value) {
+        // check if required is true
+        if(model[value].trim) {
+            prop.push(value);
+        }
+    });
+
+    // return the properties
+    return prop;
+};
+
+/**
+ * Trims all values
+ */
+exports.trimValuesForProperties = function (properties, obj) {
+    // loop over all properties
+    _.forEach(properties, function(value) {
+        // trim each value
+        obj[value] = _.trim(obj[value]);
+    });
+};
+
+/**
  * Get existing keys of model
  */
 exports.getAllExistingKeysFromModel = function (model) {
     // return the keys
     return _.keys(model);
+};
+
+/**
+ * Trim string value
+ */
+exports.trimString = function (value) {
+    // return the trimmed value
+    return _.trim(value);
+};
+
+/**
+ * Trim array of strings
+ */
+exports.trimArrayOfString = function (arr) {
+    // return the trimmed values
+    return _.map(arr, _.trim);;
 };
 
 /**

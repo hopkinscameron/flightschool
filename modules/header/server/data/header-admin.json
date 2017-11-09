@@ -20,7 +20,8 @@
                 },
 				{
 					"title": "Sign Out",
-					"pageLink": "logout"
+					"pageLink": "logout",
+					"logout": true
 				}
 			]
 		}

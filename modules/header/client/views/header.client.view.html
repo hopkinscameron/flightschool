@@ -54,7 +54,7 @@
                         <a class="font-fancy--2 dropdown-item decoration--never" ng-class="{'active': isActive(navigation.pageLink)}" ng-href="/{{navigation.pageLink}}" ng-repeat="dropdown in navigation.dropdown" ng-if="dropdown.home"><span ng-bind-html="dropdown.title | trustHTML"></span></a>
                         <!-- End Initial Dropdown Item -->
                         <!-- Begin All Dropdown Items -->
-                        <a class="font-fancy--2 dropdown-item decoration--never" ng-class="{'active': isActive(navigation.pageLink + '/' + dropdown.pageLink)}" ng-href="/{{navigation.pageLink}}/{{dropdown.pageLink}}" ng-repeat="dropdown in navigation.dropdown" ng-if="!dropdown.home"><span ng-bind-html="dropdown.title | trustHTML"></span></a>
+                        <a class="font-fancy--2 dropdown-item decoration--never" ng-class="{'active': isActive(navigation.pageLink + '/' + dropdown.pageLink)}" ng-href="{{dropdown.logout ? '/' + dropdown.pageLink : '/' + navigation.pageLink + '/' + dropdown.pageLink}}" ng-repeat="dropdown in navigation.dropdown" ng-if="!dropdown.home"><span ng-bind-html="dropdown.title | trustHTML"></span></a>
                         <!-- End All Dropdown Items -->
                     </div>
                     <!-- End Dropdown -->
@@ -65,7 +65,7 @@
                     <div class="dropdown-menu form-login-dropdown" aria-labelledby="navbarDropdownLogin" ng-if="navigation.login">
                         <section ng-controller="LoginController">
                             <!-- Begin Login Form -->
-                            <div class="col" ng-if="!loginForm.formSubmitted">
+                            <div class="col" ng-if="!formInTransit">
                                 <div ng-if="loginForm.errors.isError">
                                     <span style="color: red;">{{loginForm.errors.errorMessage}}</span>
                                 </div>
@@ -73,12 +73,12 @@
                                 <form class="form-group mb-0" ng-submit="login()">
                                     <!-- Begin Name -->
                                     <div class="form-group">
-                                        <label class="col-form-label" for="username">Username <span style="color: red;">*</span></label>
-                                        <div class="input-group" ng-class="{'has-danger': loginForm.errors.username}">
+                                        <label class="col-form-label" for="email">Username <span style="color: red;">*</span></label>
+                                        <div class="input-group" ng-class="{'has-danger': loginForm.errors.email}">
                                             <span class="input-group-addon">
                                                 <i class="fa fa-user" aria-hidden="true"></i>
                                             </span>
-                                            <input class="form-control form-control-danger" type="text" name="username" placeholder="Username" id="username" ng-model="loginForm.inputs.username" ng-focus="viewFocusEnter(loginForm.views.username)" ng-blur="viewFocusLeave(loginForm.views.username)" ng-disabled="loginForm.formSubmitted">
+                                            <input class="form-control form-control-danger" type="text" name="email" placeholder="Username" id="email" ng-model="loginForm.inputs.email" ng-focus="viewFocusEnter(loginForm.views.email)" ng-blur="viewFocusLeave(loginForm.views.email)" ng-disabled="formInTransit">
                                         </div>
                                     </div>
                                     <!-- End Name -->
@@ -89,23 +89,44 @@
                                             <span class="input-group-addon">
                                                 <i class="fa fa-key" aria-hidden="true"></i>
                                             </span>
-                                            <input class="form-control form-control-danger" type="password" name="password" placeholder="Password" id="password" ng-model="loginForm.inputs.password" ng-focus="viewFocusEnter(loginForm.views.password)" ng-blur="viewFocusLeave(loginForm.views.password)" ng-disabled="loginForm.formSubmitted">
+                                            <input class="form-control form-control-danger" type="password" name="password" placeholder="Password" id="password" ng-model="loginForm.inputs.password" ng-focus="viewFocusEnter(loginForm.views.password)" ng-blur="viewFocusLeave(loginForm.views.password)" ng-disabled="formInTransit">
                                         </div>
                                     </div>
                                     <!-- End Password -->
-                                    <!-- Begin Login Button -->
-                                    <div class="row">
-                                        <div class="col text-right">
-                                            <button type="submit" class="btn btn-theme-primary" ng-class="{'w-100': $root.isDeviceWidthSmallerThan(426)}" ng-disabled="formSubmitted || loginForm.errors.isError">Login</button>
+                                    <!-- Begin Remember Me -->
+                                    <div class="form-group mb-2">
+                                        <div class="form-check text-right">
+                                            <label class="col-form-label" for="rememberMe">Remember Me</label>
+                                            <label class="form-check-label">
+                                                <input class="form-check-input" name="rememberMe" type="checkbox" value="" ng-model="loginForm.inputs.rememberMe" ng-disabled="formInTransit">
+                                            </label>
                                         </div>
                                     </div>
-                                    <!-- End Login Button -->
+                                    <!-- End Remember Me -->
+                                    <!-- Begin Sign Up/Login Button -->
+                                    <div class="row mb-2">
+                                        <div class="col text-left">
+                                            <p class="mb-0">Not a member?</p>
+                                            <a class="decoration--never decorate--highlight highlight-text-foreground font-weight-bold" href="/signup" ng-disabled="formSubmitted">Sign Up</a>
+                                        </div>
+                                        <div class="col text-right">
+                                            <button type="submit" class="btn btn-theme-primary" style="cursor: pointer;" ng-class="{'w-100': $root.isDeviceWidthSmallerThan(426)}" ng-disabled="formSubmitted || loginForm.errors.isError">Login</button>
+                                        </div>
+                                    </div>
+                                    <!-- End Sign Up/Login Button -->
+                                    <!-- Begin Forgot Password -->
+                                    <div class="row">
+                                        <div class="col text-right">
+                                            <a class="decoration--never" href="/forgotpassword" ng-disabled="formSubmitted">Forgot Password?</a>
+                                        </div>
+                                    </div>
+                                    <!-- End Forgot Password -->
                                 </form>
                                 <!-- End Login Form -->
                             </div>
                             <!-- End Login Form -->
                             <!-- Begin Loging In Spinner -->
-                            <div class="col-auto d-flex align-items-center text-center" style="height: 218px;" ng-if="loginForm.formSubmitted">
+                            <div class="col-auto d-flex align-items-center text-center" style="height: 218px;" ng-if="formInTransit">
                                 <div class="col ml-auto mr-auto d-block">
                                     <i class="fa fa-spinner fa-3x fa-spin"></i>
                                 </div>

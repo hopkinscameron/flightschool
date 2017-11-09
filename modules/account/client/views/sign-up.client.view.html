@@ -1,0 +1,92 @@
+<!-- Begin Sign Up Page -->
+<section ng-controller="SignUpController">
+    <!-- Begin Container -->
+    <div class="container">
+        <!-- Begin Page Fully Loaded With Errors -->
+        <div id="pageShow" class="collapse" ng-if="pageFullyLoaded && error.error">
+            <div ng-controller="ErrorController" ng-init="init(error.title, error.status, error.message)">
+                <div ng-include="'/modules/core/client/views/error.client.view.html'"></div>
+            </div>
+        </div>
+        <!-- End Page Fully Loaded With Errors -->
+        <!-- Begin Page Fully Loaded With No Errors -->
+        <div id="pageShow" class="animated animation-delay--sm fadeIn collapse" ng-if="pageFullyLoaded && !error.error">
+            <!-- Begin Content Header -->
+            <div class="jumbotron jumbotron-radius--none jumbotron-color--opacity-black jumbotron-fixed-height text-center mb-0">
+                <h1 class="font-fancy--2 text-color--white" ng-class="{'mb-0': signUp.pageSubHeader.length == 0}">{{signUp.pageHeader}}</h1>
+                <h5 class="mb-0 text-color--white">{{signUp.pageSubHeader}}</h5>
+            </div>
+            <!-- End Content Header -->
+            <!-- Begin Content Body -->
+            <div class="card card--border--none card--radius--none card-body box-shadow--sm card-min-height">
+                <!-- Begin Sign Up Form -->
+                <div id="signUp-form" class="col-md-12" ng-style="animationStyle" style="visibility: hidden;">
+                    <div style="padding-bottom: 24px;" ng-if="!signUpForm.errors.isError"></div>
+                    <div ng-if="signUpForm.errors.isError">
+                        <span style="color: red;">{{signUpForm.errors.errorMessage}}</span>
+                    </div>
+                    <!-- Begin Sign Up Form -->
+                    <form class="form-group" ng-submit="signUp()">
+                        <!-- Begin First Name -->
+                        <div class="form-group">
+                            <label class="col-form-label" for="firstName">First Name <span style="color: red;">*</span></label>
+                            <div class="input-group" ng-class="{'has-danger': signUpForm.errors.firstName}">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-user" aria-hidden="true"></i>
+                                </span>
+                                <input class="form-control form-control-danger" type="text" name="firstName" placeholder="First Name" id="firstName" ng-model="signUpForm.inputs.firstName" ng-focus="viewFocusEnter(signUpForm.views.firstName)" ng-blur="viewFocusLeave(signUpForm.views.firstName)" ng-disabled="formInTransit">
+                            </div>
+                        </div>
+                        <!-- End First Name -->
+                        <!-- Begin Last Name -->
+                        <div class="form-group">
+                            <label class="col-form-label" for="lastName">Last Name <span style="color: red;">*</span></label>
+                            <div class="input-group" ng-class="{'has-danger': signUpForm.errors.lastName}">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-user" aria-hidden="true"></i>
+                                </span>
+                                <input class="form-control form-control-danger" type="lastName" name="lastName" placeholder="Last Name" id="lastName" ng-model="signUpForm.inputs.lastName" ng-focus="viewFocusEnter(signUpForm.views.lastName)" ng-blur="viewFocusLeave(signUpForm.views.lastName)" ng-disabled="formInTransit">
+                            </div>
+                        </div>
+                        <!-- End Last Name -->
+                        <!-- Begin Email -->
+                        <div class="form-group">
+                            <label class="col-form-label" for="email">Email <span style="color: red;">*</span></label>
+                            <div class="input-group" ng-class="{'has-danger': signUpForm.errors.email}">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-envelope-o" aria-hidden="true"></i>
+                                </span>
+                                <input class="form-control form-control-danger" type="email" name="email" placeholder="example@example.com" id="email" ng-model="signUpForm.inputs.email" ng-focus="viewFocusEnter(signUpForm.views.email)" ng-blur="viewFocusLeave(signUpForm.views.email)" ng-disabled="formInTransit">
+                            </div>
+                        </div>
+                        <!-- End Email -->
+                        <!-- Begin Password -->
+                        <div class="form-group">
+                            <label class="col-form-label" for="password">Password <span style="color: red;">*</span></label>
+                            <div class="input-group" ng-class="{'has-danger': signUpForm.errors.password}">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-key" aria-hidden="true"></i>
+                                </span>
+                                <input class="form-control form-control-danger" type="password" name="password" placeholder="Password" id="password" ng-model="signUpForm.inputs.password" ng-focus="viewFocusEnter(signUpForm.views.password)" ng-blur="viewFocusLeave(signUpForm.views.password)" ng-disabled="formInTransit">
+                            </div>
+                        </div>
+                        <!-- End Password -->
+                        <!-- Begin Sign Up Button -->
+                        <div class="row">
+                            <div class="col text-right">
+                                <button type="submit" class="btn btn-theme-primary" style="cursor: pointer;" ng-class="{'w-100': $root.isDeviceWidthSmallerThan(426)}" ng-disabled="formSubmitted || signUpForm.errors.isError">Sign Up</button>
+                            </div>
+                        </div>
+                        <!-- End Sign Up Button -->
+                    </form>
+                    <!-- End Sign Up Form -->
+                </div>
+                <!-- End Sign Up Form -->
+            </div>
+            <!-- End Content Body -->
+        </div>
+        <!-- End Page Fully Loaded With No Errors -->
+    </div>
+    <!-- End Container -->
+</section>
+<!-- End Sign Up Page -->

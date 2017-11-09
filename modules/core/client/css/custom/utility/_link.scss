@@ -4,7 +4,11 @@ a {
 	text-decoration: underline;
 
 	&.decoration--never {
-		text-decoration: none!important;	
+		text-decoration: none!important;
+
+		&.decorate--highlight:hover {
+			text-decoration: underline!important;
+		}
 	}
 	&:hover, &:active, &:focus {
 		color: $brand-theme-main;

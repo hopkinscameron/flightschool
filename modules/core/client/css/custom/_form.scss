@@ -14,7 +14,11 @@
     min-height: $body-min-height;
 }
 .form-login-dropdown {
-    color: $light-light
+    color: $light-light;
+
+    & a {
+        color: $light-light;
+    }
 }
 /* Begin Media Queries */
 /* If [device width] is greater than or equal to 426px */

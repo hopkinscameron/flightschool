@@ -61,10 +61,10 @@
     font-weight: 900;
     
     &-background {
-        background-color: $brand-theme-main;
+        background-color: $brand-theme-main !important;
     }
     &-foreground {
-        color: $brand-theme-main;
+        color: $brand-theme-main !important;
     }
 }
 .text-color {

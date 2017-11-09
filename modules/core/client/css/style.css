@@ -360,6 +360,8 @@ body::-webkit-scrollbar-thumb {
 
 .form-login-dropdown {
   color: #F5F7F9; }
+  .form-login-dropdown a {
+    color: #F5F7F9; }
 
 /* Begin Media Queries */
 /* If [device width] is greater than or equal to 426px */
@@ -789,6 +791,8 @@ a {
   text-decoration: underline; }
   a.decoration--never {
     text-decoration: none !important; }
+    a.decoration--never.decorate--highlight:hover {
+      text-decoration: underline !important; }
   a:hover, a:active, a:focus {
     color: #0076FF; }
   a.highlight--never:hover, a.highlight--never:active, a.highlight--never:focus {
@@ -880,9 +884,9 @@ hr.blog-post-bar {
 .highlight-text {
   font-weight: 900; }
   .highlight-text-background {
-    background-color: #0076FF; }
+    background-color: #0076FF !important; }
   .highlight-text-foreground {
-    color: #0076FF; }
+    color: #0076FF !important; }
 
 .text-color--white {
   color: #F5F7F9; }

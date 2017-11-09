@@ -1,13 +1,13 @@
-﻿'use strict';
+﻿'use strict'
 
 // set up the module
-var supportModule = angular.module('support');
+var accountModule = angular.module('account');
 
 // create the controller
-supportModule.controller('ContactController', ['$scope', '$rootScope', '$compile', '$location', '$window', '$timeout', 'Service', 'SupportFactory', function ($scope, $rootScope, $compile, $location, $window, $timeout, Service, SupportFactory) {
+accountModule.controller('ForgotPasswordController', ['$scope', '$rootScope', '$compile', '$location', '$timeout', '$window', 'Service', 'LoginFactory', function ($scope, $rootScope, $compile, $location, $timeout, $window, Service, LoginFactory) {
     // determines if a page has already sent a request for load
     var pageRequested = false;
-
+    
     // set jQuery
     $ = window.jQuery;
 
@@ -21,7 +21,7 @@ supportModule.controller('ContactController', ['$scope', '$rootScope', '$compile
         'status': 404,
         'message': ''
     };
-
+    
     // determines if the page is fully loaded
     $scope.pageFullyLoaded = false;
 
@@ -34,7 +34,7 @@ supportModule.controller('ContactController', ['$scope', '$rootScope', '$compile
         $rootScope.$emit('refreshFooter', {});
     }
     else {
-        // always refresh header to ensure login
+        // always refresh header to ensure home
         $rootScope.$emit('refreshHeader', {});
     }
 
@@ -64,82 +64,41 @@ supportModule.controller('ContactController', ['$scope', '$rootScope', '$compile
         }
     });
 
-    // show contact phone number
-    $scope.showPhoneNumber =  function () {
-        swal({
-            text: 'Phone: ' + $scope.contact.data.phone
-        });
-    };
-
     // initialize page
     function initializePage() {
-        // show the header if not shown     
-        if (!$rootScope.$root.showHeader) {
+        // hide the header if shown     
+        if ($rootScope.$root.showHeader) {
             $rootScope.$root.showHeader = true;
         }
 
-        // show the footer if not shown
-        if (!$rootScope.$root.showFooter) {
+        // hide the footer if shown
+        if ($rootScope.$root.showFooter) {
             $rootScope.$root.showFooter = true;
         }
 
         // if page hasn't been requested yet
         if(!pageRequested) {
-            // set page has been requested
             pageRequested = true;
 
-            // show the page after a timeout
-            $timeout(getPageData, $rootScope.$root.getPageDataTimeout);
+            // get page data
+            getPageData();
         }
     };
 
     // gets the page data
     function getPageData() {
         // initialize
-        $scope.contact = {};
+        $scope.forgotPassword = {};
 
-        // get support page data
-        SupportFactory.getContactPageInformation().then(function (responseC) {
-            // if returned a valid response
-            if (!responseC.error) {
-                // set the data
-                $scope.contact.data = responseC;
-                $scope.contact.title = 'Contact Us';
-                $scope.contact.pageHeader = $scope.contact.title;
-                $scope.contact.pageSubHeader = 'Oh no! Can\'t find what you\'re looking for?';
+        $scope.forgotPassword.title = 'Forgot Password';
+        $scope.forgotPassword.pageHeader = $scope.forgotPassword.title;
+        $scope.forgotPassword.pageSubHeader = 'Oh no! You forgot your password?';
 
-                // holds the animation time
-                $scope.animationStyle = $rootScope.$root.getAnimationDelay();
+        // holds the page title
+        $scope.pageTitle = $scope.forgotPassword.title + ' | ' + ApplicationConfiguration.applicationName;
 
-                // holds the page title
-                $scope.pageTitle = $scope.contact.title + ' | ' + ApplicationConfiguration.applicationName;
-                
-                // setup page
-                setUpPage();
-            }
-            else {
-                // set error
-                $scope.pageTitle = responseC.title;
-                $scope.error.error = true;
-                $scope.error.title = responseC.title;
-                $scope.error.status = responseC.status;
-                $scope.error.message = responseC.message;
-
-                // setup page
-                setUpPage();
-            }
-        })
-        .catch(function (responseC) {
-            // set error
-            $scope.pageTitle = responseC.title;
-            $scope.error.error = true;
-            $scope.error.title = responseC.title;
-            $scope.error.status = responseC.status;
-            $scope.error.message = responseC.message;
-
-            // setup page
-            setUpPage();
-        });
+        // setup page
+        setUpPage();
     };
 
     // sets up the page
@@ -179,8 +138,8 @@ supportModule.controller('ContactController', ['$scope', '$rootScope', '$compile
 
         // initialize the waypoint list
         var waypointList = [
-            { id: 'contact-body', offset: startOffset, class: 'animated fadeIn' },
-            { id: 'contact-customer-service', offset: startOffset, class: 'animated fadeIn' }
+            { id: 'home-services', offset: startOffset, class: 'animated fadeIn' },
+            { id: 'home-slider', offset: startOffset, class: 'animated fadeIn' }
         ];
 
         // set up waypoints

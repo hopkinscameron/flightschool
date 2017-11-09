@@ -97,15 +97,15 @@ accountModule.controller('EditProfileController', ['$scope', '$rootScope', '$com
                     // if returned a valid response
                     if (!responseEP.error) {
                         // set the data
-                        $scope.account = responseEP;
-                        $scope.account.navigation = responseAN;
-                        $scope.account.title = 'Edit Profile';
+                        $scope.editProfile = responseEP;
+                        $scope.editProfile.navigation = responseAN;
+                        $scope.editProfile.title = 'Edit Profile';
 
                         // holds the animation time
                         $scope.animationStyle = $rootScope.$root.getAnimationDelay();
 
                         // holds the page title
-                        $scope.pageTitle = $scope.account.title + ' | ' + ApplicationConfiguration.applicationName;
+                        $scope.pageTitle = $scope.editProfile.title + ' | ' + ApplicationConfiguration.applicationName;
                         
                         // setup page
                         setUpPage();
