@@ -56,11 +56,21 @@ var UserSchema = {
         trim: true,
         required: true
     },
+    gender: {
+        type: String,
+        enum: ['male', 'female'],
+        default: null
+    },
     email: {
         type: String,
         required: true,
         unique: true,
         trim: true
+    },
+    phone: {
+        type: String,
+        trim: true,
+        default: null
     },
     password: {
         type: String,

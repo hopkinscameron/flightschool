@@ -94,7 +94,7 @@ aboutModule.controller('AboutController', ['$scope', '$rootScope', '$compile', '
         // get about us page data
         AboutFactory.getAboutUsPageInformation().then(function (responseAU) {
             // if returned a valid response
-            if (!responseAU.error) {
+            if (responseAU && !responseAU.error) {
                 // set the data
                 $scope.about.data = responseAU;
                 $scope.about.title = 'About Us';

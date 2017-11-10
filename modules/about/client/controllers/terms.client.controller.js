@@ -94,7 +94,7 @@ aboutModule.controller('TermsController', ['$scope', '$rootScope', '$compile', '
         // get terms and conditions page data
         AboutFactory.getTermsPageInformation().then(function (responseTAC) {
             // if returned a valid response
-            if (!responseTAC.error) {
+            if (responseTAC && !responseTAC.error) {
                 // set the data
                 $scope.terms.data = responseTAC;
                 $scope.terms.title = 'Terms and Conditions';

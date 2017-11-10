@@ -94,7 +94,7 @@ supportModule.controller('FAQController', ['$scope', '$rootScope', '$compile', '
         // get support page data
         SupportFactory.getFAQPageInformation().then(function (responseF) {
             // if returned a valid response
-            if (!responseF.error) {
+            if (responseF && !responseF.error) {
                 // set the data
                 $scope.faq.data = responseF;
                 $scope.faq.title = 'FAQ';

@@ -43,7 +43,7 @@ accountModule.controller('LoginController', ['$scope', '$rootScope', 'LoginFacto
 
     // on call event when the focus leaves
     $scope.viewFocusLeave = function (viewId) {
-        // if entering the email view
+        // if leaving the email view
         if (viewId == $scope.loginForm.views.email) {
             // if user left field blank
             if ($scope.loginForm.inputs.email.length == 0) {
@@ -52,7 +52,7 @@ accountModule.controller('LoginController', ['$scope', '$rootScope', 'LoginFacto
                 $scope.loginForm.errors.isError = true;
             }
         }
-        // if entering the password view
+        // if leaving the password view
         else if (viewId == $scope.loginForm.views.password) {
             // if user left field blank
             if ($scope.loginForm.inputs.password.length == 0) {
@@ -65,11 +65,11 @@ accountModule.controller('LoginController', ['$scope', '$rootScope', 'LoginFacto
         // check to see if there is an error
         if ($scope.loginForm.errors.email) {
             // set error
-            $scope.loginForm.errors.errorMessage = 'You must enter the email';
+            $scope.loginForm.errors.errorMessage = 'You must enter your email';
         }
         else if ($scope.loginForm.errors.password) {
             // set error
-            $scope.loginForm.errors.errorMessage = 'You must enter the password';
+            $scope.loginForm.errors.errorMessage = 'You must enter your password';
         }
         else {
             // remove error
@@ -96,8 +96,8 @@ accountModule.controller('LoginController', ['$scope', '$rootScope', 'LoginFacto
 
             // login
             LoginFactory.login(loginData).then(function (responseL) {
-                // if no error
-                if(!responseL.error) {
+                // if returned a valid response
+                if(responseL && !responseL.error) {
                     // refresh header
                     $rootScope.$emit('refreshHeader', {});
                 }

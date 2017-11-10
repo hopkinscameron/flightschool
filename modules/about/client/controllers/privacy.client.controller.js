@@ -94,7 +94,7 @@ aboutModule.controller('PrivacyController', ['$scope', '$rootScope', '$compile',
         // get privacy page data
         AboutFactory.getPrivacyPageInformation().then(function (responseP) {
             // if returned a valid response
-            if (!responseP.error) {
+            if (responseP && !responseP.error) {
                 // set the data
                 $scope.privacy.data = responseP;
                 $scope.privacy.title = 'Privacy';

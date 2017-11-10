@@ -37,11 +37,11 @@ footerModule.controller('FooterController', ['$scope', '$rootScope', 'FooterFact
             $scope.footer = responseF;
 
             // footer refreshed
-            $rootScope.$emit('footerRefreshed', {});
+            $rootScope.$broadcast('footerRefreshed', {});
         })
         .catch(function (responseF) {
             // footer refreshed with error
-            $rootScope.$emit('footerRefreshed', {'error': true, 'message': responseF.message});
+            $rootScope.$broadcast('footerRefreshed', {'error': true, 'message': responseF.message});
         });
     };
 }]);

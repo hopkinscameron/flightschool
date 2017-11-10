@@ -21,18 +21,18 @@
             <div class="navbar-nav mr-auto">
                 <div class="nav-item" ng-class="{'dropdown': navigation.dropdown !== undefined}" ng-repeat="navigation in header.navigation">
                     <!-- Begin Not Dropdown -->
-                    <a class="font-fancy--2 nav-link decoration--never h5 mb-0" ng-class="{'active': isActive(navigation.pageLink)}" ng-href="/{{navigation.pageLink}}" ng-if="navigation.dropdown === undefined"><span ng-bind-html="navigation.title | trustHTML"></span></a>
+                    <a class="font-fancy--2 nav-link decoration--never h5 mb-0" ng-class="{'active': $root.isActive(navigation.pageLink)}" ng-href="/{{navigation.pageLink}}" ng-if="navigation.dropdown === undefined"><span ng-bind-html="navigation.title | trustHTML"></span></a>
                     <!-- End Not Dropdown -->
                     <!-- Begin Dropdown -->
-                    <a role="button" id="navbarDropdownMenuLink{{$index}}" class="font-fancy--2 nav-link decoration--never dropdown-toggle h5 mb-0" ng-class="{'active': isActive(navigation.pageLink)}" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ng-if="navigation.dropdown !== undefined">
+                    <a role="button" id="navbarDropdownMenuLink{{$index}}" class="font-fancy--2 nav-link decoration--never dropdown-toggle h5 mb-0" ng-class="{'active': $root.isActive(navigation.pageLink)}" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ng-if="navigation.dropdown !== undefined">
                         <span role="button" ng-bind-html="navigation.title | trustHTML"></span>
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink{{$index}}" ng-if="navigation.dropdown !== undefined">
                         <!-- Begin Initial Dropdown Item (usually the dropdown home) -->
-                        <a class="font-fancy--2 dropdown-item decoration--never" ng-class="{'active': isActive(navigation.pageLink)}" ng-href="/{{navigation.pageLink}}" ng-repeat="dropdown in navigation.dropdown" ng-if="dropdown.home"><span ng-bind-html="dropdown.title | trustHTML"></span></a>
+                        <a class="font-fancy--2 dropdown-item decoration--never" ng-class="{'active': $root.isActive(navigation.pageLink)}" ng-href="/{{navigation.pageLink}}" ng-repeat="dropdown in navigation.dropdown" ng-if="dropdown.home"><span ng-bind-html="dropdown.title | trustHTML"></span></a>
                         <!-- End Initial Dropdown Item -->
                         <!-- Begin All Dropdown Items -->
-                        <a class="font-fancy--2 dropdown-item decoration--never" ng-class="{'active': isActive(navigation.pageLink + '/' + dropdown.pageLink)}" ng-href="/{{navigation.pageLink}}/{{dropdown.pageLink}}" ng-repeat="dropdown in navigation.dropdown" ng-if="!dropdown.home"><span ng-bind-html="dropdown.title | trustHTML"></span></a>
+                        <a class="font-fancy--2 dropdown-item decoration--never" ng-class="{'active': $root.isActive(navigation.pageLink + '/' + dropdown.pageLink)}" ng-href="/{{navigation.pageLink}}/{{dropdown.pageLink}}" ng-repeat="dropdown in navigation.dropdown" ng-if="!dropdown.home"><span ng-bind-html="dropdown.title | trustHTML"></span></a>
                         <!-- End All Dropdown Items -->
                     </div>
                     <!-- End Dropdown -->
@@ -43,18 +43,18 @@
             <div class="navbar-nav">
                 <div class="nav-item" ng-class="{'dropdown': navigation.dropdown !== undefined || navigation.login}" ng-repeat="navigation in header.secondaryNavigation">
                     <!-- Begin Non Dropdown + Not Login -->
-                    <a class="font-fancy--2 nav-link decoration--never h5 mb-0" ng-class="{'active': isActive(navigation.pageLink)}" ng-href="/{{navigation.pageLink}}" ng-if="navigation.dropdown === undefined && !navigation.login"><span ng-bind-html="navigation.title | trustHTML"></span></a>
+                    <a class="font-fancy--2 nav-link decoration--never h5 mb-0" ng-class="{'active': $root.isActive(navigation.pageLink)}" ng-href="/{{navigation.pageLink}}" ng-if="navigation.dropdown === undefined && !navigation.login"><span ng-bind-html="navigation.title | trustHTML"></span></a>
                     <!-- End Non Dropdown + Not Login -->
                     <!-- Begin Dropdown -->
-                    <a role="button" id="navbarDropdownMenuLink{{$index}}" class="font-fancy--2 nav-link decoration--never dropdown-toggle h5 mb-0" ng-class="{'active': isActive(navigation.pageLink)}" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ng-if="navigation.dropdown !== undefined && !navigation.login">
+                    <a role="button" id="navbarDropdownMenuLink{{$index}}" class="font-fancy--2 nav-link decoration--never dropdown-toggle h5 mb-0" ng-class="{'active': $root.isActive(navigation.pageLink) || navigation.pageLink == 'account' || navigation.pageLink == 'admin'}" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ng-if="navigation.dropdown !== undefined && !navigation.login">
                         <span role="button" ng-bind-html="navigation.title | trustHTML"></span>
                     </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink{{$index}}" ng-if="navigation.dropdown !== undefined && !navigation.login">
+                    <div class="dropdown-menu" ng-class="{'dropdown-menu-right': $index == header.secondaryNavigation.length - 1}" aria-labelledby="navbarDropdownMenuLink{{$index}}" ng-if="navigation.dropdown !== undefined && !navigation.login">
                         <!-- Begin Initial Dropdown Item (usually the dropdown home) -->
-                        <a class="font-fancy--2 dropdown-item decoration--never" ng-class="{'active': isActive(navigation.pageLink)}" ng-href="/{{navigation.pageLink}}" ng-repeat="dropdown in navigation.dropdown" ng-if="dropdown.home"><span ng-bind-html="dropdown.title | trustHTML"></span></a>
+                        <a class="font-fancy--2 dropdown-item decoration--never" ng-class="{'active': $root.isActive(navigation.pageLink)}" ng-href="/{{navigation.pageLink}}" ng-repeat="dropdown in navigation.dropdown" ng-if="dropdown.home"><span ng-bind-html="dropdown.title | trustHTML"></span></a>
                         <!-- End Initial Dropdown Item -->
                         <!-- Begin All Dropdown Items -->
-                        <a class="font-fancy--2 dropdown-item decoration--never" ng-class="{'active': isActive(navigation.pageLink + '/' + dropdown.pageLink)}" ng-href="{{dropdown.logout ? '/' + dropdown.pageLink : '/' + navigation.pageLink + '/' + dropdown.pageLink}}" ng-repeat="dropdown in navigation.dropdown" ng-if="!dropdown.home"><span ng-bind-html="dropdown.title | trustHTML"></span></a>
+                        <a class="font-fancy--2 dropdown-item decoration--never" ng-class="{'active': $root.isActive(navigation.pageLink + '/' + dropdown.pageLink)}" ng-href="{{dropdown.logout ? '/' + dropdown.pageLink : '/' + navigation.pageLink + '/' + dropdown.pageLink}}" ng-repeat="dropdown in navigation.dropdown" ng-if="!dropdown.home"><span ng-bind-html="dropdown.title | trustHTML"></span></a>
                         <!-- End All Dropdown Items -->
                     </div>
                     <!-- End Dropdown -->
@@ -107,17 +107,17 @@
                                     <div class="row mb-2">
                                         <div class="col text-left">
                                             <p class="mb-0">Not a member?</p>
-                                            <a class="decoration--never decorate--highlight highlight-text-foreground font-weight-bold" href="/signup" ng-disabled="formSubmitted">Sign Up</a>
+                                            <a class="decoration--never decorate--highlight highlight-text-foreground font-weight-bold" href="/signup" ng-disabled="formInTransit">Sign Up</a>
                                         </div>
                                         <div class="col text-right">
-                                            <button type="submit" class="btn btn-theme-primary" style="cursor: pointer;" ng-class="{'w-100': $root.isDeviceWidthSmallerThan(426)}" ng-disabled="formSubmitted || loginForm.errors.isError">Login</button>
+                                            <button type="submit" class="btn btn-theme-primary" style="cursor: pointer;" ng-class="{'w-100': $root.isDeviceWidthSmallerThan(426)}" ng-disabled="formInTransit || loginForm.errors.isError">Login</button>
                                         </div>
                                     </div>
                                     <!-- End Sign Up/Login Button -->
                                     <!-- Begin Forgot Password -->
                                     <div class="row">
                                         <div class="col text-right">
-                                            <a class="decoration--never" href="/forgotpassword" ng-disabled="formSubmitted">Forgot Password?</a>
+                                            <a class="decoration--never" href="/forgotpassword" ng-disabled="formInTransit">Forgot Password?</a>
                                         </div>
                                     </div>
                                     <!-- End Forgot Password -->
@@ -127,7 +127,7 @@
                             <!-- End Login Form -->
                             <!-- Begin Loging In Spinner -->
                             <div class="col-auto d-flex align-items-center text-center" style="height: 218px;" ng-if="formInTransit">
-                                <div class="col ml-auto mr-auto d-block">
+                                <div class="col mx-auto d-block">
                                     <i class="fa fa-spinner fa-3x fa-spin"></i>
                                 </div>
                             </div>

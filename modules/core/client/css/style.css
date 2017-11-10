@@ -33,8 +33,6 @@
 /* End Icon Font Path */
 /* Begin Images */
 /* End Images */
-/* Begin ngDialog */
-/* End ngDialog */
 /* Begin Scales */
 /* End Scales */
 /* 
@@ -257,6 +255,12 @@ body::-webkit-scrollbar-thumb {
 
 .card--border--quadruple {
   border-width: 16px; }
+
+.card--border--remove-left {
+  border-left-width: 0; }
+
+.card--border--remove-right {
+  border-right-width: 0; }
 
 .card--radius--none {
   border-radius: 0; }
@@ -527,6 +531,17 @@ nav {
     color: #F5F7F9 !important;
     background-color: #0076FF; }
 
+.tab {
+  border-left: 1px solid rgba(0, 0, 0, 0.125); }
+  .tab:hover {
+    border-left: 1px solid #4d9fff; }
+  .tab--active {
+    border-left: 1px solid #0076FF; }
+
+.dropdown-menu-right {
+  left: unset;
+  right: 0; }
+
 /* Begin Media Queries */
 /* If [device width] is less than or equal to 376px */
 /* If [device width] is less than or equal to 991px */
@@ -555,38 +570,6 @@ nav {
 
 /* End Media Queries */
 /* End Custom Navigation Styles */
-/* Begin Custom ngDialog */
-.ngdialog.ngdialog-theme-dark .ngdialog-content {
-  background: #2C3035;
-  color: #2C3035; }
-
-.ngdialog.ngdialog-theme-dark .ngdialog-close {
-  -webkit-appearance: none;
-  background: none;
-  border: none; }
-  .ngdialog.ngdialog-theme-dark .ngdialog-close:before {
-    color: #2C3035; }
-  .ngdialog.ngdialog-theme-dark .ngdialog-close:hover:before, .ngdialog.ngdialog-theme-dark .ngdialog-close:active:before {
-    color: black; }
-
-.ngdialog.ngdialog-theme-dark .ngdialog-open {
-  height: auto !important; }
-
-.ngdialog.ngdialog-theme-default.custom-width .ngdialog-content, .ngdialog.ngdialog-theme-plain.custom-width .ngdialog-content, .ngdialog.ngdialog-theme-dark.custom-width .ngdialog-content {
-  width: 600px; }
-
-.ngdialog::-webkit-scrollbar {
-  width: 12px;
-  background-color: transparent; }
-
-.ngdialog::-webkit-scrollbar-track {
-  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
-  background-color: #2C3035; }
-
-.ngdialog::-webkit-scrollbar-thumb {
-  background-color: #0076FF; }
-
-/* End Custom ngDialog */
 /* Begin Custom Pagination */
 .page-item.disabled .page-link--dark {
   color: #090a0b;

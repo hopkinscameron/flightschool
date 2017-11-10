@@ -240,7 +240,7 @@ headerModule.controller('HeaderController', ['$scope', '$rootScope', '$location'
     };
 
     // checks if the page is active
-    $scope.isActive = function (page) {
+    $rootScope.$root.isActive = function (page) {
         // get the third index of forward slash
         var index = nthIndexOf($window.location.href, '/', 3);
         var link = $window.location.href.substring(index + 1);
@@ -321,11 +321,11 @@ headerModule.controller('HeaderController', ['$scope', '$rootScope', '$location'
             $rootScope.$root.isLoggedIn = responseHeader.isLoggedIn;
 
             // header refreshed
-            $rootScope.$emit('headerRefreshed', {});
+            $rootScope.$broadcast('headerRefreshed', {});
         })
         .catch(function (responseHeader) {
             // header refreshed with error
-            $rootScope.$emit('headerRefreshed', {'error': true, 'message': responseHeader.message});
+            $rootScope.$broadcast('headerRefreshed', {'error': true, 'message': responseHeader.message});
         });
     };
 

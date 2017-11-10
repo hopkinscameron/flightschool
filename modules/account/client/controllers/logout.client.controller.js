@@ -21,8 +21,8 @@ accountModule.controller('LogoutController', ['$scope', '$rootScope', '$compile'
 
     // logout
     LogoutFactory.logout().then(function (responseL) {
-        // if no error
-        if(!responseL.error) {
+        // if returned a valid response
+        if(responseL && !responseL.error) {
             // if was on a previous route and doesn't need authentication
             if(previousPath && previousPath.length > 0 && $rootScope.$root.prevRouteNeedsAuth) {
                 // redirect to previous page and reload page to refresh user object

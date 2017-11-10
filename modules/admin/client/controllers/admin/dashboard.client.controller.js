@@ -208,7 +208,7 @@ adminModule.controller('DashboardController', ['$scope', '$rootScope', '$compile
         // get dashboard me page data
         DashboardFactory.getDashboardPageInformation().then(function (responseD) {
             // if returned a valid response
-            if (!responseD.error) {
+            if (responseD && !responseD.error) {
                 // set the data
                 $scope.dashboard.requests = responseD;
                 $scope.dashboard.title = 'Dashboard';

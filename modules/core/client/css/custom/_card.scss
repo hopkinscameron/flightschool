@@ -50,8 +50,14 @@
         &--quadruple {
             border-width: $border-size-quadruple * 4;
         }
+        &--remove-left {
+            border-left-width: 0;
+        }
+        &--remove-right {
+            border-right-width: 0;
+        }
     }
-    &--radius{
+    &--radius {
         &--none {
             border-radius: 0;
         }

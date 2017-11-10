@@ -4,155 +4,221 @@
 var accountModule = angular.module('account');
 
 // create the controller
-accountModule.controller('ChangePasswordController', ['$scope', '$rootScope', '$compile', '$location', '$window', '$timeout', 'Service', 'AccountFactory', function ($scope, $rootScope, $compile, $location, $window, $timeout, Service, AccountFactory) {
-    // determines if a page has already sent a request for load
-    var pageRequested = false;
-
+accountModule.controller('ChangePasswordController', ['$scope', '$rootScope', '$location', 'Service', 'AccountFactory', function ($scope, $rootScope, $location, Service, AccountFactory) {
     // set jQuery
     $ = window.jQuery;
 
     // set the path
     Service.afterPath = $location.path();
 
-    // holds the error
-    $scope.error = {
-        'error': false,
-        'title': '',
-        'status': 404,
-        'message': ''
-    };
-
-    // determines if the page is fully loaded
-    $scope.pageFullyLoaded = false;
-
-    // check if header/footer was initialized
-    if($rootScope.$root.showHeader === undefined || $rootScope.$root.showFooter === undefined) {
-        // refresh header
-        $rootScope.$emit('refreshHeader', {});
-
-        // refresh footer
-        $rootScope.$emit('refreshFooter', {});
-    }
-    else {
-        // always refresh header to ensure login
-        $rootScope.$emit('refreshHeader', {});
-    }
-
-    // on header refresh
-    $rootScope.$on('headerRefreshed', function (event, data) {
-        // if footer still hasn't been initialized
-        if($rootScope.$root.showFooter === undefined) {
-            // refresh footer
-            $rootScope.$emit('refreshFooter', {});
-        }
-        else {
-            // initialize the page
-            initializePage();
-        }
-    });
-
-    // on footer refresh
-    $rootScope.$on('footerRefreshed', function (event, data) {
-        // if footer still hasn't been initialized
-        if($rootScope.$root.showHeader === undefined) {
-            // refresh header
-            $rootScope.$emit('refreshHeader', {});
-        }
-        else {
-            // initialize the page
-            initializePage();
-        }
-    });
-
-    // initialize page
-    function initializePage() {
-        // show the header if not shown     
-        if (!$rootScope.$root.showHeader) {
-            $rootScope.$root.showHeader = true;
-        }
-
-        // show the footer if not shown
-        if (!$rootScope.$root.showFooter) {
-            $rootScope.$root.showFooter = true;
-        }
-
-        // if page hasn't been requested yet
-        if(!pageRequested) {
-            // set page has been requested
-            pageRequested = true;
-
-            // show the page after a timeout
-            $timeout(getPageData, $rootScope.$root.getPageDataTimeout);
+    // holds the changePassword form data
+    $scope.changePasswordForm = {
+        'inputs': {
+            'old': '',
+            'new': '',
+            'confirm': ''
+        },
+        'views': {
+            'old': 'old',
+            'new': 'new',
+            'confirm': 'confirm'
+        },
+        'errors': {
+            'errorMessage': '',
+            'isError': false,
+            'old': false,
+            'new': false,
+            'confirm': false
         }
     };
 
+    // determines if form is in transit
+    $scope.formInTransit = false;
+
+     // on call event when the focus enters
+    $scope.viewFocusEnter = function (viewId) {
+        // if entering the old password view
+        if (viewId == $scope.changePasswordForm.views.old) {
+            // reset the error
+            $scope.changePasswordForm.errors.old = false;
+        }
+        // if entering the new password view
+        else if (viewId == $scope.changePasswordForm.views.new) {
+            // reset the error
+            $scope.changePasswordForm.errors.new = false;
+        }
+        // if entering the confirm password view
+        else if (viewId == $scope.changePasswordForm.views.confirm) {
+            // reset the error
+            $scope.changePasswordForm.errors.confirm = false;
+        }
+    };
+
+    // on call event when the focus leaves
+    $scope.viewFocusLeave = function (viewId) {
+        // if leaving the old password view
+        if (viewId == $scope.changePasswordForm.views.old) {
+            // if user left field blank
+            if ($scope.changePasswordForm.inputs.old.length == 0) {
+                // set error
+                $scope.changePasswordForm.errors.old = true;
+                $scope.changePasswordForm.errors.isError = true;
+            }
+        }
+        // if leaving the new password view
+        else if (viewId == $scope.changePasswordForm.views.new) {
+            // if user left field blank
+            if ($scope.changePasswordForm.inputs.new.length == 0) {
+                // set error
+                $scope.changePasswordForm.errors.new = true;
+                $scope.changePasswordForm.errors.isError = true;
+            }
+            // if password is the same as current
+            else if($scope.changePasswordForm.inputs.old == $scope.changePasswordForm.inputs.new) {
+                // set error
+                $scope.changePasswordForm.errors.new = true;
+                $scope.changePasswordForm.errors.isError = true;
+            }
+        }
+        // if leaving the confirm password view
+        else if (viewId == $scope.changePasswordForm.views.confirm) {
+            // if user left field blank
+            if ($scope.changePasswordForm.inputs.confirm.length == 0) {
+                // set error
+                $scope.changePasswordForm.errors.confirm = true;
+                $scope.changePasswordForm.errors.isError = true;
+            }
+            // if passwords don't match
+            else if($scope.changePasswordForm.inputs.new != $scope.changePasswordForm.inputs.confirm) {
+                // set error
+                $scope.changePasswordForm.errors.confirm = true;
+                $scope.changePasswordForm.errors.isError = true;
+            }
+        }
+        
+        // check to see if there is an error
+        if ($scope.changePasswordForm.errors.old) {
+            // set error
+            $scope.changePasswordForm.errors.errorMessage = 'You must enter your old password';
+        }
+        else if ($scope.changePasswordForm.errors.new) {
+            // set error
+            $scope.changePasswordForm.errors.errorMessage = $scope.changePasswordForm.inputs.new.length == 0 ? 'You must enter your new password' : 'Your new password cannot be the same as your old password';
+        }
+        else if ($scope.changePasswordForm.errors.confirm) {
+            // set error
+            $scope.changePasswordForm.errors.errorMessage = $scope.changePasswordForm.inputs.confirm.length == 0 ? 'You must enter your new password again' : 'The new password does not match';
+        }
+        else {
+            // remove error
+            $scope.changePasswordForm.errors.errorMessage = '';
+            $scope.changePasswordForm.errors.isError = false;
+        }
+    };
+
+    // update password
+    $scope.updatePassword = function () {
+        // check for empty values
+        checkEmptyValues();
+
+        // check if an error exists
+        if(!$scope.changePasswordForm.errors.old && !$scope.changePasswordForm.errors.new && !$scope.changePasswordForm.errors.confirm) {
+            // disable button but showing the form has been submitted
+            $scope.formInTransit = true;
+
+            // the data to send
+            var changePasswordData = {
+                'oldPassword': $scope.changePasswordForm.inputs.old,
+                'newPassword': $scope.changePasswordForm.inputs.new,
+                'confirmedPassword': $scope.changePasswordForm.inputs.confirm
+            };
+
+            // update password
+            AccountFactory.updatePassword(changePasswordData).then(function (responseCP) {
+                // if returned a valid response
+                if(responseCP && !responseCP.error) {
+                    // show success
+                    swal({
+                        title: 'Success!',
+                        text: 'You have successfully changed your password.',
+                        type: 'success'
+                    }).then(function () {
+                        // set form not in transit
+                        $scope.formInTransit = false;
+
+                        // clear the form for security
+                        resetForm();
+                    });
+                }
+                else {
+                    // show error
+                    swal({
+                        title: 'Error!',
+                        text: 'Sorry! There was an error: ' + responseCP.message,
+                        type: 'error'
+                    }).then(function () {
+                        // show error
+                        $scope.changePasswordForm.errors.errorMessage = responseCP.message;
+                        $scope.changePasswordForm.errors.isError = true;
+                        $scope.formInTransit = false;
+
+                        // clear the form for security
+                        resetForm();
+                    });
+                }
+            })
+            .catch(function (responseCP) {
+                // show error
+                $scope.changePasswordForm.errors.errorMessage = responseCP.message;
+                $scope.changePasswordForm.errors.isError = true;
+                $scope.formInTransit = false;
+            });
+        }
+    };
+
+    // get page data
+    getPageData();
+    
     // gets the page data
     function getPageData() {
-        // get account navigation data
-        AccountFactory.getAccountNavigation().then(function (responseAN) {
+        // initialize
+        $scope.changePassword = {};
+
+        // get change new page data
+        AccountFactory.getChangePasswordPageInformation().then(function (responseCP) {
             // if returned a valid response
-            if (!responseAN.error) {
-                // get change password page data
-                AccountFactory.getChangePasswordPageInformation().then(function (responseCP) {
-                    // if returned a valid response
-                    if (!responseCP.error) {
-                        // set the data
-                        $scope.account = responseCP;
-                        $scope.account.navigation = responseAN;
-                        $scope.account.title = 'Change Password';
+            if (responseCP && !responseCP.error) {
+                // set the data
+                $scope.changePassword.data = responseCP;
+                $scope.changePassword.title = 'Change Password';
+                $scope.changePassword.pageHeader = $scope.changePassword.title;
+                $scope.changePassword.pageSubHeader = 'Oh we see you want to change your password right?';
 
-                        // holds the animation time
-                        $scope.animationStyle = $rootScope.$root.getAnimationDelay();
-
-                        // holds the page title
-                        $scope.pageTitle = $scope.account.title + ' | ' + ApplicationConfiguration.applicationName;
-                        
-                        // setup page
-                        setUpPage();
-                    }
-                    else {
-                        // set error
-                        $scope.pageTitle = responseCP.title;
-                        $scope.error.error = true;
-                        $scope.error.title = responseCP.title;
-                        $scope.error.status = responseCP.status;
-                        $scope.error.message = responseCP.message;
-
-                        // setup page
-                        setUpPage();
-                    }
-                })
-                .catch(function (responseCP) {
-                    // set error
-                    $scope.pageTitle = responseCP.title;
-                    $scope.error.error = true;
-                    $scope.error.title = responseCP.title;
-                    $scope.error.status = responseCP.status;
-                    $scope.error.message = responseCP.message;
-
-                    // setup page
-                    setUpPage();
-                });
+                // holds the page title
+                $scope.pageTitle = $scope.changePassword.title + ' | ' + ApplicationConfiguration.applicationName;
+                
+                // setup page
+                setUpPage();
             }
             else {
                 // set error
-                $scope.pageTitle = responseAN.title;
+                $scope.pageTitle = responseCP.title;
                 $scope.error.error = true;
-                $scope.error.title = responseAN.title;
-                $scope.error.status = responseAN.status;
-                $scope.error.message = responseAN.message;
+                $scope.error.title = responseCP.title;
+                $scope.error.status = responseCP.status;
+                $scope.error.message = responseCP.message;
 
                 // setup page
                 setUpPage();
             }
         })
-        .catch(function (responseAN) {
+        .catch(function (responseCP) {
             // set error
-            $scope.pageTitle = responseAN.title;
+            $scope.pageTitle = responseCP.title;
             $scope.error.error = true;
-            $scope.error.title = responseAN.title;
-            $scope.error.status = responseAN.status;
-            $scope.error.message = responseAN.message;
+            $scope.error.title = responseCP.title;
+            $scope.error.status = responseCP.status;
+            $scope.error.message = responseCP.message;
 
             // setup page
             setUpPage();
@@ -161,25 +227,46 @@ accountModule.controller('ChangePasswordController', ['$scope', '$rootScope', '$
 
     // sets up the page
     function setUpPage() {
-        // set up the title
-        var titleDOM = document.getElementById('pageTitle');
-        var title = '\'' + $scope.pageTitle + '\'';
-        titleDOM.setAttribute('ng-bind-html', title);
-        $compile(titleDOM)($scope);
+        // the data to send to the parent
+        var data = {
+            'error': _.cloneDeep($scope.error),
+            'pageTitle': _.cloneDeep($scope.pageTitle),
+            'pageHeader': _.cloneDeep($scope.changePassword.pageHeader),
+            'pageSubHeader': _.cloneDeep($scope.changePassword.pageSubHeader)
+        };
 
-        // set page fully loaded
-        $scope.pageFullyLoaded = true;
-
-        // show the page after a timeout
-        $timeout(showPage, $rootScope.$root.showPageTimeout);
+        // update the account page
+        $scope.$emit('updateAccountPage', data);
     };
 
-    // shows the page
-    function showPage() {
-        // check if collapsing is already occuring
-        if(!angular.element('#pageShow').hasClass('collapsing')) {
-            // show the page
-            angular.element('#pageShow').collapse('show');
+    // checks for any empty values
+    function checkEmptyValues() {
+        // check for any empty values
+        if (!$scope.changePasswordForm.inputs.confirm || $scope.changePasswordForm.inputs.confirm.length == 0) {
+            // set error
+            $scope.changePasswordForm.errors.errorMessage = $scope.changePasswordForm.inputs.confirm.length == 0 ? 'You must enter your new password again' : 'The new password does not match';
+            $scope.changePasswordForm.errors.confirm = true;
+            $scope.changePasswordForm.errors.isError = true;
         }
+        if (!$scope.changePasswordForm.inputs.new || $scope.changePasswordForm.inputs.new.length == 0) {
+            // set error
+            $scope.changePasswordForm.errors.errorMessage = $scope.changePasswordForm.inputs.new.length == 0 ? 'You must enter your new password' : 'Your new password cannot be the same as your old password';
+            $scope.changePasswordForm.errors.new = true;
+            $scope.changePasswordForm.errors.isError = true;
+        }
+        if (!$scope.changePasswordForm.inputs.old || $scope.changePasswordForm.inputs.old.length == 0) {
+            // set error
+            $scope.changePasswordForm.errors.errorMessage = 'You must enter your old password';
+            $scope.changePasswordForm.errors.old = true;
+            $scope.changePasswordForm.errors.isError = true;
+        }
+    };
+
+    // clear the fields
+    function resetForm() {
+        // set to default
+        $scope.changePasswordForm.inputs.old = '';
+        $scope.changePasswordForm.inputs.new = '';
+        $scope.changePasswordForm.inputs.confirm = '';
     };
 }]);

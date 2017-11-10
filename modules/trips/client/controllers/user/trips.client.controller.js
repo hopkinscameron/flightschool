@@ -88,13 +88,13 @@ tripsModule.controller('TripsController', ['$scope', '$rootScope', '$compile', '
 
     // gets the page data
     function getPageData() {
-        // get trips us page data
-        TripsFactory.getTripsUsPageInformation().then(function (responseAU) {
+        // get trips page data
+        TripsFactory.getTripsPageInformation().then(function (responseT) {
             // if returned a valid response
-            if (!responseAU.error) {
+            if (responseT && !responseT.error) {
                 // set the data
-                $scope.trips = responseAU;
-                $scope.trips.title = 'Trips Us';
+                $scope.trips = responseT;
+                $scope.trips.title = 'Trips';
 
                 // holds the animation time
                 $scope.animationStyle = $rootScope.$root.getAnimationDelay();
@@ -107,23 +107,23 @@ tripsModule.controller('TripsController', ['$scope', '$rootScope', '$compile', '
             }
             else {
                 // set error
-                $scope.pageTitle = responseAU.title;
+                $scope.pageTitle = responseT.title;
                 $scope.error.error = true;
-                $scope.error.title = responseAU.title;
-                $scope.error.status = responseAU.status;
-                $scope.error.message = responseAU.message;
+                $scope.error.title = responseT.title;
+                $scope.error.status = responseT.status;
+                $scope.error.message = responseT.message;
 
                 // setup page
                 setUpPage();
             }
         })
-        .catch(function (responseAU) {
+        .catch(function (responseT) {
             // set error
-            $scope.pageTitle = responseAU.title;
+            $scope.pageTitle = responseT.title;
             $scope.error.error = true;
-            $scope.error.title = responseAU.title;
-            $scope.error.status = responseAU.status;
-            $scope.error.message = responseAU.message;
+            $scope.error.title = responseT.title;
+            $scope.error.status = responseT.status;
+            $scope.error.message = responseT.message;
 
             // setup page
             setUpPage();

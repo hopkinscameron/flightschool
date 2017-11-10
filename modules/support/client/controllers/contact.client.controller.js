@@ -101,7 +101,7 @@ supportModule.controller('ContactController', ['$scope', '$rootScope', '$compile
         // get support page data
         SupportFactory.getContactPageInformation().then(function (responseC) {
             // if returned a valid response
-            if (!responseC.error) {
+            if (responseC && !responseC.error) {
                 // set the data
                 $scope.contact.data = responseC;
                 $scope.contact.title = 'Contact Us';

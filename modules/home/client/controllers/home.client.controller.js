@@ -93,7 +93,7 @@ homeModule.controller('HomeController', ['$scope', '$rootScope', '$compile', '$l
         // get home page data
         HomeFactory.getHomePageInformation().then(function (responseH) {
             // if returned a valid response
-            if (!responseH.error) {
+            if (responseH && !responseH.error) {
                 // set the data
                 $scope.home.data = responseH;
                 $scope.home.title = 'Home';

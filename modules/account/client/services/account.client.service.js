@@ -41,15 +41,33 @@ accountServiceModule.factory('AccountFactory', ['$http', '$location', '$rootScop
         // set the endpoint
         var endpoint = appPath + '/account/edit-profile';
 
-        // create request
-        var req = {
-            method: 'GET',
-            url: endpoint,
-            data: undefined
-        };
+        // send request
+        return $http.get(endpoint, { 'ignoreLoadingBar': true }).then(function (response) {
+            return response.data.d;
+        })
+        .catch(function (response) {
+            // if the response was sent back with the custom data response
+            if(response.data) {
+                return { 'error': true, 'title': response.data.title, 'status': response.status, 'message': response.data.message };
+            }
+
+            // return default response
+            return { 'error': true, 'title': $rootScope.$root.generalStatusError, 'status': response.status, 'message': response.xhrStatus };
+        });
+    };
+
+    // updates profile
+    factory.updateProfile = function (data) {
+        // set the endpoint
+        var endpoint = appPath + '/account/edit-profile';
+
+        // stringify the data
+        var dataStrigified = JSON.stringify({
+            
+        });
 
         // send request
-        return $http(req).then(function (response) {
+        return $http.put(endpoint, dataStrigified, { 'ignoreLoadingBar': true }).then(function (response) {
             return response.data.d;
         })
         .catch(function (response) {
@@ -68,15 +86,35 @@ accountServiceModule.factory('AccountFactory', ['$http', '$location', '$rootScop
         // set the endpoint
         var endpoint = appPath + '/account/change-password';
 
-        // create request
-        var req = {
-            method: 'GET',
-            url: endpoint,
-            data: undefined
-        };
+        // send request
+        return $http.get(endpoint, { 'ignoreLoadingBar': true }).then(function (response) {
+            return response.data.d;
+        })
+        .catch(function (response) {
+            // if the response was sent back with the custom data response
+            if(response.data) {
+                return { 'error': true, 'title': response.data.title, 'status': response.status, 'message': response.data.message };
+            }
+
+            // return default response
+            return { 'error': true, 'title': $rootScope.$root.generalStatusError, 'status': response.status, 'message': response.xhrStatus };
+        });
+    };
+
+    // updates password
+    factory.updatePassword = function (data) {
+        // set the endpoint
+        var endpoint = appPath + '/account/change-password';
+
+        // stringify the data
+        var dataStrigified = JSON.stringify({
+            'oldPassword': data.oldPassword,
+            'newPassword': data.newPassword,
+            'confirmedPassword': data.confirmedPassword
+        });
 
         // send request
-        return $http(req).then(function (response) {
+        return $http.put(endpoint, dataStrigified, { 'ignoreLoadingBar': true }).then(function (response) {
             return response.data.d;
         })
         .catch(function (response) {
@@ -95,15 +133,33 @@ accountServiceModule.factory('AccountFactory', ['$http', '$location', '$rootScop
         // set the endpoint
         var endpoint = appPath + '/account/hub';
 
-        // create request
-        var req = {
-            method: 'GET',
-            url: endpoint,
-            data: undefined
-        };
+        // send request
+        return $http.get(endpoint, { 'ignoreLoadingBar': true }).then(function (response) {
+            return response.data.d;
+        })
+        .catch(function (response) {
+            // if the response was sent back with the custom data response
+            if(response.data) {
+                return { 'error': true, 'title': response.data.title, 'status': response.status, 'message': response.data.message };
+            }
+
+            // return default response
+            return { 'error': true, 'title': $rootScope.$root.generalStatusError, 'status': response.status, 'message': response.xhrStatus };
+        });
+    };
+
+    // updates hubs
+    factory.updateHubs = function (data) {
+        // set the endpoint
+        var endpoint = appPath + '/account/hub';
+
+        // stringify the data
+        var dataStrigified = JSON.stringify({
+            
+        });
 
         // send request
-        return $http(req).then(function (response) {
+        return $http.put(endpoint, dataStrigified, { 'ignoreLoadingBar': true }).then(function (response) {
             return response.data.d;
         })
         .catch(function (response) {
@@ -122,15 +178,33 @@ accountServiceModule.factory('AccountFactory', ['$http', '$location', '$rootScop
         // set the endpoint
         var endpoint = appPath + '/account/notifications';
 
-        // create request
-        var req = {
-            method: 'GET',
-            url: endpoint,
-            data: undefined
-        };
+        // send request
+        return $http.get(endpoint, { 'ignoreLoadingBar': true }).then(function (response) {
+            return response.data.d;
+        })
+        .catch(function (response) {
+            // if the response was sent back with the custom data response
+            if(response.data) {
+                return { 'error': true, 'title': response.data.title, 'status': response.status, 'message': response.data.message };
+            }
+
+            // return default response
+            return { 'error': true, 'title': $rootScope.$root.generalStatusError, 'status': response.status, 'message': response.xhrStatus };
+        });
+    };
+
+    // updates notification settings
+    factory.updateNotifications = function (data) {
+        // set the endpoint
+        var endpoint = appPath + '/account/notifications';
+
+        // stringify the data
+        var dataStrigified = JSON.stringify({
+            
+        });
 
         // send request
-        return $http(req).then(function (response) {
+        return $http.put(endpoint, dataStrigified, { 'ignoreLoadingBar': true }).then(function (response) {
             return response.data.d;
         })
         .catch(function (response) {

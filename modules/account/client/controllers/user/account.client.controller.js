@@ -25,6 +25,9 @@ accountModule.controller('AccountController', ['$scope', '$rootScope', '$compile
         'message': ''
     };
 
+    // determines if the top level (account) page has been set up
+    $scope.pageAlreadySet = false;
+
     // determines if the page is fully loaded
     $scope.pageFullyLoaded = false;
 
@@ -67,19 +70,58 @@ accountModule.controller('AccountController', ['$scope', '$rootScope', '$compile
         }
     });
 
-    // checks if the page is active
-    $scope.isActive = function (page) {
-        // get the third index of forward slash
-        var index = nthIndexOf($window.location.href, '/', 3);
-        var link = $window.location.href.substring(index + 1);
-        
-        // check if on page
-        if (link == page) {
-            // set the class as active
-            return true;
-        }
+    // listen for the event in the relevant $scope
+    $scope.$on('updateAccountPage', function (event, data) {
+        // if there is data
+        if(data) {
+            // if there is a new error
+            if(data.error) {
+                // set the error
+                $scope.error = data.error;
+            }
 
-        return false;
+            // if there is a new page title
+            if(data.pageTitle) {
+                // set the title
+                $scope.pageTitle = data.pageTitle;
+
+                // set up the title
+                var titleDOM = document.getElementById('pageTitle');
+                var title = '\'' + $scope.pageTitle + '\'';
+                titleDOM.setAttribute('ng-bind-html', title);
+                $compile(titleDOM)($scope);
+            }
+
+            // if there is a new page header
+            if(data.pageHeader) {
+                // set the header
+                $scope.account.pageHeader = data.pageHeader;
+            }
+
+            // if there is a new page sub header
+            if(data.pageSubHeader) {
+                // set the sub header
+                $scope.account.pageSubHeader = data.pageSubHeader;
+            }
+        }
+    });
+
+    // navigate to tab
+    $scope.navigateToTab = function (path) {
+        /*
+        // change the location without reloading the entire page
+        $location.path(path, false);
+        */
+
+        // set the path
+        Service.afterPath = $location.path();
+        $routeParams.section = path.substring(path.lastIndexOf('/') + 1);
+
+        // set the account section
+        section = $routeParams.section;
+
+        // change page and get the data
+        getPageData();
     };
 
     // initialize page
@@ -106,49 +148,67 @@ accountModule.controller('AccountController', ['$scope', '$rootScope', '$compile
 
     // gets the page data
     function getPageData() {
-        // initialize
-        $scope.account = {};
+        // if not set
+        if(!$scope.pageAlreadySet) {
+            $scope.pageAlreadySet = true;
 
-        // get account navigation data
-        AccountFactory.getAccountNavigation().then(function (responseAN) {
-            // if returned a valid response
-            if (!responseAN.error) {
-                // set the data
-                $scope.account.navigation = responseAN;
-                $scope.account.title = 'Account';
+            // initialize
+            $scope.account = {};
 
-                // holds the animation time
-                $scope.animationStyle = $rootScope.$root.getAnimationDelay();
+            // get account navigation data
+            AccountFactory.getAccountNavigation().then(function (responseAN) {
+                // if returned a valid response
+                if (responseAN && !responseAN.error) {
+                    // set the data
+                    $scope.account.navigation = responseAN;
+                    $scope.account.title = 'Account';
+                    $scope.account.pageHeader = $scope.account.title;
+                    $scope.account.pageSubHeader = 'Let\'s go ahead and edit some stuff.';
 
-                // holds the page title
-                $scope.pageTitle = $scope.account.title + ' | ' + ApplicationConfiguration.applicationName;
+                    // holds the page title
+                    $scope.pageTitle = $scope.account.title + ' | ' + ApplicationConfiguration.applicationName;
 
-                // initialize
-                $scope.partialView = undefined;
+                    // holds the animation time
+                    $scope.animationStyle = $rootScope.$root.getAnimationDelay();
 
-                // set the correct page
-                _.forEach(responseAN, function (value) {
-                    // if matches
-                    if(value.pageLink == section) {
-                        $scope.partialView = _.cloneDeep(value);
-                        return;
+                    // initialize
+                    $scope.partialView = undefined;
+
+                    // set the correct page
+                    _.forEach(responseAN, function (value) {
+                        // if matches
+                        if(value.pageLink == section) {
+                            $scope.partialView = _.cloneDeep(value);
+                            return;
+                        }
+                    });
+                    
+                    // if there is not a correct match
+                    if(!$scope.partialView) {
+                        // set error
+                        $scope.pageTitle = 'Page not found';
+                        $scope.error.error = true;
+                        $scope.error.title = 'Page not found';
+                        $scope.error.status = 404;
+                        $scope.error.message = 'Page not found';
                     }
-                });
-                
-                // if there is not a correct match
-                if(!$scope.partialView) {
-                    // set error
-                    $scope.pageTitle = 'Page not found';
-                    $scope.error.error = true;
-                    $scope.error.title = 'Page not found';
-                    $scope.error.status = 404;
-                    $scope.error.message = 'Page not found';
-                }
 
-                // setup page
-                setUpPage();
-            }
-            else {
+                    // setup page
+                    setUpPage();
+                }
+                else {
+                    // set error
+                    $scope.pageTitle = responseAN.title;
+                    $scope.error.error = true;
+                    $scope.error.title = responseAN.title;
+                    $scope.error.status = responseAN.status;
+                    $scope.error.message = responseAN.message;
+
+                    // setup page
+                    setUpPage();
+                }
+            })
+            .catch(function (responseAN) {
                 // set error
                 $scope.pageTitle = responseAN.title;
                 $scope.error.error = true;
@@ -158,19 +218,31 @@ accountModule.controller('AccountController', ['$scope', '$rootScope', '$compile
 
                 // setup page
                 setUpPage();
-            }
-        })
-        .catch(function (responseAN) {
-            // set error
-            $scope.pageTitle = responseAN.title;
-            $scope.error.error = true;
-            $scope.error.title = responseAN.title;
-            $scope.error.status = responseAN.status;
-            $scope.error.message = responseAN.message;
+            });
+        }
+        else {
+            // initialize
+            $scope.partialView = undefined;
 
-            // setup page
-            setUpPage();
-        });
+            // set the correct page
+            _.forEach($scope.account.navigation, function (value) {
+                // if matches
+                if(value.pageLink == section) {
+                    $scope.partialView = _.cloneDeep(value);
+                    return;
+                }
+            });
+            
+            // if there is not a correct match
+            if(!$scope.partialView) {
+                // set error
+                $scope.pageTitle = 'Page not found';
+                $scope.error.error = true;
+                $scope.error.title = 'Page not found';
+                $scope.error.status = 404;
+                $scope.error.message = 'Page not found';
+            }
+        }
     };
 
     // sets up the page

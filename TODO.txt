@@ -1,4 +1,6 @@
 ﻿In Progress
+- finish change password page -> once submitted, form doesn't get unlocked
+- get user by id when on account server side
 
 Next
 - add an "error dashboard" so if there are errors in server, we can view them
@@ -9,6 +11,7 @@ Future
 - after sign up, send an email to verify
 
 Done
+- fixed issue with if a non valid response comes back, and there is no response.data.d
 
 Testing
 

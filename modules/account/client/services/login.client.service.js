@@ -47,15 +47,8 @@ accountServiceModule.factory('LoginFactory', ['$http', '$location', '$rootScope'
             'password': credentials.password
         });
 
-        // create request
-        var req = {
-            method: 'POST',
-            url: endpoint,
-            data: loginStrigified
-        };
-
         // send request
-        return $http(req).then(function (response) {
+        return $http.post(endpoint, loginStrigified, { 'ignoreLoadingBar': true }).then(function (response) {
             return response.data.d;
         })
         .catch(function (response) {
@@ -82,15 +75,8 @@ accountServiceModule.factory('LoginFactory', ['$http', '$location', '$rootScope'
             'password': credentials.password
         });
 
-        // create request
-        var req = {
-            method: 'POST',
-            url: endpoint,
-            data: signUpStrigified
-        };
-
         // send request
-        return $http(req).then(function (response) {
+        return $http.post(endpoint, signUpStrigified, { 'ignoreLoadingBar': true }).then(function (response) {
             return response.data.d;
         })
         .catch(function (response) {

@@ -130,7 +130,20 @@ nav {
         background-color: $brand-theme-main;
     }
 }
+.tab {
+    border-left: 1px solid rgba(0, 0, 0, 0.125);
 
+    &:hover {
+        border-left: 1px solid lighten($brand-theme-main, 15%);
+    }
+    &--active {
+        border-left: 1px solid $brand-theme-main;
+    }
+}
+.dropdown-menu-right {
+    left: unset;
+    right: 0;
+}
 /* Begin Media Queries */
 /* If [device width] is less than or equal to 376px */
 @media (max-width: 376px) {

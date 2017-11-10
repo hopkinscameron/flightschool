@@ -201,8 +201,9 @@ accountModule.controller('SignUpController', ['$scope', '$rootScope', '$compile'
 
             // login
             LoginFactory.signUp(signUpData).then(function (responseSU) {
-                // if no error
-                if(!responseSU.error) {
+                // if returned a valid response
+                if(responseSU && !responseSU.error) {
+                    // show success
                     swal({
                         title: 'Success!',
                         text: 'An email will be sent and you need to verify your account.',
@@ -215,9 +216,16 @@ accountModule.controller('SignUpController', ['$scope', '$rootScope', '$compile'
                 }
                 else {
                     // show error
-                    $scope.signUpForm.errors.errorMessage = responseSU.message;
-                    $scope.signUpForm.errors.isError = true;
-                    $scope.formInTransit = false;
+                    swal({
+                        title: 'Error!',
+                        text: 'Sorry! There was an error: ' + responseSU.message,
+                        type: 'error'
+                    }).then(function () {
+                        // show error
+                        $scope.signUpForm.errors.errorMessage = responseSU.message;
+                        $scope.signUpForm.errors.isError = true;
+                        $scope.formInTransit = false;
+                    });
                 }
             })
             .catch(function (responseSU) {
@@ -255,8 +263,8 @@ accountModule.controller('SignUpController', ['$scope', '$rootScope', '$compile'
     function getPageData() {
         // check if user is logged in
         LoginFactory.isUserLoggedIn().then(function (responseL) {
-            // if no error
-            if(!responseL.error) {
+            // if returned a valid response
+            if(responseL && !responseL.error) {
                 // if user is not logged in
                 if(!responseL.isLoggedIn) {
                     $scope.signUp.title = 'Sign Up';

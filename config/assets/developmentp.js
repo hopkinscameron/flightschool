@@ -10,9 +10,6 @@ module.exports = {
                 'public/lib/bootstrap/bootstrap-grid.min.css',
                 'public/lib/angular-loading-bar/loading-bar.min.css',
                 'public/lib/font-awesome/font-awesome.min.css',
-                'public/lib/ng-dialog/ngDialog-theme-default.min.css',
-                'public/lib/ng-dialog/ngDialog-theme-plain.min.css',
-                'public/lib/ng-dialog/ngDialog.min.css',
                 'public/lib/sweet-alert-2/sweetalert2.min.css'
                 // endbower
             ],
@@ -32,8 +29,6 @@ module.exports = {
                 'public/lib/tinymce/tinymce.min.js',
                 'public/lib/angular-ui-tinymce/dist/tinymce.min.js',
                 'public/lib/bootstrap/bootstrap.min.js',
-                'public/lib/mark/mark.min.js',
-                'public/lib/ng-dialog/ngDialog.min.js',
                 'public/lib/chart.js/Chart.bundle.min.js',
                 'public/lib/angular-chart/angular-chart.min.js',
                 'public/lib/lodash/lodash.min.js',

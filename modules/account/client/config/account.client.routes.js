@@ -33,12 +33,12 @@ accountRoutesModule.config(['$routeProvider', function($routeProvider) {
             role: 'user'
         })
         .when('/account/hubs', {
-            templateUrl: '/modules/account/client/views/user/hubs.client.view.html',
+            templateUrl: '/modules/account/client/views/user/hub.client.view.html',
             authenticated: true,
             role: 'user'
         })
         .when('/account/notifications', {
-            templateUrl: '/modules/account/client/views/user/notification.client.view.html',
+            templateUrl: '/modules/account/client/views/user/notifications.client.view.html',
             authenticated: true,
             role: 'user'
         })*/
