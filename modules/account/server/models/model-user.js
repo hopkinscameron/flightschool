@@ -56,7 +56,7 @@ var UserSchema = {
         trim: true,
         required: true
     },
-    gender: {
+    sex: {
         type: String,
         enum: ['male', 'female'],
         default: null

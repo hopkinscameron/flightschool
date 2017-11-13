@@ -24,7 +24,7 @@
                     <div class="col-sm-3 pl-0 pr-0">
                         <div class="nav flex-column card card--radius--none card--border--remove-right">
                             <div class="nav-item" ng-repeat="navigation in account.navigation">
-                                <a class="nav-link decoration--never tab" style="cursor: pointer;" ng-class="{'active tab--active': $root.isActive('account/' + navigation.pageLink)}" ng-click="navigateToTab('account/' + navigation.pageLink)">{{navigation.title}}</a>
+                                <a class="nav-link decoration--never tab btn-cursor-pointer" ng-class="{'active tab--active': $root.isActive('account/' + navigation.pageLink)}" ng-click="navigateToTab('account/' + navigation.pageLink)">{{navigation.title}}</a>
                             </div>
                         </div>
                     </div>

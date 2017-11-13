@@ -11,7 +11,7 @@ accountModule.controller('ChangePasswordController', ['$scope', '$rootScope', '$
     // set the path
     Service.afterPath = $location.path();
 
-    // holds the changePassword form data
+    // holds the change password form data
     $scope.changePasswordForm = {
         'inputs': {
             'old': '',
@@ -34,6 +34,17 @@ accountModule.controller('ChangePasswordController', ['$scope', '$rootScope', '$
 
     // determines if form is in transit
     $scope.formInTransit = false;
+
+    // holds the last password changed
+    $scope.lastPasswordChanged = {
+        'date': new Date('1/13/17, 10:03 AM'),
+        'timeAgo': null,
+        'format': null
+    };
+
+    // set the time ago and format
+    $scope.lastPasswordChanged.timeAgo = $rootScope.$root.getTimeSince($scope.lastPasswordChanged.date);
+    $scope.lastPasswordChanged.format = $rootScope.$root.formatDate($rootScope.$root.locale, $scope.lastPasswordChanged.date);
 
      // on call event when the focus enters
     $scope.viewFocusEnter = function (viewId) {
@@ -134,18 +145,17 @@ accountModule.controller('ChangePasswordController', ['$scope', '$rootScope', '$
             };
 
             // update password
-            AccountFactory.updatePassword(changePasswordData).then(function (responseCP) {
+            AccountFactory.updatePassword(changePasswordData).then(function (responseUP) {
                 // if returned a valid response
-                if(responseCP && !responseCP.error) {
+                if(responseUP && !responseUP.error) {
                     // show success
                     swal({
                         title: 'Success!',
                         text: 'You have successfully changed your password.',
-                        type: 'success'
+                        type: 'success',
+                        confirmButtonClass: 'btn btn-theme-primary btn-cursor-pointer',
+                        buttonsStyling: false
                     }).then(function () {
-                        // set form not in transit
-                        $scope.formInTransit = false;
-
                         // clear the form for security
                         resetForm();
                     });
@@ -154,24 +164,36 @@ accountModule.controller('ChangePasswordController', ['$scope', '$rootScope', '$
                     // show error
                     swal({
                         title: 'Error!',
-                        text: 'Sorry! There was an error: ' + responseCP.message,
-                        type: 'error'
+                        text: 'Sorry! There was an error: ' + responseUP.message,
+                        type: 'error',
+                        confirmButtonClass: 'btn btn-theme-primary btn-cursor-pointer',
+                        buttonsStyling: false
                     }).then(function () {
                         // show error
-                        $scope.changePasswordForm.errors.errorMessage = responseCP.message;
+                        $scope.changePasswordForm.errors.errorMessage = responseUP.message;
                         $scope.changePasswordForm.errors.isError = true;
-                        $scope.formInTransit = false;
 
                         // clear the form for security
                         resetForm();
                     });
                 }
             })
-            .catch(function (responseCP) {
+            .catch(function (responseUP) {
                 // show error
-                $scope.changePasswordForm.errors.errorMessage = responseCP.message;
-                $scope.changePasswordForm.errors.isError = true;
-                $scope.formInTransit = false;
+                swal({
+                    title: 'Error!',
+                    text: 'Sorry! There was an error: ' + responseUP.message,
+                    type: 'error',
+                    confirmButtonClass: 'btn btn-theme-primary btn-cursor-pointer',
+                    buttonsStyling: false
+                }).then(function () {
+                    // show error
+                    $scope.changePasswordForm.errors.errorMessage = responseUP.message;
+                    $scope.changePasswordForm.errors.isError = true;
+
+                    // clear the form for security
+                    resetForm();
+                });
             });
         }
     };
@@ -268,5 +290,9 @@ accountModule.controller('ChangePasswordController', ['$scope', '$rootScope', '$
         $scope.changePasswordForm.inputs.old = '';
         $scope.changePasswordForm.inputs.new = '';
         $scope.changePasswordForm.inputs.confirm = '';
+        $scope.formInTransit = false;
+
+        // force apply
+        $scope.$apply()
     };
 }]);

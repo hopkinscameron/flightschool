@@ -15,6 +15,11 @@
         "view": "/modules/account/client/views/user/hub.client.view.html"
     },
     {
+        "title": "Membership",
+        "pageLink": "membership",
+        "view": "/modules/account/client/views/user/membership.client.view.html"
+    },
+    {
         "title": "Email and SMS",
         "pageLink": "notifications",
         "view": "/modules/account/client/views/user/notifications.client.view.html"

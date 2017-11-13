@@ -35,6 +35,12 @@ module.exports = function (app) {
     app.route('/api/account/hub').get([accountPolicy.isAllowed, ipLogger.log, accountController.readDB], accountController.read);
     app.route('/api/account/hub').put([accountPolicy.isAllowed, ipLogger.log, accountController.readDB], accountController.read);
 
+    // GET gets user's membership information
+    // PUT updates user's membership settings
+	// format /api/membership
+    app.route('/api/account/membership').get([accountPolicy.isAllowed, ipLogger.log, accountController.readDB], accountController.read);
+    app.route('/api/account/membership').put([accountPolicy.isAllowed, ipLogger.log, accountController.readDB], accountController.read);
+
     // GET gets user's notifications information
     // PUT updates user's notification settings
 	// format /api/notifications

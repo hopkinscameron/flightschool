@@ -108,10 +108,8 @@ accountModule.controller('AccountController', ['$scope', '$rootScope', '$compile
 
     // navigate to tab
     $scope.navigateToTab = function (path) {
-        /*
         // change the location without reloading the entire page
         $location.path(path, false);
-        */
 
         // set the path
         Service.afterPath = $location.path();

@@ -11,6 +11,94 @@ accountModule.controller('NotificationsController', ['$scope', '$rootScope', '$l
     // set the path
     Service.afterPath = $location.path();
 
+    // holds the notifications form data
+    $scope.notificationsForm = {
+        'inputs': {
+            'news': false,
+            'reminderEmail': false,
+            'research': false,
+            'reminderSMS': false
+        }
+    };
+
+    // determines if form is in transit
+    $scope.formInTransit = false;
+
+    // update notifications
+    $scope.updateNotifications = function () {
+        // disable button but showing the form has been submitted
+        $scope.formInTransit = true;
+
+        // the data to send
+        var notificationsData = {
+            'news': $scope.notificationsForm.inputs.news,
+            'reminderEmail': $scope.notificationsForm.inputs.reminderEmail,
+            'research': $scope.notificationsForm.inputs.research,
+            'reminderSMS': $scope.notificationsForm.inputs.reminderSMS
+        };
+
+        // update notifications
+        AccountFactory.updateNotifications(notificationsData).then(function (responseUN) {
+            // if returned a valid response
+            if(responseUN && !responseUN.error) {
+                // show success
+                swal({
+                    title: 'Success!',
+                    text: 'You have successfully updated your notifications.',
+                    type: 'success',
+                    confirmButtonClass: 'btn btn-theme-primary btn-cursor-pointer',
+                    buttonsStyling: false
+                }).then(function () {
+                    // show the form is no longer in transit
+                    $scope.formInTransit = false;
+
+                    // force apply
+                    $scope.$apply()
+                });
+            }
+            else {
+                // show error
+                swal({
+                    title: 'Error!',
+                    text: 'Sorry! There was an error: ' + responseUN.message,
+                    type: 'error',
+                    confirmButtonClass: 'btn btn-theme-primary btn-cursor-pointer',
+                    buttonsStyling: false
+                }).then(function () {
+                    // show error
+                    $scope.notificationsForm.errors.errorMessage = responseUN.message;
+                    $scope.notificationsForm.errors.isError = true;
+
+                    // show the form is no longer in transit
+                    $scope.formInTransit = false;
+
+                    // force apply
+                    $scope.$apply()
+                });
+            }
+        })
+        .catch(function (responseUN) {
+            // show error
+            swal({
+                title: 'Error!',
+                text: 'Sorry! There was an error: ' + responseUN.message,
+                type: 'error',
+                confirmButtonClass: 'btn btn-theme-primary btn-cursor-pointer',
+                buttonsStyling: false
+            }).then(function () {
+                // show error
+                $scope.notificationsForm.errors.errorMessage = responseUN.message;
+                $scope.notificationsForm.errors.isError = true;
+
+                // show the form is no longer in transit
+                $scope.formInTransit = false;
+
+                // force apply
+                $scope.$apply()
+            });
+        });
+    };
+
     // get page data
     getPageData();
     
@@ -19,15 +107,15 @@ accountModule.controller('NotificationsController', ['$scope', '$rootScope', '$l
         // initialize
         $scope.notifications = {};
 
-        // get change password page data
-        AccountFactory.getNotificationsPageInformation().then(function (responseCP) {
+        // get notifications page data
+        AccountFactory.getNotificationsPageInformation().then(function (responseN) {
             // if returned a valid response
-            if (responseCP && !responseCP.error) {
+            if (responseN && !responseN.error) {
                 // set the data
-                $scope.notifications.data = responseCP;
+                $scope.notifications.data = responseN;
                 $scope.notifications.title = 'Notifications';
                 $scope.notifications.pageHeader = $scope.notifications.title;
-                $scope.notifications.pageSubHeader = 'Let\'s manage these notifications?';
+                $scope.notifications.pageSubHeader = 'Let\'s manage these notifications!';
 
                 // holds the page title
                 $scope.pageTitle = $scope.notifications.title + ' | ' + ApplicationConfiguration.applicationName;
@@ -37,23 +125,23 @@ accountModule.controller('NotificationsController', ['$scope', '$rootScope', '$l
             }
             else {
                 // set error
-                $scope.pageTitle = responseCP.title;
+                $scope.pageTitle = responseN.title;
                 $scope.error.error = true;
-                $scope.error.title = responseCP.title;
-                $scope.error.status = responseCP.status;
-                $scope.error.message = responseCP.message;
+                $scope.error.title = responseN.title;
+                $scope.error.status = responseN.status;
+                $scope.error.message = responseN.message;
 
                 // setup page
                 setUpPage();
             }
         })
-        .catch(function (responseCP) {
+        .catch(function (responseN) {
             // set error
-            $scope.pageTitle = responseCP.title;
+            $scope.pageTitle = responseN.title;
             $scope.error.error = true;
-            $scope.error.title = responseCP.title;
-            $scope.error.status = responseCP.status;
-            $scope.error.message = responseCP.message;
+            $scope.error.title = responseN.title;
+            $scope.error.status = responseN.status;
+            $scope.error.message = responseN.message;
 
             // setup page
             setUpPage();

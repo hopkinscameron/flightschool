@@ -105,7 +105,7 @@ html, body {
   height: 100%; }
 
 body {
-  font-family: 'Trebuchet MS', sans-serif;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   color: #2C3035;
   background-repeat: repeat;
   /*
@@ -208,6 +208,9 @@ body::-webkit-scrollbar-thumb {
     background-position: 0 -15px;
     color: #FFFFFF; }
 
+.btn-cursor-pointer {
+  cursor: pointer; }
+
 /* End Custom Button Styles */
 /* Begin Custom Cards */
 .card--transparent {
@@ -216,6 +219,9 @@ body::-webkit-scrollbar-thumb {
 
 .card--light {
   background-color: #C9CAC8; }
+
+.card--light-light {
+  background-color: #F5F7F9; }
 
 .card--dark {
   background-color: #2C3035; }
@@ -261,6 +267,21 @@ body::-webkit-scrollbar-thumb {
 
 .card--border--remove-right {
   border-right-width: 0; }
+
+.card--border--remove-top {
+  border-top-width: 0; }
+
+.card--border--remove-bottom {
+  border-bottom-width: 0; }
+
+.card--border--color-light-light {
+  border-color: #F5F7F9; }
+
+.card--border--color-light {
+  border-color: #C9CAC8; }
+
+.card--border--color-primary {
+  border-color: #0076FF; }
 
 .card--radius--none {
   border-radius: 0; }

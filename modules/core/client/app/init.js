@@ -44,6 +44,27 @@ angular.module(ApplicationConfiguration.applicationModuleName).config(['$routePr
 
 // configure the route
 angular.module(ApplicationConfiguration.applicationModuleName).run(['$rootScope', '$location', '$route', 'LoginFactory', function($rootScope, $location, $route, LoginFactory) {
+    // get the origional path
+    var original = $location.path;
+
+    // redefine the path functionality
+    $location.path = function (path, reload) {
+        // if not trying to reload
+        if (reload === false) {
+            // set last route to current route
+            var lastRoute = $route.current;
+
+            // on success
+            var un = $rootScope.$on('$locationChangeSuccess', function () {
+                $route.current = lastRoute;
+                un();
+            });
+        }
+
+        // apply changes
+        return original.apply($location, [path]);
+    };
+
     // on a route change (the start of a route change)
     $rootScope.$on('$routeChangeStart', function(event, next, current) {
         // check to see if user is logged in

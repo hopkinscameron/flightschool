@@ -19,7 +19,7 @@ accountModule.controller('HubController', ['$scope', '$rootScope', '$location', 
         // initialize
         $scope.hub = {};
 
-        // get change password page data
+        // get hub page data
         AccountFactory.getHubPageInformation().then(function (responseCP) {
             // if returned a valid response
             if (responseCP && !responseCP.error) {

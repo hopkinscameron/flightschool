@@ -67,7 +67,9 @@ supportModule.controller('ContactController', ['$scope', '$rootScope', '$compile
     // show contact phone number
     $scope.showPhoneNumber =  function () {
         swal({
-            text: 'Phone: ' + $scope.contact.data.phone
+            text: 'Phone: ' + $scope.contact.data.phone,
+            confirmButtonClass: 'btn btn-theme-primary btn-cursor-pointer',
+            buttonsStyling: false
         });
     };
 

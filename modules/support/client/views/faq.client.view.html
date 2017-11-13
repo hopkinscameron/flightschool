@@ -21,8 +21,8 @@
             <div class="card card--border--none card--radius--none card-body box-shadow--sm card-min-height">
                 <!-- Begin FAQ List -->
                 <div id="faq-list-item-{{$index}}" class="col-md-12" ng-style="animationStyle" style="visibility: hidden;" ng-repeat="faq in faq.data.faqs">
-                    <h5 style="cursor: pointer;" class="font-weight-bold" ng-click="faq.open = !faq.open">{{faq.q}}</h5>
-                    <i class="fa" ng-class="{'fa-caret-up': faq.open, 'fa-caret-down': !faq.open}" aria-hidden="true" style="cursor: pointer; position: absolute; right: 20px; top: 3px;" ng-click="faq.open = !faq.open"></i>
+                    <h5 class="font-weight-bold btn-cursor-pointer" ng-click="faq.open = !faq.open">{{faq.q}}</h5>
+                    <i class="fa btn-cursor-pointer" ng-class="{'fa-caret-up': faq.open, 'fa-caret-down': !faq.open}" aria-hidden="true" style="position: absolute; right: 20px; top: 3px;" ng-click="faq.open = !faq.open"></i>
                     <p class="pl-3 pr-3" ng-hide="!faq.open">{{faq.a}}</p>
                 </div>
                 <!-- End FAQ List -->

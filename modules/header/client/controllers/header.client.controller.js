@@ -41,7 +41,7 @@ headerModule.controller('HeaderController', ['$scope', '$rootScope', '$location'
                 return date.toLocaleString('en-us', { day: 'numeric', month: 'short', year: 'numeric' });
             }
             else if(type == $rootScope.$root.dateLong) {
-                return date;
+                return date.toLocaleString('en-us', { day: 'numeric', month: 'long', year: 'numeric' });
             }
             else if(type == $rootScope.$root.dateOnly) {
                 return date.toLocaleString('en-us', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute:'2-digit' });
@@ -51,6 +51,9 @@ headerModule.controller('HeaderController', ['$scope', '$rootScope', '$location'
             }
             else if(type == $rootScope.$root.iso) {
                 return date.toISOString();
+            }
+            else if(type == $rootScope.$root.shortNumeric) {
+                return date.toLocaleString('en-us', { day: 'numeric', month: 'numeric', year: 'numeric' });
             }
         }
         catch (e) {
@@ -283,6 +286,7 @@ headerModule.controller('HeaderController', ['$scope', '$rootScope', '$location'
         $rootScope.$root.dateOnly = 'dateOnly';
         $rootScope.$root.locale = 'locale';
         $rootScope.$root.iso = 'iso';
+        $rootScope.$root.shortNumeric = 'shortNumeric';
 
         // parses date/time
         $rootScope.$root.parseDateTime = function (dateTime) {
@@ -309,7 +313,10 @@ headerModule.controller('HeaderController', ['$scope', '$rootScope', '$location'
         $rootScope.$root.emailRegex = /^(([^<>()\[\]\\.,;:\s@\']+(\.[^<>()\[\]\\.,;:\s@']+)*)|('.+'))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
         // url regex
-        $rootScope.$root.url = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/;
+        $rootScope.$root.urlRegex = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/;
+
+        // phone number regex
+        $rootScope.$root.phoneRegex = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
     };
 
     // gets the header information

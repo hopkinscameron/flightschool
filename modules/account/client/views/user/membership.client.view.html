@@ -1,0 +1,82 @@
+<!-- Begin Membership Page -->
+<section ng-controller="MembershipController">
+    <!-- Begin Container -->
+    <div class="container-fluid">
+        <!-- Begin Membership -->
+        <div class="col-md-10 mx-auto pb-4">
+            <!-- Begin Active Membership -->
+            <div class="mt-2" ng-if="membership.data.subscribed && membership.data.tier">
+                <h3 class="mt-3 text-uppecase font-weight-bold">Your Membership</h3>
+                <div class="card card-body card--light-light">
+                    <h4>{{membership.data.tier.displayName}}</h4>
+                    <ul>
+                        <li ng-repeat="details in membership.data.tier.descriptions">{{details}}</li>
+                    </ul>
+                    <p class="mb-0">Next billing date</p>
+                    <p>{{$root.formatDate($root.dateLong, membership.data.renewalDate)}}</p>
+                </div>
+                <!-- Begin Payment History -->
+                <div class="mt-3 pt-3 card--border--none card--border--top card--border--color-light" ng-class="{'mt-4': $index == 0}" ng-repeat="payment in membership.data.payments">
+                    <!-- Begin Date Renewed && Price -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="font-weight-bold highlight-text-foreground mb-0">{{$root.formatDate($root.shortNumeric, payment.date)}}</h6>
+                        </div>
+                        <div class="col-md-6 text-right">
+                            <h6 class="font-weight-bold mb-0">${{payment.price + payment.tax}}</h6>
+                        </div>
+                    </div>
+                    <!-- End Date Renewed && Price -->
+                    <!-- Begin Membership Type and Date of Service -->
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <p class="mb-0">Membership type: {{payment.tierId}}</p>
+                            <p class="mb-0">{{$root.formatDate($root.shortNumeric, payment.date)}} - {{$root.formatDate($root.shortNumeric, payment.endDate)}}</p>
+                        </div>
+                    </div>
+                    <!-- End Membership Type and Date of Service -->
+                    <!-- Begin Card Information -->
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <!-- Begin Card Types -->
+                            <i class="fa fa-cc-visa" aria-hidden="true" ng-if="payment.cardType == 'VISA'"></i>
+                            <i class="fa fa-cc-mastercard" aria-hidden="true" ng-if="payment.cardType == 'MASTERCARD'"></i>
+                            <i class="fa fa-cc-discover" aria-hidden="true" ng-if="payment.cardType == 'DISCOVER'"></i>
+                            <i class="fa fa-cc-amex" aria-hidden="true" ng-if="payment.cardType == 'AMEX'"></i>
+                            <!-- End Card Types -->
+                            <span class="">&middot;&middot;&middot;&middot; &middot;&middot;&middot;&middot; &middot;&middot;&middot;&middot; {{payment.cardDigits}}</span>
+                            <p class="mb-0">${{payment.price}} (+${{payment.tax}} tax)</p>
+                        </div>
+                    </div>
+                    <!-- End Card Information -->
+                </div>
+                <!-- End Payment History -->
+            </div>
+            <!-- End Active Membership -->
+            <!-- Begin Not Active Membership -->
+            <div class="mt-2" ng-if="!membership.data.subscribed && membership.data.tier">
+                <h6 class="text-danger">Oh no, looks like your membership is currently inactive.</h6>
+                <button class="btn btn-theme-primary btn-cursor-pointer" ng-click="renewMembership()">Renew Now</button>
+                <h3 class="mt-3 text-uppecase font-weight-bold">Your Membership</h3>
+                <div class="card card-body card--light-light">
+                    <h4>{{membership.data.tier.displayName}}</h4>
+                    <ul>
+                        <li ng-repeat="details in membership.data.tier.descriptions">{{details}}</li>
+                    </ul>
+                </div>
+            </div>
+            <!-- End Not Active Membership -->
+            <!-- Begin No Membership -->
+            <div class="mt-2" ng-if="!subscribed && !membership.data.tier">
+                <h6 class="">You've never had a membership before!? Whaaaaattt? Well take a look below at some options below.</h6>
+                <div class="list-group mt-2">
+                    <div class="list-group-item list-group-item-action btn-cursor-pointer" ng-click="showMembershipDetails(m)" ng-repeat="m in membershipOptions.options">{{m.displayName}}</div>
+                </div>
+            </div>
+            <!-- End No Membership -->
+        </div>
+        <!-- End Membership -->
+    </div>
+    <!-- End Container -->
+</section>
+<!-- End Membership Page -->

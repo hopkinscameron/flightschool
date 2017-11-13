@@ -63,7 +63,11 @@ accountServiceModule.factory('AccountFactory', ['$http', '$location', '$rootScop
 
         // stringify the data
         var dataStrigified = JSON.stringify({
-            
+            'firstName': data.firstName,
+            'lastName': data.lastName,
+            'sex': data.sex.toLowerCase(),
+            'phone': data.phone,
+            'email': data.email
         });
 
         // send request
@@ -173,6 +177,51 @@ accountServiceModule.factory('AccountFactory', ['$http', '$location', '$rootScop
         });
     };
 
+    // gets membership page information
+    factory.getMembershipPageInformation = function () {
+        // set the endpoint
+        var endpoint = appPath + '/account/membership';
+
+        // send request
+        return $http.get(endpoint, { 'ignoreLoadingBar': true }).then(function (response) {
+            return response.data.d;
+        })
+        .catch(function (response) {
+            // if the response was sent back with the custom data response
+            if(response.data) {
+                return { 'error': true, 'title': response.data.title, 'status': response.status, 'message': response.data.message };
+            }
+
+            // return default response
+            return { 'error': true, 'title': $rootScope.$root.generalStatusError, 'status': response.status, 'message': response.xhrStatus };
+        });
+    };
+
+    // updates membership
+    factory.updateMembership = function (data) {
+        // set the endpoint
+        var endpoint = appPath + '/account/membership';
+
+        // stringify the data
+        var dataStrigified = JSON.stringify({
+            
+        });
+
+        // send request
+        return $http.put(endpoint, dataStrigified, { 'ignoreLoadingBar': true }).then(function (response) {
+            return response.data.d;
+        })
+        .catch(function (response) {
+            // if the response was sent back with the custom data response
+            if(response.data) {
+                return { 'error': true, 'title': response.data.title, 'status': response.status, 'message': response.data.message };
+            }
+
+            // return default response
+            return { 'error': true, 'title': $rootScope.$root.generalStatusError, 'status': response.status, 'message': response.xhrStatus };
+        });
+    };
+
     // gets notifications page information
     factory.getNotificationsPageInformation = function () {
         // set the endpoint
@@ -200,7 +249,10 @@ accountServiceModule.factory('AccountFactory', ['$http', '$location', '$rootScop
 
         // stringify the data
         var dataStrigified = JSON.stringify({
-            
+            'news': data.news,
+            'reminderEmail': data.reminderEmail,
+            'research': data.research,
+            'reminderSMS': data.reminderSMS
         });
 
         // send request
