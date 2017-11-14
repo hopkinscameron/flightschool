@@ -41,7 +41,7 @@ var UserSchema = {
         type: String,
         overwriteable: false
     },
-    roles: {
+    role: {
         type: String,
         enum: ['user', 'admin'],
         default: 'user'
@@ -306,10 +306,10 @@ exports.update = function(query, updatedObj, callback) {
         helpers.removeAttemptedNonOverwritableProperties(nonOverwritableSchemaProperties, updatedObj);
 
         // check and set acceptable values
-        helpers.checkAndSetAcceptableValueForProperties(acceptableValuesSchemaProperties, UserSchema, objToSave);
+        helpers.checkAndSetAcceptableValueForProperties(acceptableValuesSchemaProperties, UserSchema, updatedObj);
 
         // trim any values
-        helpers.trimValuesForProperties(trimmableSchemaProperties, objToSave);
+        helpers.trimValuesForProperties(trimmableSchemaProperties, updatedObj);
         
         // encrypt password
         encryptPassword(updatedObj, function(err) {

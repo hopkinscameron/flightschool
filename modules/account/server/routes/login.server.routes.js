@@ -26,11 +26,4 @@ module.exports = function (app) {
     // GET gets random passphrase
 	// format /generateRandomPassphrase
     app.route('/api/generateRandomPassphrase').get([accountPolicy.isAllowed, ipLogger.log], loginController.generateRandomPassphrase);
-
-    // PUT changes password
-	// format /changePassword/:username
-    app.route('/api/changePassword/:username').put([accountPolicy.isAllowed, ipLogger.log], loginController.changePassword);
-
-    // if username exists, bind the User by username middleware
-	app.param('username', loginController.userById);
 };

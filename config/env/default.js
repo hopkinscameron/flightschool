@@ -23,7 +23,7 @@ module.exports = {
     // session options
     sessionOptions: {
         type: 'tingodb',
-        dbPath: 'modules/login/server/models/db/sessions',
+        dbPath: 'modules/account/server/models/db/sessions',
         ttl: 86400, // 86400 24 hours (in seconds) // 60 -> 1 minute
         timeout: 10000, 
         collectionName: 'sessions',

@@ -158,6 +158,11 @@ accountModule.controller('ChangePasswordController', ['$scope', '$rootScope', '$
                     }).then(function () {
                         // clear the form for security
                         resetForm();
+                    },
+                    // handling the promise rejection
+                    function (dismiss) {
+                        // clear the form for security
+                        resetForm();                   
                     });
                 }
                 else {
@@ -175,6 +180,11 @@ accountModule.controller('ChangePasswordController', ['$scope', '$rootScope', '$
 
                         // clear the form for security
                         resetForm();
+                    },
+                    // handling the promise rejection
+                    function (dismiss) {
+                        // clear the form for security
+                        resetForm();                   
                     });
                 }
             })
@@ -193,6 +203,15 @@ accountModule.controller('ChangePasswordController', ['$scope', '$rootScope', '$
 
                     // clear the form for security
                     resetForm();
+                },
+                // handling the promise rejection
+                function (dismiss) {
+                    // show error
+                    $scope.changePasswordForm.errors.errorMessage = responseUP.message;
+                    $scope.changePasswordForm.errors.isError = true;
+
+                    // clear the form for security
+                    resetForm();               
                 });
             });
         }
@@ -206,45 +225,16 @@ accountModule.controller('ChangePasswordController', ['$scope', '$rootScope', '$
         // initialize
         $scope.changePassword = {};
 
-        // get change new page data
-        AccountFactory.getChangePasswordPageInformation().then(function (responseCP) {
-            // if returned a valid response
-            if (responseCP && !responseCP.error) {
-                // set the data
-                $scope.changePassword.data = responseCP;
-                $scope.changePassword.title = 'Change Password';
-                $scope.changePassword.pageHeader = $scope.changePassword.title;
-                $scope.changePassword.pageSubHeader = 'Oh we see you want to change your password right?';
+        // set the data
+        $scope.changePassword.title = 'Change Password';
+        $scope.changePassword.pageHeader = $scope.changePassword.title;
+        $scope.changePassword.pageSubHeader = 'Oh we see you want to change your password right?';
 
-                // holds the page title
-                $scope.pageTitle = $scope.changePassword.title + ' | ' + ApplicationConfiguration.applicationName;
-                
-                // setup page
-                setUpPage();
-            }
-            else {
-                // set error
-                $scope.pageTitle = responseCP.title;
-                $scope.error.error = true;
-                $scope.error.title = responseCP.title;
-                $scope.error.status = responseCP.status;
-                $scope.error.message = responseCP.message;
-
-                // setup page
-                setUpPage();
-            }
-        })
-        .catch(function (responseCP) {
-            // set error
-            $scope.pageTitle = responseCP.title;
-            $scope.error.error = true;
-            $scope.error.title = responseCP.title;
-            $scope.error.status = responseCP.status;
-            $scope.error.message = responseCP.message;
-
-            // setup page
-            setUpPage();
-        });
+        // holds the page title
+        $scope.pageTitle = $scope.changePassword.title + ' | ' + ApplicationConfiguration.applicationName;
+        
+        // setup page
+        setUpPage();
     };
 
     // sets up the page

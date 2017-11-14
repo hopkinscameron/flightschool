@@ -212,6 +212,11 @@ accountModule.controller('SignUpController', ['$scope', '$rootScope', '$compile'
                     }).then(function () {
                         // redirect to home page
                         $window.location.href = '/';
+                    },
+                    // handling the promise rejection
+                    function (dismiss) {
+                        // redirect to home page
+                        $window.location.href = '/';
                     });
                 }
                 else {
@@ -225,14 +230,47 @@ accountModule.controller('SignUpController', ['$scope', '$rootScope', '$compile'
                         $scope.signUpForm.errors.errorMessage = responseSU.message;
                         $scope.signUpForm.errors.isError = true;
                         $scope.formInTransit = false;
+
+                        // force apply
+                        $scope.$apply()
+                    },
+                    // handling the promise rejection
+                    function (dismiss) {
+                        // show error
+                        $scope.signUpForm.errors.errorMessage = responseSU.message;
+                        $scope.signUpForm.errors.isError = true;
+                        $scope.formInTransit = false;
+
+                        // force apply
+                        $scope.$apply()
                     });
                 }
             })
             .catch(function (responseSU) {
                 // show error
-                $scope.signUpForm.errors.errorMessage = responseSU.message;
-                $scope.signUpForm.errors.isError = true;
-                $scope.formInTransit = false;
+                swal({
+                    title: 'Error!',
+                    text: 'Sorry! There was an error: ' + responseSU.message,
+                    type: 'error'
+                }).then(function () {
+                    // show error
+                    $scope.signUpForm.errors.errorMessage = responseSU.message;
+                    $scope.signUpForm.errors.isError = true;
+                    $scope.formInTransit = false;
+
+                    // force apply
+                    $scope.$apply()
+                },
+                // handling the promise rejection
+                function (dismiss) {
+                    // show error
+                    $scope.signUpForm.errors.errorMessage = responseSU.message;
+                    $scope.signUpForm.errors.isError = true;
+                    $scope.formInTransit = false;
+
+                    // force apply
+                    $scope.$apply()
+                });
             });
         }
     };

@@ -1,15 +1,17 @@
 ﻿In Progress
-- get user by id when on account server side
+- finsih account getting/updating on server side
 
 Next
 - add an "error dashboard" so if there are errors in server, we can view them
 - if I have the html editor up on page load, and I exit out, I can't get the other content to show
-
+- use 'https://api.ipify.org?format=json' if can't use other tool to get ip address
+- if signin/signup failed, clear password
 
 Future
 - after sign up, send an email to verify
 
 Done
+
 
 Testing
 

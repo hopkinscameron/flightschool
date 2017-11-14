@@ -29,8 +29,8 @@ accountModule.controller('LogoutController', ['$scope', '$rootScope', '$compile'
                 $window.location.href = previousPath;
             }
             else {
-                // redirect to about page and reload page to refresh user object
-                $window.location.href = '/about';
+                // redirect to home page and reload page to refresh user object
+                $window.location.href = '/';
             }
 
             // refresh header

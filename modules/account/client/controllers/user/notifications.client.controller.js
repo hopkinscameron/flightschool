@@ -54,6 +54,14 @@ accountModule.controller('NotificationsController', ['$scope', '$rootScope', '$l
 
                     // force apply
                     $scope.$apply()
+                },
+                // handling the promise rejection
+                function (dismiss) {
+                    // show the form is no longer in transit
+                    $scope.formInTransit = false;
+
+                    // force apply
+                    $scope.$apply()               
                 });
             }
             else {
@@ -73,7 +81,19 @@ accountModule.controller('NotificationsController', ['$scope', '$rootScope', '$l
                     $scope.formInTransit = false;
 
                     // force apply
-                    $scope.$apply()
+                    $scope.$apply();
+                },
+                // handling the promise rejection
+                function (dismiss) {
+                    // show error
+                    $scope.notificationsForm.errors.errorMessage = responseUN.message;
+                    $scope.notificationsForm.errors.isError = true;
+
+                    // show the form is no longer in transit
+                    $scope.formInTransit = false;
+
+                    // force apply
+                    $scope.$apply();                
                 });
             }
         })
@@ -94,7 +114,19 @@ accountModule.controller('NotificationsController', ['$scope', '$rootScope', '$l
                 $scope.formInTransit = false;
 
                 // force apply
-                $scope.$apply()
+                $scope.$apply();
+            },
+            // handling the promise rejection
+            function (dismiss) {
+                // show error
+                $scope.notificationsForm.errors.errorMessage = responseUN.message;
+                $scope.notificationsForm.errors.isError = true;
+
+                // show the form is no longer in transit
+                $scope.formInTransit = false;
+
+                // force apply
+                $scope.$apply();                
             });
         });
     };

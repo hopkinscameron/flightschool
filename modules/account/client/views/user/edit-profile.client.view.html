@@ -1,11 +1,11 @@
 <!-- Begin Edit Profile Page -->
 <section ng-controller="EditProfileController">
     <!-- Begin Container -->
-    <div class="container-fluid">
+    <div class="card-body">
         <!-- Begin Profile Form -->
-        <div class="col-md-10 mx-auto pb-4">
-            <div class="mt-2" style="padding-bottom: 24px;" ng-if="!profileForm.errors.isError"></div>
-            <div class="mt-2" ng-if="profileForm.errors.isError">
+        <div class="col-md-10 mx-auto">
+            <div style="padding-bottom: 24px;" ng-if="!profileForm.errors.isError"></div>
+            <div ng-if="profileForm.errors.isError">
                 <span style="color: red;">{{profileForm.errors.errorMessage}}</span>
             </div>
             <!-- Begin Profile Form -->

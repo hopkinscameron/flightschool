@@ -10,7 +10,9 @@ var // the path
     // the account policy
 	accountPolicy = require('../policies/account.server.policy'),
     // the account controller to handle routes
-    accountController = require('../controllers/account.server.controller');
+    accountController = require('../controllers/account.server.controller'),
+    // the login controller to handle routes
+    loginController = require('../controllers/login.server.controller');
 
 module.exports = function (app) {
     // GET gets account navigation
@@ -18,32 +20,32 @@ module.exports = function (app) {
     app.route('/api/account').get([accountPolicy.isAllowed, ipLogger.log, accountController.readDB], accountController.read);
 
     // GET gets user's edit profile information
-    // PUT updates user's profile information
+    // POST updates user's profile information
 	// format /api/edit-profile
-    app.route('/api/account/edit-profile').get([accountPolicy.isAllowed, ipLogger.log, accountController.readDB], accountController.read);
-    app.route('/api/account/edit-profile').put([accountPolicy.isAllowed, ipLogger.log, accountController.readDB], accountController.read);
+    app.route('/api/account/edit-profile').get([accountPolicy.isAllowed, ipLogger.log], accountController.readProfile);
+    app.route('/api/account/edit-profile').post([accountPolicy.isAllowed, ipLogger.log], accountController.updateProfile);
 
-    // GET gets user's change password information
-    // PUT updates user's password
+    // POST updates user's password
 	// format /api/change-password
-    app.route('/api/account/change-password').get([accountPolicy.isAllowed, ipLogger.log, accountController.readDB], accountController.read);
-    app.route('/api/account/change-password').put([accountPolicy.isAllowed, ipLogger.log, accountController.readDB], accountController.read);
+    app.route('/api/account/change-password').post([accountPolicy.isAllowed, ipLogger.log], accountController.updatePassword);
 
     // GET gets user's hub information
-    // PUT updates user's hub information
+    // POST updates user's hub information
 	// format /api/hub
-    app.route('/api/account/hub').get([accountPolicy.isAllowed, ipLogger.log, accountController.readDB], accountController.read);
-    app.route('/api/account/hub').put([accountPolicy.isAllowed, ipLogger.log, accountController.readDB], accountController.read);
+    app.route('/api/account/hub').get([accountPolicy.isAllowed, ipLogger.log], accountController.readHubs);
+    app.route('/api/account/hub').post([accountPolicy.isAllowed, ipLogger.log], accountController.updateHubs);
 
     // GET gets user's membership information
-    // PUT updates user's membership settings
+    // POST changes user's membership settings
+    // DELETE changes user's membership settings
 	// format /api/membership
-    app.route('/api/account/membership').get([accountPolicy.isAllowed, ipLogger.log, accountController.readDB], accountController.read);
-    app.route('/api/account/membership').put([accountPolicy.isAllowed, ipLogger.log, accountController.readDB], accountController.read);
+    app.route('/api/account/membership').get([accountPolicy.isAllowed, ipLogger.log], accountController.readMembership);
+    app.route('/api/account/membership').post([accountPolicy.isAllowed, ipLogger.log], accountController.changeMembership);
+    app.route('/api/account/membership').delete([accountPolicy.isAllowed, ipLogger.log], accountController.cancelMembership);
 
     // GET gets user's notifications information
-    // PUT updates user's notification settings
+    // POST updates user's notification settings
 	// format /api/notifications
-    app.route('/api/account/notifications').get([accountPolicy.isAllowed, ipLogger.log, accountController.readDB], accountController.read);
-    app.route('/api/account/notifications').put([accountPolicy.isAllowed, ipLogger.log, accountController.readDB], accountController.read);
+    app.route('/api/account/notifications').get([accountPolicy.isAllowed, ipLogger.log], accountController.readNotifications);
+    app.route('/api/account/notifications').post([accountPolicy.isAllowed, ipLogger.log], accountController.updateNotifications);
 };

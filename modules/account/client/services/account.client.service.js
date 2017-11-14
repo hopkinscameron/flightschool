@@ -71,27 +71,7 @@ accountServiceModule.factory('AccountFactory', ['$http', '$location', '$rootScop
         });
 
         // send request
-        return $http.put(endpoint, dataStrigified, { 'ignoreLoadingBar': true }).then(function (response) {
-            return response.data.d;
-        })
-        .catch(function (response) {
-            // if the response was sent back with the custom data response
-            if(response.data) {
-                return { 'error': true, 'title': response.data.title, 'status': response.status, 'message': response.data.message };
-            }
-
-            // return default response
-            return { 'error': true, 'title': $rootScope.$root.generalStatusError, 'status': response.status, 'message': response.xhrStatus };
-        });
-    };
-
-    // gets change password page information
-    factory.getChangePasswordPageInformation = function () {
-        // set the endpoint
-        var endpoint = appPath + '/account/change-password';
-
-        // send request
-        return $http.get(endpoint, { 'ignoreLoadingBar': true }).then(function (response) {
+        return $http.post(endpoint, dataStrigified, { 'ignoreLoadingBar': true }).then(function (response) {
             return response.data.d;
         })
         .catch(function (response) {
@@ -118,7 +98,7 @@ accountServiceModule.factory('AccountFactory', ['$http', '$location', '$rootScop
         });
 
         // send request
-        return $http.put(endpoint, dataStrigified, { 'ignoreLoadingBar': true }).then(function (response) {
+        return $http.post(endpoint, dataStrigified, { 'ignoreLoadingBar': true }).then(function (response) {
             return response.data.d;
         })
         .catch(function (response) {
@@ -159,11 +139,12 @@ accountServiceModule.factory('AccountFactory', ['$http', '$location', '$rootScop
 
         // stringify the data
         var dataStrigified = JSON.stringify({
-            
+            'homeLocation': data.homeLocation,
+            'hubs': data.hubs
         });
 
         // send request
-        return $http.put(endpoint, dataStrigified, { 'ignoreLoadingBar': true }).then(function (response) {
+        return $http.post(endpoint, dataStrigified, { 'ignoreLoadingBar': true }).then(function (response) {
             return response.data.d;
         })
         .catch(function (response) {
@@ -208,7 +189,27 @@ accountServiceModule.factory('AccountFactory', ['$http', '$location', '$rootScop
         });
 
         // send request
-        return $http.put(endpoint, dataStrigified, { 'ignoreLoadingBar': true }).then(function (response) {
+        return $http.post(endpoint, dataStrigified, { 'ignoreLoadingBar': true }).then(function (response) {
+            return response.data.d;
+        })
+        .catch(function (response) {
+            // if the response was sent back with the custom data response
+            if(response.data) {
+                return { 'error': true, 'title': response.data.title, 'status': response.status, 'message': response.data.message };
+            }
+
+            // return default response
+            return { 'error': true, 'title': $rootScope.$root.generalStatusError, 'status': response.status, 'message': response.xhrStatus };
+        });
+    };
+
+    // cancel membership
+    factory.cancelMembership = function (data) {
+        // set the endpoint
+        var endpoint = appPath + '/account/membership';
+
+        // send request
+        return $http.delete(endpoint, null, { 'ignoreLoadingBar': true }).then(function (response) {
             return response.data.d;
         })
         .catch(function (response) {
@@ -256,7 +257,7 @@ accountServiceModule.factory('AccountFactory', ['$http', '$location', '$rootScop
         });
 
         // send request
-        return $http.put(endpoint, dataStrigified, { 'ignoreLoadingBar': true }).then(function (response) {
+        return $http.post(endpoint, dataStrigified, { 'ignoreLoadingBar': true }).then(function (response) {
             return response.data.d;
         })
         .catch(function (response) {

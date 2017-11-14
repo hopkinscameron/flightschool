@@ -182,8 +182,11 @@ exports.getTrimmableProperties = function (model) {
 exports.trimValuesForProperties = function (properties, obj) {
     // loop over all properties
     _.forEach(properties, function(value) {
-        // trim each value
-        obj[value] = _.trim(obj[value]);
+        // if the value exists
+        if(obj[value]) {
+            // trim each value
+            obj[value] = _.trim(obj[value]);
+        }
     });
 };
 

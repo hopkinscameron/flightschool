@@ -1,8 +1,60 @@
 <!-- Begin Hub Page -->
 <section ng-controller="HubController">
     <!-- Begin Container -->
-    <div class="container-fluid">
-        Hub Page
+    <div class="card-body">
+        <!-- Begin Hub List -->
+        <div class="col-md-10 mx-auto">
+            <!-- Begin Home Location -->
+            <div ng-if="hub.data.homeLocation">
+                <h3 class="font-weight-bold">Your Home Location</h3>
+                <!-- Begin Location/Edit Button -->
+                <div class="card card-body card--light-light">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h4 class="font-weight-bold">{{hub.data.homeLocation.city}}, {{hub.data.homeLocation.state}}</h4>
+                        </div>
+                        <div class="col-md-6 text-right">
+                            <button class="btn btn-theme-primary btn-cursor-pointer" ng-click="editHomeLocation(tmpHub)">Edit</button>
+                        </div>
+                    </div>
+                    <p class="mb-0">Airport: <span class="font-weight-bold">{{hub.data.homeLocation.airport}}</span></p>
+                </div>
+                <!-- End Location/Edit Button -->
+            </div>
+            <!-- End Home Location -->
+            <!-- Begin No Home Location -->
+            <div ng-if="!hub.data.homeLocation">
+                <p>Looks like you haven't set your home location.</p>
+                <button class="btn btn-theme-primary btn-cursor-pointer" ng-click="editHomeLocation()">Create</button>
+            </div>
+            <!-- End No Home Location -->
+            <!-- Begin Hubs -->
+            <div class="row mt-3" ng-if="hub.data.homeLocation && hub.data.hubs.length > 0">
+                <div class="col-md-6">
+                    <h3 class="font-weight-bold">Your Hubs</h3>
+                </div>
+                <div class="col-md-6 text-right">
+                     <button class="btn btn-theme-primary btn-cursor-pointer" ng-click="addHub()" ng-disabled="hub.data.hubs.length >= hub.data.maxHubs">Add Hub</button>
+                </div>
+            </div>
+            <div class="row" ng-if="hub.data.homeLocation">
+                <div class="col-md-4 mt-2"  ng-class="{'mt-3': $index == 0 || $index == 1 || $index == 2 }" ng-repeat="tmpHub in hub.data.hubs">
+                    <div class="card card-body card--light-light">
+                        <p class="mb-0 font-weight-bold">{{tmpHub.city}}, {{tmpHub.state}}</p>
+                        <p class="">Airport: <span class="font-weight-bold">{{tmpHub.airport}}</span></p>
+                        <button class="btn btn-theme-primary btn-cursor-pointer w-100" ng-click="editHub($index)">Edit</button>
+                    </div>
+                </div>
+            </div>
+            <!-- End Hubs -->
+            <!-- Begin No Hubs -->
+            <div class="mt-3" ng-if="hub.data.homeLocation && (!hub.data.hubs || hub.data.hubs.length == 0)">
+                <p>Looks like you don't have any hubs. Would you like to add one? Based on your membership, you're alloted up to {{hub.data.maxHubs}}.</p>
+                <button class="btn btn-theme-primary btn-cursor-pointer" ng-click="addHub()">Add Hub</button>
+            </div>
+            <!-- End No Hubs -->
+        </div>
+        <!-- End Hub List -->
     </div>
     <!-- End Container -->
 </section>

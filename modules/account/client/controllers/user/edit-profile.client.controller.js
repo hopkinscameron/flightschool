@@ -229,7 +229,12 @@ accountModule.controller('EditProfileController', ['$scope', '$rootScope', '$loc
                         $scope.formInTransit = false;
 
                         // force apply
-                        $scope.$apply()
+                        $scope.$apply();
+                    },
+                    // handling the promise rejection
+                    function (dismiss) {
+                        // clear the form for security
+                        resetForm();                   
                     });
                 }
                 else {
@@ -249,7 +254,19 @@ accountModule.controller('EditProfileController', ['$scope', '$rootScope', '$loc
                         $scope.formInTransit = false;
 
                         // force apply
-                        $scope.$apply()
+                        $scope.$apply();
+                    },
+                    // handling the promise rejection
+                    function (dismiss) {
+                        // show error
+                        $scope.profileForm.errors.errorMessage = responseUP.message;
+                        $scope.profileForm.errors.isError = true;
+
+                        // show the form is no longer in transit
+                        $scope.formInTransit = false;
+
+                        // force apply
+                        $scope.$apply();                 
                     });
                 }
             })
@@ -270,7 +287,19 @@ accountModule.controller('EditProfileController', ['$scope', '$rootScope', '$loc
                     $scope.formInTransit = false;
 
                     // force apply
-                    $scope.$apply()
+                    $scope.$apply();
+                },
+                // handling the promise rejection
+                function (dismiss) {
+                    // show error
+                    $scope.profileForm.errors.errorMessage = responseUP.message;
+                    $scope.profileForm.errors.isError = true;
+
+                    // show the form is no longer in transit
+                    $scope.formInTransit = false;
+
+                    // force apply
+                    $scope.$apply();                 
                 });
             });
         }

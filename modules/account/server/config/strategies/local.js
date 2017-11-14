@@ -19,7 +19,7 @@ module.exports = function () {
     // we are using named strategies since we have one for login and one for signup
     // by default, if there was no name, it would just be called 'local'
     passport.use('local-signup', new LocalStrategy({
-        // by default, local strategy uses username and password
+        // by default, local strategy uses email and password
         usernameField: 'email',
         passwordField: 'password',
         passReqToCallback: true // allows us to pass back the entire request to the callback
@@ -28,6 +28,9 @@ module.exports = function () {
         // asynchronous
         // User.findOne wont fire unless data is sent back
         process.nextTick(function() {
+            // convert to lowercase
+            email = email ? email.toLowerCase() : email;
+
             // find a user whose email is the same as the forms email
             // we are checking to see if the user trying to login already exists
             User.findOne({ 'email': email }, function(err, user) {
@@ -50,7 +53,7 @@ module.exports = function () {
                     };
 
                     // save the user
-                    User.save(newUser, function(err) {
+                    User.save(newUser, function(err, newSavedUser) {
                         // if error occurred
                         if (err) {
                             throw err;
@@ -58,12 +61,12 @@ module.exports = function () {
 
                         // save the id since it will be lost when going to object
                         // hide the password for security purposes
-                        var id = newUser._id;
-                        newUser = User.toObject(newUser, { 'hide': 'password lastPasswords internalName created resetPasswordToken resetPasswordExpires' });
-                        newUser._id = id;
+                        var id = newSavedUser._id;
+                        var user = User.toObject(newSavedUser, { 'hide': 'password lastPasswords internalName created resetPasswordToken resetPasswordExpires' });
+                        user._id = id;
 
                         // hide the password
-                        return done(null, newUser);
+                        return done(null, user);
                     });
                 }
             });    
@@ -76,18 +79,18 @@ module.exports = function () {
     // we are using named strategies since we have one for login and one for signup
     // by default, if there was no name, it would just be called 'local'
     passport.use('local-login', new LocalStrategy({
-        // by default, local strategy uses username and password
-        usernameField: 'username',
+        // by default, local strategy uses email and password
+        usernameField: 'email',
         passwordField: 'password',
         passReqToCallback: true // allows us to pass back the entire request to the callback
     },
-    function (req, username, password, done) {
+    function (req, email, password, done) {
         // convert to lowercase
-        username = username ? username.toLowerCase() : username;
+        email = email ? email.toLowerCase() : email;
 
         // find a user whose username is the same as the forms username
         // we are checking to see if the user trying to login already exists
-        User.findOne({ 'username': username }, function (err, user) {
+        User.findOne({ 'email': email }, function (err, user) {
             // if error occurred
             if (err) {
                 return done(err);

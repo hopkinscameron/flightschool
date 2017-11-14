@@ -8,8 +8,8 @@ accountModule.controller('LoginController', ['$scope', '$rootScope', 'LoginFacto
     // holds the login form data
     $scope.loginForm = {
         'inputs': {
-            'email': '',
-            'password': '',
+            'email': 'john.doe@example.com',
+            'password': 'password',
             'rememberMe': false
         },
         'views': {

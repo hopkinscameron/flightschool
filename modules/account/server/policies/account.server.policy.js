@@ -16,7 +16,7 @@ exports.isAllowed = function (req, res, next) {
     var user = true;
 
     // if user is authenticated in the session, carry on 
-	if (!req.isAuthenticated() && user) {
+	if (req.isAuthenticated() && user) {
         return next();
     }
 	else {
