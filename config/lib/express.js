@@ -131,8 +131,48 @@ module.exports.initMiddleware = function (app) {
     app.use(cookieParser());
     app.use(flash());
 
-    // use header/body validation
-    app.use(expressValidator());
+    // use header/body validation (add any additional custom validators)
+    app.use(expressValidator({
+        customValidators: {
+            // determines if two values are strictly equal
+            isEqual: (value1, value2) => {
+                return value1 === value2;
+            },
+            // determines if value is strictly less than
+            isLessThan: (value1, value2) => {
+                return value1 < value2;
+            },
+            // determines if value is strictly less than or equal to
+            isLessThanOrEqualTo: (value1, value2) => {
+                return value1 <= value2;
+            },
+            // determines if value is strictly greater than
+            isGreaterThan: (value1, value2) => {
+                return value1 > value2;
+            },
+            // determines if value is strictly greater than
+            isGreaterThanOrEqualTo: (value1, value2) => {
+                return value1 >= value2;
+            },
+            // determines if value is a type of boolean
+            isBoolean: (value) => {
+                return typeof(value) === 'boolean';
+            },
+            // determines if value is a type of string
+            isString: (value) => {
+                return typeof(value) === 'string';
+            },
+            // determines if value exists
+            exists: (value, arr) => {
+                return _.findIndex(arr, function(o) { 
+                    var iata = o.iata.toLowerCase().includes(value.toLowerCase());
+                    var city = o.city.toLowerCase().includes(value.toLowerCase());
+                    var name = o.name.toLowerCase().includes(value.toLowerCase());
+                    return iata || city || name; 
+                });
+            }
+        }
+    }));
 };
 
 /**

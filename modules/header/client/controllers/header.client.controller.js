@@ -257,6 +257,17 @@ headerModule.controller('HeaderController', ['$scope', '$rootScope', '$location'
         return false;
     };
 
+    // removed any undefined members from object
+    $rootScope.$root.removeUndefinedMembers = function(obj) {
+        // go through each option and remove
+        _.forEach(Object.keys(obj), function (value) {
+            // if undefined
+            if(obj[value] === undefined) {
+                delete obj[value];
+            }
+        });
+    };
+
     // initialize variables
     function initializeVariables () {
         // set jQuery

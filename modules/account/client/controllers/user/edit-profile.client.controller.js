@@ -16,17 +16,17 @@ accountModule.controller('EditProfileController', ['$scope', '$rootScope', '$loc
 
     // the sex options
     $scope.sexOptions = {
-        'selected': 'Male', //$scope.initialText
+        'selected': $scope.initialText, //'Male'
         'options': [$scope.initialText, 'Male', 'Female']
     };
 
     // holds the profile form data
     $scope.profileForm = {
         'inputs': {
-            'first': 'John',
-            'last': 'Does',
-            'phone': '555-555-5555',
-            'email': 'example@example.com'
+            'first': '',//'John',
+            'last': '',//'Does',
+            'phone': '',//'555-555-5555',
+            'email': ''//'example@example.com'
         },
         'views': {
             'first': 'first',
@@ -326,6 +326,13 @@ accountModule.controller('EditProfileController', ['$scope', '$rootScope', '$loc
                 // holds the page title
                 $scope.pageTitle = $scope.editProfile.title + ' | ' + ApplicationConfiguration.applicationName;
                 
+                // set form values
+                $scope.profileForm.inputs.first = $scope.editProfile.data.firstName;
+                $scope.profileForm.inputs.last = $scope.editProfile.data.lastName;
+                $scope.sexOptions.selected = $scope.editProfile.data.sex.charAt(0).toUpperCase() + $scope.editProfile.data.sex.slice(1);
+                $scope.profileForm.inputs.phone = $scope.editProfile.data.phone;
+                $scope.profileForm.inputs.email = $scope.editProfile.data.email;
+
                 // setup page
                 setUpPage();
             }

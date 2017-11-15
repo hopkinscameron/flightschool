@@ -112,6 +112,34 @@ var UserSchema = {
     },
     renewalDate: {
         type: Date
+    },
+    homeLocation: {
+        type: String,
+        default: null
+    },
+    hubs: {
+        type: Array,
+        default: new Array()
+    },
+    maxHubs: {
+        type: Number,
+        default: 0
+    },
+    notificationNews: {
+        type: Boolean,
+        default: true
+    },
+    notificationReminderEmail: {
+        type: Boolean,
+        default: true
+    },
+    notificationResearch: {
+        type: Boolean,
+        default: true
+    },
+    notificationReminderSMS: {
+        type: Boolean,
+        default: true
     }
 };
 
@@ -310,6 +338,9 @@ exports.update = function(query, updatedObj, callback) {
 
         // trim any values
         helpers.trimValuesForProperties(trimmableSchemaProperties, updatedObj);
+
+        // add the last passwords to this obj
+        updatedObj.lastPasswords = obj.lastPasswords;
         
         // encrypt password
         encryptPassword(updatedObj, function(err) {
@@ -379,13 +410,16 @@ exports.comparePassword = function(user, plainTextPassword, callback) {
  * Compares last passwords
  */
 exports.compareLastPasswords = function(user, plainTextPassword, callback) {
-    // determines if past password
-    var isPast = false;
+    // holds all the indice that have completed the functionality
+    var indicesCompleted = 0;
 
     // check if this is a past password
     _.forEach(user.lastPasswords, function (value) {
         // compare the passwords
-        bcrypt.compare(plainTextPassword, user.password, function(err, isMatch) {
+        bcrypt.compare(plainTextPassword, value, function(err, isMatch) {
+            // increase the number of indicies
+            indicesCompleted++;
+
             // if error occurred
             if (err) {
                 // if a callback
@@ -396,15 +430,17 @@ exports.compareLastPasswords = function(user, plainTextPassword, callback) {
                 }
             } 
             else if(isMatch) {
-                // set match occurred
-                isPast = isMatch;
+                // hit the callback
+                callback(null, isMatch);
+
                 return;
+            }
+            else if(indicesCompleted == user.lastPasswords.length) {
+                // hit the callback
+                callback(null, isMatch);
             }
         });
     });
-
-    // hit the callback
-    callback(null, isPast);
 };
 
 // encrypt password

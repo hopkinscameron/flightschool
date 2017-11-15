@@ -9,14 +9,20 @@ var // the path
     errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller')),
     // chalk for console logging
     clc = require(path.resolve('./config/lib/clc')),
+    // lodash
+    _ = require('lodash'),
     // the file system reader
     fs = require('fs'),
+    // airport codes
+    airportCodes = require('airport-codes').toJSON(),
     // the path to the file details for this view
     accountDetailsPath = path.join(__dirname, '../data/account.json'),
     // the file details for this view
     accountDetails = {},
     // the User model
-    User = require(path.resolve('./modules/account/server/models/model-user'));
+    User = require(path.resolve('./modules/account/server/models/model-user')),
+    // the helper functions
+    helpers = require(path.resolve('./config/lib/global-model-helpers'));
 
 /**
  * Show the current page
@@ -31,7 +37,7 @@ exports.read = function (req, res) {
  */
 exports.readProfile = function (req, res) {
     // create safe profile object
-    var user = User.toObject(req.user, { 'hide': 'tierId renewalDate subscribed passwordUpdatedLast' });
+    var user = User.toObject(req.user, { 'hide': 'tierId renewalDate subscribed homeLocation hubs maxHubs passwordUpdatedLast notificationNews notificationReminderEmail notificationResearch notificationReminderSMS' });
 
     // send data
     res.json({ 'd': user });
@@ -41,86 +47,395 @@ exports.readProfile = function (req, res) {
  * Updates the profile details
  */
 exports.updateProfile = function (req, res) {
-    // send data
-    res.json({ 'd': accountDetails });
+    // create the updated values object
+    var updatedValues = {
+        'firstName': _.has(req.body, 'firstName') ? req.body.firstName : undefined,
+        'lastName': _.has(req.body, 'lastName') ? req.body.lastName : undefined,
+        'sex': _.has(req.body, 'sex') ? req.body.sex.toLowerCase() : undefined,
+        'phone': _.has(req.body, 'phone') ? req.body.phone : undefined,
+        'email': _.has(req.body, 'email') ? req.body.email : undefined
+    };
+
+    // remove all undefined members
+    helpers.removeUndefinedMembers(updatedValues);
+
+    // if there is something to update
+    if(Object.keys(updatedValues).length > 0) {
+        // update the values
+        User.update(req.user, updatedValues, function(err, updatedUser) {
+            // if an error occurred
+            if (err) {
+                // send internal error
+                res.status(500).send({ error: true, title: errorHandler.getErrorTitle(err), message: errorHandler.getGenericErrorMessage(err) });
+                console.log(clc.error(errorHandler.getDetailedErrorMessage(err)));
+            }
+            else if (updatedUser) {
+                // create the safe user object
+                var safeUserObj = createUserReqObject(updatedUser);
+
+                // set the updated object
+                req.user = safeUserObj;
+
+                // read the profile
+                module.exports.readProfile(req, res);
+            }
+            else {
+                // send internal error
+                res.status(500).send({ error: true, title: errorHandler.getErrorTitle({ code: 500 }), message: errorHandler.getGenericErrorMessage({ code: 500 }) });
+                console.log(clc.error(`In ${path.basename(__filename)} \'updateProfile\': ` + errorHandler.getDetailedErrorMessage({ code: 500 }) + ' Couldn\'t update User.'));
+            }
+        });
+    }
+    else {
+        // read the profile
+        module.exports.readProfile(req, res);
+    }
 };
 
 /**
  * Updates password
  */
 exports.updatePassword = function (req, res, next) {
-    // set the user
-    var user = req.foundUser;
+    // validate existence
+    req.checkBody('oldPassword', 'Old password is required.').notEmpty();
+    req.checkBody('newPassword', 'New password is required.').notEmpty();
+    req.checkBody('confirmedPassword', 'Confirmed password is required.').notEmpty();
+    req.checkBody('confirmedPassword', 'Confirmed password should be equal to new password.').isEqual(req.body.newPassword);
 
-    // if found user
-    if(user) {
-        // set updated values 
-        var updatedValues = {
-            'password': req.body.newpassword
-        };
+    // validate errors
+    req.getValidationResult().then(function(errors) {
+        // if any errors exists
+        if(!errors.isEmpty()) {
+            // holds all the errors in one text
+            var errorText = '';
 
-        // check if user entered a previous password
-        User.compareLastPasswords(user, req.body.newpassword, function(err, isPastPassword) {
-            // if error occurred occurred
-            if (err) {
-                // send internal error
-                res.status(500).send({ error: true, title: errorHandler.getErrorTitle(err), message: errorHandler.getGenericErrorMessage(err) });
-                console.log(clc.error(errorHandler.getDetailedErrorMessage(err)));
+            // add all the errors
+            for(var x = 0; x < errors.array().length; x++) {
+                // if not the last error
+                if(x < errors.array().length - 1) {
+                    errorText += errors.array()[x].msg + '\r\n';
+                }
+                else {
+                    errorText += errors.array()[x].msg;
+                }
             }
-            else if(isPastPassword) {
-                // return error
-                res.json({ 'd': { error: true, title: errorHandler.getErrorTitle({ code: 200 }), message: 'This password was used within the last 5 password changes. Please choose a different one.' } });
-            }
-            else {
-                // update user
-                User.update(user, updatedValues, function(err, updatedUser) {
-                    // if error occurred occurred
-                    if (err) {
-                        // send internal error
-                        res.status(500).send({ error: true, title: errorHandler.getErrorTitle(err), message: errorHandler.getGenericErrorMessage(err) });
-                        console.log(clc.error(errorHandler.getDetailedErrorMessage(err)));
-                    }
-                    else if(updatedUser) {
-                        // return password changed
-                        res.json({ 'd': { title: errorHandler.getErrorTitle({ code: 200 }), message: errorHandler.getGenericErrorMessage({ code: 200 }) + ' Successful password change.' } });
-                    }
-                    else {
-                        // send internal error
-                        res.status(500).send({ error: true, title: errorHandler.getErrorTitle({ code: 500 }), message: errorHandler.getGenericErrorMessage({ code: 500 }) });
-                        console.log(clc.error(`In ${path.basename(__filename)} \'changePassword\': ` + errorHandler.getDetailedErrorMessage({ code: 500 }) + ' Couldn\'t update User.'));
-                    }
-                });
-            }
-        });
-    }
-    else {
-        // send not found
-        res.status(404).send({ title: errorHandler.getErrorTitle({ code: 404 }), message: errorHandler.getGenericErrorMessage({ code: 404 }) + ' Usernmae/Password is incorrect.' });
-    }
+
+            // send bad request
+            res.status(400).send({ title: errorHandler.getErrorTitle({ code: 400 }), message: errorText });
+        } 
+        else {
+            // find user based on id
+            User.findById(req.user._id, function(err, foundUser) {
+                // if error occurred occurred
+                if (err) {
+                    // return error
+                    return next(err);
+                }
+                // if user was found
+                else if(foundUser) {
+                    // compare current password equality
+                    User.comparePassword(foundUser, req.body.oldPassword, function(err, isMatch) {
+                        // if error occurred occurred
+                        if (err) {
+                            // send internal error
+                            res.status(500).send({ error: true, title: errorHandler.getErrorTitle(err), message: errorHandler.getGenericErrorMessage(err) });
+                            console.log(clc.error(errorHandler.getDetailedErrorMessage(err)));
+                        }
+                        else if(!isMatch) {
+                            // return error
+                            res.json({ 'd': { error: true, title: errorHandler.getErrorTitle({ code: 200 }), message: 'Current password does not match.' } });
+                        }
+                        else {
+                            // check if user entered a previous password
+                            User.compareLastPasswords(foundUser, req.body.newPassword, function(err, isPastPassword) {
+                                // if error occurred occurred
+                                if (err) {
+                                    // send internal error
+                                    res.status(500).send({ error: true, title: errorHandler.getErrorTitle(err), message: errorHandler.getGenericErrorMessage(err) });
+                                    console.log(clc.error(errorHandler.getDetailedErrorMessage(err)));
+                                }
+                                else if(isPastPassword) {
+                                    // return error
+                                    res.json({ 'd': { error: true, title: errorHandler.getErrorTitle({ code: 200 }), message: 'This password was used within the last 5 password changes. Please choose a different one.' } });
+                                }
+                                else {
+                                    // create the updated values object
+                                    var updatedValues = {
+                                        'password': req.body.newPassword
+                                    };
+
+                                    // update user
+                                    User.update(foundUser, updatedValues, function(err, updatedUser) {
+                                        // if error occurred occurred
+                                        if (err) {
+                                            // send internal error
+                                            res.status(500).send({ error: true, title: errorHandler.getErrorTitle(err), message: errorHandler.getGenericErrorMessage(err) });
+                                            console.log(clc.error(errorHandler.getDetailedErrorMessage(err)));
+                                        }
+                                        else if(updatedUser) {
+                                            // create the safe user object
+                                            var safeUserObj = createUserReqObject(updatedUser);
+
+                                            // set the updated object
+                                            req.user = safeUserObj;
+
+                                            // return password changed
+                                            res.json({ 'd': { title: errorHandler.getErrorTitle({ code: 200 }), message: errorHandler.getGenericErrorMessage({ code: 200 }) + ' Successful password change.' } });
+                                        }
+                                        else {
+                                            // send internal error
+                                            res.status(500).send({ error: true, title: errorHandler.getErrorTitle({ code: 500 }), message: errorHandler.getGenericErrorMessage({ code: 500 }) });
+                                            console.log(clc.error(`In ${path.basename(__filename)} \'changePassword\': ` + errorHandler.getDetailedErrorMessage({ code: 500 }) + ' Couldn\'t update User.'));
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    });	
+                }
+                else {
+                    // send internal error
+                    res.status(500).send({ error: true, title: errorHandler.getErrorTitle({ code: 500 }), message: errorHandler.getGenericErrorMessage({ code: 500 }) });
+                    console.log(clc.error(`In ${path.basename(__filename)} \'changePassword\': ` + errorHandler.getDetailedErrorMessage({ code: 500 }) + ' Couldn\'t find User.'));
+                }
+            });
+        }
+    });
 };
 
 /**
  * Get the hub details
  */
 exports.readHubs = function (req, res) {
+    // create safe profile object
+    var user = User.toObject(req.user, { 'hide': 'firstName lastName sex email phone lastLogin tierId renewalDate subscribed passwordUpdatedLast notificationNews notificationReminderEmail notificationResearch notificationReminderSMS' });
+
+    // if home location exists
+    if(user.homeLocation) {
+        // get the airport
+        var index = _.findIndex(airportCodes, { iata: user.homeLocation.toUpperCase() });
+        var airport = index != -1 ? airportCodes[index] : null;
+
+        // recreate the home location object
+        user.homeLocation = _.cloneDeep(airport);
+        delete user.homeLocation.id;
+    }
+    
+    // loop through all hubs
+    _.forEach(user.hubs, function(value) {
+        // get the airport
+        var index = _.findIndex(airportCodes, { 'iata': value.toUpperCase() });
+        var airport = index != -1 ? airportCodes[index] : null;
+
+        // redefine the home location to save
+        value = _.cloneDeep(airport);
+        delete value.id;
+    });
+
     // send data
-    res.json({ 'd': accountDetails });
+    res.json({ 'd': user });
 };
 
 /**
- * Updates the hub details
+ * Updates the hub home location
  */
-exports.updateHubs = function (req, res) {
-    // send data
-    res.json({ 'd': accountDetails });
+exports.updateHubHome = function (req, res) {
+    // validate existence
+    req.checkBody('homeLocation', `You must have a hub. Must be airport code in string format.`).notEmpty();
+    req.checkBody('homeLocation', `${req.body.homeLocation} is not a valid hub. Must be airport code in string format.`).isString();
+    req.checkBody('homeLocation', `There is no airport based on this this text '${req.body.homeLocation}'.`).exists(airportCodes);
+
+    // validate errors
+    req.getValidationResult().then(function(errors) {
+        // if any errors exists
+        if(!errors.isEmpty()) {
+            // holds all the errors in one text
+            var errorText = '';
+
+            // add all the errors
+            for(var x = 0; x < errors.array().length; x++) {
+                // if not the last error
+                if(x < errors.array().length - 1) {
+                    errorText += errors.array()[x].msg + '\r\n';
+                }
+                else {
+                    errorText += errors.array()[x].msg;
+                }
+            }
+
+            // send bad request
+            res.status(400).send({ title: errorHandler.getErrorTitle({ code: 400 }), message: errorText });
+        }
+        else {
+            // create the updated values object
+            var updatedValues = {
+                'homeLocation': req.body.homeLocation
+            };
+
+            // get the airport
+            var index = _.findIndex(airportCodes, { 'iata': updatedValues.homeLocation.toUpperCase() });
+            var airport = index != -1 ? airportCodes[index] : null;
+
+            // redefine the home location to save
+            updatedValues.homeLocation = airport.iata;
+
+            // update the values
+            User.update(req.user, updatedValues, function(err, updatedUser) {
+                // if an error occurred
+                if (err) {
+                    // send internal error
+                    res.status(500).send({ error: true, title: errorHandler.getErrorTitle(err), message: errorHandler.getGenericErrorMessage(err) });
+                    console.log(clc.error(errorHandler.getDetailedErrorMessage(err)));
+                }
+                else if (updatedUser) {
+                    // create the safe user object
+                    var safeUserObj = createUserReqObject(updatedUser);
+
+                    // set the updated object
+                    req.user = safeUserObj;
+
+                    // recreate the home location object
+                    var homeLocation = _.cloneDeep(airport);
+                    delete homeLocation.id;
+
+                    // send data
+                    res.json({ 'd': homeLocation });
+                }
+                else {
+                    // send internal error
+                    res.status(500).send({ error: true, title: errorHandler.getErrorTitle({ code: 500 }), message: errorHandler.getGenericErrorMessage({ code: 500 }) });
+                    console.log(clc.error(`In ${path.basename(__filename)} \'updateHubs\': ` + errorHandler.getDetailedErrorMessage({ code: 500 }) + ' Couldn\'t update User.'));
+                }
+            });
+        }
+    });
+};
+
+/**
+ * Adds/Updates the hub
+ */
+exports.upsertHub = function (req, res) {
+    // validate existence
+    req.checkBody('newHub', `You must have a hub. Must be airport code in string format.`).notEmpty();
+    req.checkBody('newHub', `${req.body.newHub} is not a valid hub. Must be airport code in string format.`).isString();
+    req.checkBody('newHub', `There is no airport based on this this text '${req.body.newHub}'.`).exists(airportCodes);
+
+    // if there is an old hub
+    if(req.body.oldHub) {
+        // validate existence
+        req.checkBody('oldHub', `${req.body.oldHub} is not a valid hub. Must be airport code in string format.`).isString();
+        req.checkBody('newHub', `There is no airport based on this this text '${req.body.oldHub}'.`).exists(airportCodes);
+    }
+
+    // validate errors
+    req.getValidationResult().then(function(errors) {
+        // if any errors exists
+        if(!errors.isEmpty()) {
+            // holds all the errors in one text
+            var errorText = '';
+
+            // add all the errors
+            for(var x = 0; x < errors.array().length; x++) {
+                // if not the last error
+                if(x < errors.array().length - 1) {
+                    errorText += errors.array()[x].msg + '\r\n';
+                }
+                else {
+                    errorText += errors.array()[x].msg;
+                }
+            }
+
+            // send bad request
+            res.status(400).send({ title: errorHandler.getErrorTitle({ code: 400 }), message: errorText });
+        }
+        else {
+            // holds the index of old/new hubs
+            var oldIndex = -1,
+                newIndex = _.findIndex(req.user.hubs, req.body.newHub.toUpperCase());
+
+            // if there is an old hub
+            if(req.body.oldHub) {
+                // find index of old hub
+                oldIndex = _.findIndex(req.user.hubs, req.body.oldHub.toUpperCase());
+            }
+
+            // if there already a hub
+            if(newIndex != -1) {
+                // send bad request
+                res.status(400).send({ title: errorHandler.getErrorTitle({ code: 400 }), message: 'Cannot have duplicate hubs.' });
+            }
+            else {
+                // get the airport
+                var index = _.findIndex(airportCodes, { 'iata': req.body.newHub.toUpperCase() });
+                var airport = index != -1 ? airportCodes[index] : null;
+
+                // clone hubs and add
+                var hubs = _.cloneDeep(req.user.hubs);
+
+                // if updating old hub, replace, otherwise add
+                oldIndex != -1 ? hubs[oldIndex] = airport.iata : hubs.push(airport.iata);
+
+                // create the updated values object
+                var updatedValues = {
+                    'hubs': hubs
+                };
+
+                // check the lenth to see if user tried to go over the limit
+                if(hubs.length > req.user.maxHubs) {
+                    // send bad request
+                    res.status(400).send({ title: errorHandler.getErrorTitle({ code: 400 }), message: `Cannot add more than ${req.user.maxHubs} hubs.` });
+                }
+                else {
+                    // update the values
+                    User.update(req.user, updatedValues, function(err, updatedUser) {
+                        // if an error occurred
+                        if (err) {
+                            // send internal error
+                            res.status(500).send({ error: true, title: errorHandler.getErrorTitle(err), message: errorHandler.getGenericErrorMessage(err) });
+                            console.log(clc.error(errorHandler.getDetailedErrorMessage(err)));
+                        }
+                        else if (updatedUser) {
+                            // create the safe user object
+                            var safeUserObj = createUserReqObject(updatedUser);
+
+                            // set the updated object
+                            req.user = safeUserObj;
+
+                            // recreate the home location object
+                            var hub = _.cloneDeep(airport);
+                            delete hub.id;
+
+                            // send data
+                            res.json({ 'd': hub });
+                        }
+                        else {
+                            // send internal error
+                            res.status(500).send({ error: true, title: errorHandler.getErrorTitle({ code: 500 }), message: errorHandler.getGenericErrorMessage({ code: 500 }) });
+                            console.log(clc.error(`In ${path.basename(__filename)} \'updateHubs\': ` + errorHandler.getDetailedErrorMessage({ code: 500 }) + ' Couldn\'t update User.'));
+                        }
+                    });
+                }
+            }
+        }
+    });
+};
+
+/**
+ * Deletes the hub
+ */
+exports.deleteHub = function (req, res) {
+
 };
 
 /**
  * Get the membership details
  */
 exports.readMembership = function (req, res) {
+    // create safe profile object
+    var user = User.toObject(req.user, { 'hide': 'firstName lastName sex email phone lastLogin passwordUpdatedLast homeLocation hubs maxHubs notificationNews notificationReminderEmail notificationResearch notificationReminderSMS' });
+
     // send data
-    res.json({ 'd': accountDetails });
+    res.json({ 'd': user });
 };
 
 /**
@@ -143,16 +458,33 @@ exports.cancelMembership = function (req, res) {
  * Get the notification details
  */
 exports.readNotifications = function (req, res) {
+    // create safe profile object
+    var user = User.toObject(req.user, { 'hide': 'firstName lastName sex email phone lastLogin tierId renewalDate subscribed passwordUpdatedLast homeLocation hubs maxHubs' });
+
     // send data
-    res.json({ 'd': accountDetails });
+    res.json({ 'd': user });
 };
 
 /**
  * Updates the notification details
  */
 exports.updateNotifications = function (req, res) {
-    // send data
-    res.json({ 'd': accountDetails });
+    // create the updated values object
+    var updatedValues = {
+        
+    };
+
+    // remove all undefined members
+    helpers.removeUndefinedMembers(updatedValues);
+
+    // if there is something to update
+    if(Object.keys(updatedValues).length > 0) {
+
+    }
+    else {
+        // read the notifications
+        module.exports.readNotifications(req, res);
+    }
 };
 
 /**
@@ -197,9 +529,11 @@ exports.readDB = function (req, res, next) {
     });
 };
 
+
 /**
  * User middleware
  */
+/*
 exports.userById = function (req, res, next, id) {
     // if user is authenticated in the session
     if (req.isAuthenticated()) {
@@ -241,7 +575,7 @@ exports.userById = function (req, res, next, id) {
                         // return error
                         return next(err);
                     }
-                    // if draft was found
+                    // if user was found
                     else if(foundUser) {
                         // compare equality
                         User.comparePassword(req.body.oldpassword, function(err, isMatch) {
@@ -264,7 +598,7 @@ exports.userById = function (req, res, next, id) {
                     }
                     else {
                         // send not found
-                        res.status(404).send({ title: errorHandler.getErrorTitle({ code: 404 }), message: 'Usernmae/Password is incorrect.' });
+                        res.status(404).send({ title: errorHandler.getErrorTitle({ code: 404 }), message: 'Username/Password is incorrect.' });
                     }
                 });
             }
@@ -274,4 +608,20 @@ exports.userById = function (req, res, next, id) {
         // create forbidden error
         res.status(403).send({ title: errorHandler.getErrorTitle({ code: 403 }), message: errorHandler.getGenericErrorMessage({ code: 403 }) });
     }
+};
+*/
+
+// creates the safe user objec to set in the request
+function createUserReqObject(user) {
+    // clone to not overwrite
+    var safeObj = _.cloneDeep(user);
+
+    // save the id since it will be lost when going to object
+    // hide the password for security purposes
+    var id = safeObj._id;
+    safeObj = User.toObject(safeObj, { 'hide': 'password lastPasswords internalName created' });
+    safeObj._id = id;
+
+    // return the safe obj
+    return safeObj;
 };

@@ -4,7 +4,7 @@
 var accountModule = angular.module('account');
 
 // create the controller
-accountModule.controller('LoginController', ['$scope', '$rootScope', 'LoginFactory', function ($scope, $rootScope, LoginFactory) {
+accountModule.controller('LoginController', ['$scope', '$rootScope', '$window', 'LoginFactory', function ($scope, $rootScope, $window, LoginFactory) {
     // holds the login form data
     $scope.loginForm = {
         'inputs': {
@@ -99,7 +99,8 @@ accountModule.controller('LoginController', ['$scope', '$rootScope', 'LoginFacto
                 // if returned a valid response
                 if(responseL && !responseL.error) {
                     // refresh header
-                    $rootScope.$emit('refreshHeader', {});
+                    //$rootScope.$emit('refreshHeader', {});
+                    $window.location.reload();
                 }
                 else {
                     // show error

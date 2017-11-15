@@ -215,7 +215,7 @@ exports.trimArrayOfString = function (arr) {
 };
 
 /**
- * Converts To Object
+ * Converts to object
  */
 exports.toObject = function(obj, options) {
     // clone object
@@ -237,6 +237,19 @@ exports.toObject = function(obj, options) {
     }
 
     return clonedObj;
+};
+
+/**
+ * Removes undefined members of object
+ */
+exports.removeUndefinedMembers = function(obj) {
+    // go through each option and remove
+    _.forEach(Object.keys(obj), function (value) {
+        // if undefined
+        if(obj[value] === undefined) {
+            delete obj[value];
+        }
+    });
 };
 
 /**

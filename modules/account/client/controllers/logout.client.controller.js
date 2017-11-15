@@ -32,9 +32,6 @@ accountModule.controller('LogoutController', ['$scope', '$rootScope', '$compile'
                 // redirect to home page and reload page to refresh user object
                 $window.location.href = '/';
             }
-
-            // refresh header
-            $rootScope.$emit('refreshHeader', {});
         }
         else {
             // set error

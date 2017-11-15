@@ -30,10 +30,18 @@ module.exports = function (app) {
     app.route('/api/account/change-password').post([accountPolicy.isAllowed, ipLogger.log], accountController.updatePassword);
 
     // GET gets user's hub information
-    // POST updates user's hub information
-	// format /api/hub
+    // format /api/hub
     app.route('/api/account/hub').get([accountPolicy.isAllowed, ipLogger.log], accountController.readHubs);
-    app.route('/api/account/hub').post([accountPolicy.isAllowed, ipLogger.log], accountController.updateHubs);
+
+    // POST updates user's home information
+    // format /api/hub/home
+    app.route('/api/account/hub/home').post([accountPolicy.isAllowed, ipLogger.log], accountController.updateHubHome);
+
+    // POST adds/updates user's hub information
+    // DELETE deletes user's hub information
+    // format /api/hub/hubs
+    app.route('/api/account/hub/hubs').post([accountPolicy.isAllowed, ipLogger.log], accountController.upsertHub);
+    app.route('/api/account/hub/hubs').delete([accountPolicy.isAllowed, ipLogger.log], accountController.deleteHub);
 
     // GET gets user's membership information
     // POST changes user's membership settings

@@ -152,6 +152,12 @@ accountModule.controller('NotificationsController', ['$scope', '$rootScope', '$l
                 // holds the page title
                 $scope.pageTitle = $scope.notifications.title + ' | ' + ApplicationConfiguration.applicationName;
                 
+                // set form values
+                $scope.notificationsForm.inputs.news = $scope.notifications.data.notificationNews;
+                $scope.notificationsForm.inputs.reminderEmail = $scope.notifications.data.notificationReminderEmail;
+                $scope.notificationsForm.inputs.research = $scope.notifications.data.notificationResearch;
+                $scope.notificationsForm.inputs.reminderSMS = $scope.notifications.data.notificationReminderSMS;
+
                 // setup page
                 setUpPage();
             }

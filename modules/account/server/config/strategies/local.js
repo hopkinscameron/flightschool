@@ -125,7 +125,7 @@ module.exports = function () {
                         // save the id since it will be lost when going to object
                         // hide the password for security purposes
                         var id = updatedUser._id;
-                        updatedUser = User.toObject(updatedUser, { 'hide': 'password internalName created' });
+                        updatedUser = User.toObject(updatedUser, { 'hide': 'password lastPasswords internalName created' });
                         updatedUser._id = id;
 
                         // login

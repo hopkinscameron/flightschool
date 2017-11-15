@@ -6,6 +6,15 @@ Next
 - if I have the html editor up on page load, and I exit out, I can't get the other content to show
 - use 'https://api.ipify.org?format=json' if can't use other tool to get ip address
 - if signin/signup failed, clear password
+- for isBoolean, use below
+    req.checkBody({
+        'key': {
+            isBoolean: {
+                errorMessage: 'should be a boolean'
+            }
+        }
+    });
+- when a user purchases a membership, then set maxHubs
 
 Future
 - after sign up, send an email to verify

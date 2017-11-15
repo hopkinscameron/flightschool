@@ -65,7 +65,7 @@ accountServiceModule.factory('AccountFactory', ['$http', '$location', '$rootScop
         var dataStrigified = JSON.stringify({
             'firstName': data.firstName,
             'lastName': data.lastName,
-            'sex': data.sex.toLowerCase(),
+            'sex': data.sex,
             'phone': data.phone,
             'email': data.email
         });
@@ -132,19 +132,69 @@ accountServiceModule.factory('AccountFactory', ['$http', '$location', '$rootScop
         });
     };
 
-    // updates hubs
-    factory.updateHubs = function (data) {
+    // updates home location
+    factory.updateHubHome = function (data) {
         // set the endpoint
-        var endpoint = appPath + '/account/hub';
+        var endpoint = appPath + '/account/hub/home';
 
         // stringify the data
         var dataStrigified = JSON.stringify({
-            'homeLocation': data.homeLocation,
-            'hubs': data.hubs
+            'homeLocation': data.homeLocation
         });
 
         // send request
         return $http.post(endpoint, dataStrigified, { 'ignoreLoadingBar': true }).then(function (response) {
+            return response.data.d;
+        })
+        .catch(function (response) {
+            // if the response was sent back with the custom data response
+            if(response.data) {
+                return { 'error': true, 'title': response.data.title, 'status': response.status, 'message': response.data.message };
+            }
+
+            // return default response
+            return { 'error': true, 'title': $rootScope.$root.generalStatusError, 'status': response.status, 'message': response.xhrStatus };
+        });
+    };
+
+    // adds/updates hub
+    factory.upsertHub = function (data) {
+        // set the endpoint
+        var endpoint = appPath + '/account/hub/hubs';
+
+        // stringify the data
+        var dataStrigified = JSON.stringify({
+            'newHub': data.newHub,
+            'oldHub': data.oldHub
+        });
+
+        // send request
+        return $http.post(endpoint, dataStrigified, { 'ignoreLoadingBar': true }).then(function (response) {
+            return response.data.d;
+        })
+        .catch(function (response) {
+            // if the response was sent back with the custom data response
+            if(response.data) {
+                return { 'error': true, 'title': response.data.title, 'status': response.status, 'message': response.data.message };
+            }
+
+            // return default response
+            return { 'error': true, 'title': $rootScope.$root.generalStatusError, 'status': response.status, 'message': response.xhrStatus };
+        });
+    };
+
+    // deletes hub
+    factory.deleteHub = function (data) {
+        // set the endpoint
+        var endpoint = appPath + '/account/hub/hubs';
+
+        // stringify the data
+        var dataStrigified = JSON.stringify({
+            'hub': data.hub
+        });
+
+        // send request
+        return $http.delete(endpoint, dataStrigified, { 'ignoreLoadingBar': true }).then(function (response) {
             return response.data.d;
         })
         .catch(function (response) {
@@ -250,10 +300,10 @@ accountServiceModule.factory('AccountFactory', ['$http', '$location', '$rootScop
 
         // stringify the data
         var dataStrigified = JSON.stringify({
-            'news': data.news,
-            'reminderEmail': data.reminderEmail,
-            'research': data.research,
-            'reminderSMS': data.reminderSMS
+            'notificationNews': data.news,
+            'notificationReminderEmail': data.reminderEmail,
+            'notificationResearch': data.research,
+            'notificationReminderSMS': data.reminderSMS
         });
 
         // send request

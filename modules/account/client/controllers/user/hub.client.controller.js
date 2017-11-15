@@ -13,10 +13,13 @@ accountModule.controller('HubController', ['$scope', '$rootScope', '$location', 
 
     // edit home location
     $scope.editHomeLocation = function () {
+        // holds the home location found
+        var hl = null;
+
         swal({
             title: 'Enter city or airport code',
             input: 'text',
-            inputPlaceholder: '',
+            inputPlaceholder: 'LAX',
             showCancelButton: true,
             confirmButtonText: 'Submit',
             showLoaderOnConfirm: true,
@@ -24,6 +27,8 @@ accountModule.controller('HubController', ['$scope', '$rootScope', '$location', 
                 return new Promise(function (resolve, reject) {
                     // if a value is present
                     if (value) {
+                        // TODO: check here if it exists
+                        hl = value;
                         resolve();
                     } 
                     else {
@@ -31,34 +36,35 @@ accountModule.controller('HubController', ['$scope', '$rootScope', '$location', 
                     }
                 })
             },
-            preConfirm: function (email) {
+            preConfirm: function () {
                 return new Promise(function (resolve, reject) {
-                    // update
-                    updateHubs(function(err, message) {
-                        // if error
-                        if(err) {
-                            reject(message);
-                        }
-                        else {
+                    // update home location
+                    AccountFactory.updateHubHome({ 'homeLocation': hl }).then(function (responseUH) {
+                        // if returned a valid response
+                        if(responseUH && !responseUH.error) {
+                            // set value
+                            hl = responseUH;
                             resolve();
                         }
+                        else {
+                            reject(responseUH.message);
+                        }
+                    })
+                    .catch(function (responseUH) {
+                        reject(responseUH.message);
                     });
                 })
             },
             allowOutsideClick: false
-        }).then(function (location) {
+        }).then(function () {
             swal({
                 type: 'success',
                 title: 'Home location set!',
                 timer: 3000
             })
-            .then(function (location) {
+            .then(function () {
                 // set location and save
-                $scope.hub.data.homeLocation = {
-                    'city': 'Columbus',
-                    'state': 'OH',
-                    'airport': 'CMH'
-                };
+                $scope.hub.data.homeLocation = hl;
 
                 // force apply
                 $scope.$apply()
@@ -66,11 +72,7 @@ accountModule.controller('HubController', ['$scope', '$rootScope', '$location', 
             // handling the promise rejection
             function (dismiss) {
                 // set location and save
-                $scope.hub.data.homeLocation = {
-                    'city': 'Columbus',
-                    'state': 'OH',
-                    'airport': 'CMH'
-                };
+                $scope.hub.data.homeLocation = hl;
 
                 // force apply
                 $scope.$apply()
@@ -80,6 +82,9 @@ accountModule.controller('HubController', ['$scope', '$rootScope', '$location', 
 
     // add an additional hub
     $scope.addHub = function () {
+        // holds the hub found
+        var hub = null;
+
         swal({
             title: 'Enter city or airport code',
             input: 'text',
@@ -91,6 +96,8 @@ accountModule.controller('HubController', ['$scope', '$rootScope', '$location', 
                 return new Promise(function (resolve, reject) {
                     // if a value is present
                     if (value) {
+                        // TODO: check here if it exists
+                        hub = value;
                         resolve();
                     } 
                     else {
@@ -98,46 +105,43 @@ accountModule.controller('HubController', ['$scope', '$rootScope', '$location', 
                     }
                 })
             },
-            preConfirm: function (email) {
+            preConfirm: function () {
                 return new Promise(function (resolve, reject) {
-                    // update
-                    updateHubs(function(err, message) {
-                        // if error
-                        if(err) {
-                            reject(message);
-                        }
-                        else {
+                    // add hub
+                    AccountFactory.upsertHub({ 'newHub': hub }).then(function (responseUH) {
+                        // if returned a valid response
+                        if(responseUH && !responseUH.error) {
+                            // set value
+                            hub = responseUH;
                             resolve();
                         }
+                        else {
+                            reject(responseUH.message);
+                        }
+                    })
+                    .catch(function (responseUH) {
+                        reject(responseUH.message);
                     });
                 })
             },
             allowOutsideClick: false
-        }).then(function (location) {
+        }).then(function () {
             swal({
                 type: 'success',
                 title: 'Hub added!',
                 timer: 3000
             })
-            .then(function (location) {
-                // add new
-                $scope.hub.data.hubs.push({
-                    'city': 'Columbus',
-                    'state': 'OH',
-                    'airport': 'CMH'
-                });
+            .then(function () {
+                // push new
+                $scope.hub.data.hubs.push(hub);
 
                 // force apply
                 $scope.$apply()
             },
             // handling the promise rejection
             function (dismiss) {
-                // add new
-                $scope.hub.data.hubs.push({
-                    'city': 'Columbus',
-                    'state': 'OH',
-                    'airport': 'CMH'
-                });
+                // push new
+                $scope.hub.data.hubs.push(hub);
 
                 // force apply
                 $scope.$apply()
@@ -147,6 +151,9 @@ accountModule.controller('HubController', ['$scope', '$rootScope', '$location', 
 
     // edit hub
     $scope.editHub = function (hubIndex) {
+        // holds the hub found
+        var hub = null;
+
         swal({
             title: 'Enter city or airport code',
             input: 'text',
@@ -158,6 +165,8 @@ accountModule.controller('HubController', ['$scope', '$rootScope', '$location', 
                 return new Promise(function (resolve, reject) {
                     // if a value is present
                     if (value) {
+                        // TODO: check here if it exists
+                        hub = value;
                         resolve();
                     } 
                     else {
@@ -165,34 +174,36 @@ accountModule.controller('HubController', ['$scope', '$rootScope', '$location', 
                     }
                 })
             },
-            preConfirm: function (email) {
+            preConfirm: function () {
                 return new Promise(function (resolve, reject) {
-                    // update
-                    updateHubs(function(err, message) {
-                        // if error
-                        if(err) {
-                            reject(message);
-                        }
-                        else {
+                    // add hub
+                    AccountFactory.upsertHub({ 'newHub': hub, 'oldHub': $scope.hub.data.hubs[hubIndex].iata }).then(function (responseUH) {
+                        // if returned a valid response
+                        if(responseUH && !responseUH.error) {
+                            // set value
+                            hub = responseUH;
+
                             resolve();
                         }
+                        else {
+                            reject(responseUH.message);
+                        }
+                    })
+                    .catch(function (responseUH) {
+                        reject(responseUH.message);
                     });
                 })
             },
             allowOutsideClick: false
-        }).then(function (location) {
+        }).then(function () {
             swal({
                 type: 'success',
                 title: 'Hub updated!',
                 timer: 3000
             })
-            .then(function (location) {
+            .then(function () {
                 // update
-                $scope.hub.data.hubs[hubIndex] = {
-                    'city': 'Toledo',
-                    'state': 'OH',
-                    'airport': 'CMH'
-                };
+                $scope.hub.data.hubs[hubIndex] = hub;
 
                 // force apply
                 $scope.$apply()
@@ -200,11 +211,7 @@ accountModule.controller('HubController', ['$scope', '$rootScope', '$location', 
             // handling the promise rejection
             function (dismiss) {
                 // update
-                $scope.hub.data.hubs[hubIndex] = {
-                    'city': 'Toledo',
-                    'state': 'OH',
-                    'airport': 'CMH'
-                };
+                $scope.hub.data.hubs[hubIndex] = hub;
 
                 // force apply
                 $scope.$apply()
@@ -229,22 +236,6 @@ accountModule.controller('HubController', ['$scope', '$rootScope', '$location', 
                 $scope.hub.title = 'Hub';
                 $scope.hub.pageHeader = $scope.hub.title;
                 $scope.hub.pageSubHeader = 'Are your hubs looking okay?';
-
-                // FIXME: used for testing
-                $scope.hub.data = {
-                    'maxHubs': 5,
-                    'homeLocation': null,
-                    'hubs': []
-                };
-
-                /*
-                // set location and save
-                $scope.hub.data.homeLocation = {
-                    'city': 'Columbus',
-                    'state': 'OH',
-                    'airport': 'CMH'
-                };
-                */
 
                 // holds the page title
                 $scope.pageTitle = $scope.hub.title + ' | ' + ApplicationConfiguration.applicationName;
@@ -292,34 +283,16 @@ accountModule.controller('HubController', ['$scope', '$rootScope', '$location', 
     };
 
     // updates the hubs
-    function updateHubs(callback) {
+    function updateHubs(data, callback) {
         // the data to send
         var hubsData = {
-            'homeLocation': $scope.hub.data.homeLocation,
-            'hubs': $scope.hub.data.hubs
+            'homeLocation': data.homeLocation,
+            'hubs': data.hubs
         };
 
-        // update password
-        AccountFactory.updateHubs(hubsData).then(function (responseUH) {
-            // if returned a valid response
-            if(responseUH && !responseUH.error) {
-                // if callback
-                if(callback) {
-                    callback();
-                }
-            }
-            else {
-                // if callback
-                if(callback) {
-                    callback(responseUH.error, responseUH.message);
-                }
-            }
-        })
-        .catch(function (responseUH) {
-            // if callback
-            if(callback) {
-                callback(responseUH.error, responseUH.message);
-            }
-        });
+        // remove all undefined members
+        $rootScope.$root.removeUndefinedMembers(hubsData);
+
+        
     }
 }]);
