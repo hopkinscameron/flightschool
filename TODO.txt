@@ -15,12 +15,12 @@ Next
         }
     });
 - when a user purchases a membership, then set maxHubs
+- instead of sending a huge amount of data over server (for hubs) just send iata and icao adn then on front end do a lookup
 
 Future
 - after sign up, send an email to verify
 
 Done
-
 
 Testing
 

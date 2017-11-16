@@ -4,3 +4,6 @@
 {"k":"0000000111","o":"0000000334","v":"001"}
 {"_id":"396xKUS5VuuW9w2fqDIdVq3emfoelkPj","_uid":1,"_dt":1510771897940,"_s":"cbcd2e1a0b19030a16fd8b275c943c79"}
 {"cookie":{"originalMaxAge":86400000,"expires":{"$wrap":"$date","v":1510858297936,"h":"2017-11-16T18:51:37.936Z"},"secure":false,"httpOnly":true,"path":"/"},"passport":{"user":"4e358660-c965-11e7-b42d-776b8f03bc75"},"expires":{"$wrap":"$date","v":1510858297936,"h":"2017-11-16T18:51:37.936Z"},"_id":"396xKUS5VuuW9w2fqDIdVq3emfoelkPj"}
+{"k":"0000000111","o":"0000000334","v":"001"}
+{"_id":"Reg7niJZ_vjoTkPsLKGQOZVzmgIFgvpt","_uid":1,"_dt":1510858438848,"_s":"92e4a05077ea2140c64b6afdc8abaafe"}
+{"cookie":{"originalMaxAge":86400000,"expires":{"$wrap":"$date","v":1510944838834,"h":"2017-11-17T18:53:58.834Z"},"secure":false,"httpOnly":true,"path":"/"},"passport":{"user":"4e358660-c965-11e7-b42d-776b8f03bc75"},"expires":{"$wrap":"$date","v":1510944838834,"h":"2017-11-17T18:53:58.834Z"},"_id":"Reg7niJZ_vjoTkPsLKGQOZVzmgIFgvpt"}

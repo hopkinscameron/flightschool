@@ -139,7 +139,10 @@ accountServiceModule.factory('AccountFactory', ['$http', '$location', '$rootScop
 
         // stringify the data
         var dataStrigified = JSON.stringify({
-            'homeLocation': data.homeLocation
+            'homeLocation': {
+                'iata': data.homeLocation ? data.homeLocation.iata : '',
+                'icao': data.homeLocation ? data.homeLocation.icao : ''
+            }
         });
 
         // send request
@@ -164,8 +167,14 @@ accountServiceModule.factory('AccountFactory', ['$http', '$location', '$rootScop
 
         // stringify the data
         var dataStrigified = JSON.stringify({
-            'newHub': data.newHub,
-            'oldHub': data.oldHub
+            'newHub': {
+                'iata': data.newHub ? data.newHub.iata : '',
+                'icao': data.newHub ? data.newHub.icao : ''
+            },
+            'oldHub': {
+                'iata': data.oldHub ? data.oldHub.iata : '',
+                'icao': data.oldHub ? data.oldHub.icao : ''
+            }
         });
 
         // send request
@@ -185,16 +194,15 @@ accountServiceModule.factory('AccountFactory', ['$http', '$location', '$rootScop
 
     // deletes hub
     factory.deleteHub = function (data) {
-        // set the endpoint
-        var endpoint = appPath + '/account/hub/hubs';
+        // set airport values
+        var iata = data.hub ? data.hub.iata : '';
+        var icao = data.hub ? data.hub.icao : '';
 
-        // stringify the data
-        var dataStrigified = JSON.stringify({
-            'hub': data.hub
-        });
+        // set the endpoint
+        var endpoint = appPath + `/account/hub/hubs?iata=${iata}&icao=${icao}`;
 
         // send request
-        return $http.delete(endpoint, dataStrigified, { 'ignoreLoadingBar': true }).then(function (response) {
+        return $http.delete(endpoint, { 'ignoreLoadingBar': true }).then(function (response) {
             return response.data.d;
         })
         .catch(function (response) {

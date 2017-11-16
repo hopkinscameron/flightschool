@@ -114,7 +114,7 @@ var UserSchema = {
         type: Date
     },
     homeLocation: {
-        type: String,
+        type: Object,
         default: null
     },
     hubs: {
@@ -339,8 +339,8 @@ exports.update = function(query, updatedObj, callback) {
         // trim any values
         helpers.trimValuesForProperties(trimmableSchemaProperties, updatedObj);
 
-        // add the last passwords to this obj
-        updatedObj.lastPasswords = obj.lastPasswords;
+        // add the last passwords to this object if changing the password
+        updatedObj.password ? updatedObj.lastPasswords = obj.lastPasswords : updatedObj;
         
         // encrypt password
         encryptPassword(updatedObj, function(err) {
@@ -354,7 +354,13 @@ exports.update = function(query, updatedObj, callback) {
             }
             else {
                 // merge old data with new data
-                _.merge(obj, updatedObj);
+                //_.merge(obj, updatedObj);
+                _.mergeWith(obj, updatedObj, function (objValue, srcValue) {
+                    // if array, replace array
+                    if (_.isArray(objValue)) {
+                        return srcValue;
+                    }
+                });
 
                 // replace item at index using native splice
                 db.splice(index, 1, obj);

@@ -213,7 +213,9 @@ exports.readHubs = function (req, res) {
     // if home location exists
     if(user.homeLocation) {
         // get the airport
-        var index = _.findIndex(airportCodes, { iata: user.homeLocation.toUpperCase() });
+        var index = _.findIndex(airportCodes, user.homeLocation);
+
+        // set airport
         var airport = index != -1 ? airportCodes[index] : null;
 
         // recreate the home location object
@@ -221,15 +223,23 @@ exports.readHubs = function (req, res) {
         delete user.homeLocation.id;
     }
     
+    // current position
+    var pos = 0;
+
     // loop through all hubs
     _.forEach(user.hubs, function(value) {
         // get the airport
-        var index = _.findIndex(airportCodes, { 'iata': value.toUpperCase() });
+        var index = _.findIndex(airportCodes, value);
+
+        // set airport
         var airport = index != -1 ? airportCodes[index] : null;
 
-        // redefine the home location to save
-        value = _.cloneDeep(airport);
-        delete value.id;
+        // redefine the hub to save
+        user.hubs[pos] = _.cloneDeep(airport);
+        delete user.hubs[pos].id;
+
+        // increase to next position
+        pos++;
     });
 
     // send data
@@ -241,9 +251,10 @@ exports.readHubs = function (req, res) {
  */
 exports.updateHubHome = function (req, res) {
     // validate existence
-    req.checkBody('homeLocation', `You must have a hub. Must be airport code in string format.`).notEmpty();
-    req.checkBody('homeLocation', `${req.body.homeLocation} is not a valid hub. Must be airport code in string format.`).isString();
-    req.checkBody('homeLocation', `There is no airport based on this this text '${req.body.homeLocation}'.`).exists(airportCodes);
+    req.checkBody('homeLocation', `You must have a location. Must have key of iata or icao.`).notEmpty();
+    req.checkBody('homeLocation.iata', `${req.body.homeLocation.iata} is not a valid location. Must have key of iata or icao.`).isString();
+    req.checkBody('homeLocation.icao', `${req.body.homeLocation.icao} is not a valid location. Must have key of iata or icao.`).isString();
+    req.checkBody('homeLocation', `There is no airport based on this this location '${req.body.homeLocation.iata}' & '${req.body.homeLocation.icao}'.`).exists(airportCodes);
 
     // validate errors
     req.getValidationResult().then(function(errors) {
@@ -269,15 +280,21 @@ exports.updateHubHome = function (req, res) {
         else {
             // create the updated values object
             var updatedValues = {
-                'homeLocation': req.body.homeLocation
+                'homeLocation': {
+                    'iata': req.body.homeLocation.iata.toUpperCase(),
+                    'icao': req.body.homeLocation.icao.toUpperCase()
+                } 
             };
 
             // get the airport
-            var index = _.findIndex(airportCodes, { 'iata': updatedValues.homeLocation.toUpperCase() });
+            var index = _.findIndex(airportCodes, updatedValues.homeLocation);
+
+            // set airport
             var airport = index != -1 ? airportCodes[index] : null;
 
             // redefine the home location to save
-            updatedValues.homeLocation = airport.iata;
+            updatedValues.homeLocation.iata = airport.iata;
+            updatedValues.homeLocation.icao = airport.icao;
 
             // update the values
             User.update(req.user, updatedValues, function(err, updatedUser) {
@@ -304,7 +321,7 @@ exports.updateHubHome = function (req, res) {
                 else {
                     // send internal error
                     res.status(500).send({ error: true, title: errorHandler.getErrorTitle({ code: 500 }), message: errorHandler.getGenericErrorMessage({ code: 500 }) });
-                    console.log(clc.error(`In ${path.basename(__filename)} \'updateHubs\': ` + errorHandler.getDetailedErrorMessage({ code: 500 }) + ' Couldn\'t update User.'));
+                    console.log(clc.error(`In ${path.basename(__filename)} \'updateHubHome\': ` + errorHandler.getDetailedErrorMessage({ code: 500 }) + ' Couldn\'t update User.'));
                 }
             });
         }
@@ -316,15 +333,18 @@ exports.updateHubHome = function (req, res) {
  */
 exports.upsertHub = function (req, res) {
     // validate existence
-    req.checkBody('newHub', `You must have a hub. Must be airport code in string format.`).notEmpty();
-    req.checkBody('newHub', `${req.body.newHub} is not a valid hub. Must be airport code in string format.`).isString();
-    req.checkBody('newHub', `There is no airport based on this this text '${req.body.newHub}'.`).exists(airportCodes);
+    req.checkBody('newHub', `You must have a location. Must have key of iata or icao.`).notEmpty();
+    req.checkBody('newHub.iata', `${req.body.newHub.iata} is not a valid location. Must have key of iata.`).isString();
+    req.checkBody('newHub.icao', `${req.body.newHub.icao} is not a valid location. Must have key of icao.`).isString();
+    req.checkBody('newHub', `There is no airport based on this this location '${req.body.newHub.iata}' & '${req.body.newHub.icao}'.`).exists(airportCodes);
 
     // if there is an old hub
     if(req.body.oldHub) {
         // validate existence
         req.checkBody('oldHub', `${req.body.oldHub} is not a valid hub. Must be airport code in string format.`).isString();
-        req.checkBody('newHub', `There is no airport based on this this text '${req.body.oldHub}'.`).exists(airportCodes);
+        req.checkBody('oldHub.iata', `${req.body.oldHub.iata} is not a valid location. Must have key of iata.`).isString();
+        req.checkBody('oldHub.icao', `${req.body.oldHub.icao} is not a valid location. Must have key icao.`).isString();
+        req.checkBody('oldHub', `There is no airport based on this this location '${req.body.oldHub.iata}' & '${req.body.oldHub.icao}'.`).exists(airportCodes);
     }
 
     // validate errors
@@ -349,14 +369,28 @@ exports.upsertHub = function (req, res) {
             res.status(400).send({ title: errorHandler.getErrorTitle({ code: 400 }), message: errorText });
         }
         else {
+            // initialize new hub
+            var newHub = {
+                'iata': req.body.newHub.iata.toUpperCase(),
+                'icao': req.body.newHub.icao.toUpperCase()
+            };
+
+            // initialize new hub
+            var oldHub = null;
+
             // holds the index of old/new hubs
             var oldIndex = -1,
-                newIndex = _.findIndex(req.user.hubs, req.body.newHub.toUpperCase());
+                newIndex = _.findIndex(req.user.hubs, newHub);
 
             // if there is an old hub
             if(req.body.oldHub) {
+                oldHub = {
+                    'iata': req.body.oldHub.iata.toUpperCase(),
+                    'icao': req.body.oldHub.icao.toUpperCase()
+                };
+
                 // find index of old hub
-                oldIndex = _.findIndex(req.user.hubs, req.body.oldHub.toUpperCase());
+                oldIndex = _.indexOf(req.user.hubs, oldHub);
             }
 
             // if there already a hub
@@ -366,14 +400,26 @@ exports.upsertHub = function (req, res) {
             }
             else {
                 // get the airport
-                var index = _.findIndex(airportCodes, { 'iata': req.body.newHub.toUpperCase() });
+                var index = _.findIndex(airportCodes, newHub);;
+
+                // set airport
                 var airport = index != -1 ? airportCodes[index] : null;
 
                 // clone hubs and add
                 var hubs = _.cloneDeep(req.user.hubs);
 
-                // if updating old hub, replace, otherwise add
-                oldIndex != -1 ? hubs[oldIndex] = airport.iata : hubs.push(airport.iata);
+                // if index
+                if(oldIndex != -1) {
+                    // replace
+                    hubs[oldIndex] = {
+                        'iata': airport.iata,
+                        'icao': airport.icao
+                    };
+                }
+                else {  
+                    // add
+                    hubs.push({ 'iata': airport.iata, 'icao': airport.icao });
+                }
 
                 // create the updated values object
                 var updatedValues = {
@@ -401,7 +447,7 @@ exports.upsertHub = function (req, res) {
                             // set the updated object
                             req.user = safeUserObj;
 
-                            // recreate the home location object
+                            // recreate the hub location object
                             var hub = _.cloneDeep(airport);
                             delete hub.id;
 
@@ -411,7 +457,7 @@ exports.upsertHub = function (req, res) {
                         else {
                             // send internal error
                             res.status(500).send({ error: true, title: errorHandler.getErrorTitle({ code: 500 }), message: errorHandler.getGenericErrorMessage({ code: 500 }) });
-                            console.log(clc.error(`In ${path.basename(__filename)} \'updateHubs\': ` + errorHandler.getDetailedErrorMessage({ code: 500 }) + ' Couldn\'t update User.'));
+                            console.log(clc.error(`In ${path.basename(__filename)} \'upsertHub\': ` + errorHandler.getDetailedErrorMessage({ code: 500 }) + ' Couldn\'t update User.'));
                         }
                     });
                 }
@@ -424,7 +470,49 @@ exports.upsertHub = function (req, res) {
  * Deletes the hub
  */
 exports.deleteHub = function (req, res) {
+    // find the index of the hub to delete
+    var index = _.indexOf(req.user.hubs, { 'iata': req.query.iata ? req.query.iata.toUpperCase() : null, 'icao': req.query.icao ? req.query.icao.toUpperCase() : null });
 
+    // if found
+    if(index != -1) {
+        // clone hubs and remove
+        var hubs = _.cloneDeep(req.user.hubs);
+        var deletedHub = hubs.splice(index, 1);
+
+        // create the updated values object
+        var updatedValues = {
+            'hubs': hubs
+        };
+
+        // update the values
+        User.update(req.user, updatedValues, function(err, updatedUser) {
+            // if an error occurred
+            if (err) {
+                // send internal error
+                res.status(500).send({ error: true, title: errorHandler.getErrorTitle(err), message: errorHandler.getGenericErrorMessage(err) });
+                console.log(clc.error(errorHandler.getDetailedErrorMessage(err)));
+            }
+            else if (updatedUser) {
+                // create the safe user object
+                var safeUserObj = createUserReqObject(updatedUser);
+
+                // set the updated object
+                req.user = safeUserObj;
+
+                // send data
+                res.json({ 'd': { 'hub': deletedHub, title: errorHandler.getErrorTitle({ code: 200 }), message: 'Hub successfully deleted.' } });
+            }
+            else {
+                // send internal error
+                res.status(500).send({ error: true, title: errorHandler.getErrorTitle({ code: 500 }), message: errorHandler.getGenericErrorMessage({ code: 500 }) });
+                console.log(clc.error(`In ${path.basename(__filename)} \'deleteHub\': ` + errorHandler.getDetailedErrorMessage({ code: 500 }) + ' Couldn\'t update User.'));
+            }
+        });
+    }
+    else {
+        // send not found
+        res.json({ 'd': { error: true, title: errorHandler.getErrorTitle({ code: 404 }), message: 'Hub not found.' } });
+    };
 };
 
 /**

@@ -165,10 +165,9 @@ module.exports.initMiddleware = function (app) {
             // determines if value exists
             exists: (value, arr) => {
                 return _.findIndex(arr, function(o) { 
-                    var iata = o.iata.toLowerCase().includes(value.toLowerCase());
-                    var city = o.city.toLowerCase().includes(value.toLowerCase());
-                    var name = o.name.toLowerCase().includes(value.toLowerCase());
-                    return iata || city || name; 
+                    var iata = o.iata.toLowerCase().includes(value.iata && value.iata.length > 0 ? value.iata.toLowerCase() : '');
+                    var icao = o.icao.toLowerCase().includes(value.icao && value.icao.length > 0 ? value.icao.toLowerCase() : '');
+                    return iata && icao; 
                 });
             }
         }

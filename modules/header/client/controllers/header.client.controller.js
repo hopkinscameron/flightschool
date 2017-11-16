@@ -21,6 +21,11 @@ headerModule.controller('HeaderController', ['$scope', '$rootScope', '$location'
         $('.navbar-collapse').collapse('hide');
     });
 
+    // get the airport codes
+    $.getJSON('/lib/airport-codes/airports.json', function(json) {
+        $rootScope.$root.airportCodes = json;
+    });
+
     // on refresh
     $rootScope.$on('refreshHeader', function (event, data) {
         // initialize variables

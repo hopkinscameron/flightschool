@@ -15,9 +15,19 @@ var // the path
     loginController = require('../controllers/login.server.controller');
 
 module.exports = function (app) {
+    // =========================================================================
+    // Account Routes ==========================================================
+    // =========================================================================
+    
     // GET gets account navigation
 	// format /api/account
     app.route('/api/account').get([accountPolicy.isAllowed, ipLogger.log, accountController.readDB], accountController.read);
+
+
+
+    // =========================================================================
+    // Profile Routes ==========================================================
+    // =========================================================================
 
     // GET gets user's edit profile information
     // POST updates user's profile information
@@ -25,9 +35,21 @@ module.exports = function (app) {
     app.route('/api/account/edit-profile').get([accountPolicy.isAllowed, ipLogger.log], accountController.readProfile);
     app.route('/api/account/edit-profile').post([accountPolicy.isAllowed, ipLogger.log], accountController.updateProfile);
 
+
+
+    // =========================================================================
+    // Account Routes ==========================================================
+    // =========================================================================
+
     // POST updates user's password
 	// format /api/change-password
     app.route('/api/account/change-password').post([accountPolicy.isAllowed, ipLogger.log], accountController.updatePassword);
+
+
+
+    // =========================================================================
+    // Hub Routes ==============================================================
+    // =========================================================================
 
     // GET gets user's hub information
     // format /api/hub
@@ -38,10 +60,18 @@ module.exports = function (app) {
     app.route('/api/account/hub/home').post([accountPolicy.isAllowed, ipLogger.log], accountController.updateHubHome);
 
     // POST adds/updates user's hub information
-    // DELETE deletes user's hub information
     // format /api/hub/hubs
     app.route('/api/account/hub/hubs').post([accountPolicy.isAllowed, ipLogger.log], accountController.upsertHub);
+
+    // DELETE deletes user's hub information
+    // format /api/hub/hubs?iata={iata}&icao={icao}
     app.route('/api/account/hub/hubs').delete([accountPolicy.isAllowed, ipLogger.log], accountController.deleteHub);
+
+
+
+    // =========================================================================
+    // Membership Routes =======================================================
+    // =========================================================================
 
     // GET gets user's membership information
     // POST changes user's membership settings
@@ -50,6 +80,12 @@ module.exports = function (app) {
     app.route('/api/account/membership').get([accountPolicy.isAllowed, ipLogger.log], accountController.readMembership);
     app.route('/api/account/membership').post([accountPolicy.isAllowed, ipLogger.log], accountController.changeMembership);
     app.route('/api/account/membership').delete([accountPolicy.isAllowed, ipLogger.log], accountController.cancelMembership);
+
+
+    
+    // =========================================================================
+    // Notification Routes =====================================================
+    // =========================================================================
 
     // GET gets user's notifications information
     // POST updates user's notification settings
