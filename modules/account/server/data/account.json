@@ -10,6 +10,11 @@
         "view": "/modules/account/client/views/user/change-password.client.view.html"
     },
     {
+        "title": "Payment Information",
+        "pageLink": "payment",
+        "view": "/modules/account/client/views/user/payment-information.client.view.html"
+    },
+    {
         "title": "Edit Hubs",
         "pageLink": "hubs",
         "view": "/modules/account/client/views/user/hub.client.view.html"

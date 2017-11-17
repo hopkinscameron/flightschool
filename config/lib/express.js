@@ -154,6 +154,10 @@ module.exports.initMiddleware = function (app) {
             isGreaterThanOrEqualTo: (value1, value2) => {
                 return value1 >= value2;
             },
+            // determines if value is of lenth
+            isOfLength: (value1, value2) => {
+                return typeof(value1) === 'string' && Number.isInteger(value2) && value1.length == value2;
+            },
             // determines if value is a type of boolean
             isBoolean: (value) => {
                 return typeof(value) === 'boolean';

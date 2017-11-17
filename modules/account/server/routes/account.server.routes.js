@@ -36,14 +36,26 @@ module.exports = function (app) {
     app.route('/api/account/edit-profile').post([accountPolicy.isAllowed, ipLogger.log], accountController.updateProfile);
 
 
-
+    
     // =========================================================================
-    // Account Routes ==========================================================
+    // Password Routes =========================================================
     // =========================================================================
 
     // POST updates user's password
 	// format /api/change-password
     app.route('/api/account/change-password').post([accountPolicy.isAllowed, ipLogger.log], accountController.updatePassword);
+
+
+
+    // =========================================================================
+    // Payment Information Routes ==============================================
+    // =========================================================================
+
+    // GET gets user's payment information
+    // POST updates user's payment information
+    // format /api/payment-information
+    app.route('/api/account/payment-information').get([accountPolicy.isAllowed, ipLogger.log], accountController.readPayment);
+    app.route('/api/account/payment-information').post([accountPolicy.isAllowed, ipLogger.log], accountController.updatePayment);
 
 
 
@@ -56,8 +68,10 @@ module.exports = function (app) {
     app.route('/api/account/hub').get([accountPolicy.isAllowed, ipLogger.log], accountController.readHubs);
 
     // POST updates user's home information
+    // DELETE deletes user's home information
     // format /api/hub/home
     app.route('/api/account/hub/home').post([accountPolicy.isAllowed, ipLogger.log], accountController.updateHubHome);
+    app.route('/api/account/hub/home').delete([accountPolicy.isAllowed, ipLogger.log], accountController.deleteHubHome);
 
     // POST adds/updates user's hub information
     // format /api/hub/hubs

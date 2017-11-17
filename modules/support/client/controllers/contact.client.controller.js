@@ -70,7 +70,9 @@ supportModule.controller('ContactController', ['$scope', '$rootScope', '$compile
             text: 'Phone: ' + $scope.contact.data.phone,
             confirmButtonClass: 'btn btn-theme-primary btn-cursor-pointer',
             buttonsStyling: false
-        });
+        }).then(function () {},
+        // handling the promise rejection
+        function (dismiss) {});
     };
 
     // initialize page

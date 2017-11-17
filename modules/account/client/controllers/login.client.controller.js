@@ -99,14 +99,18 @@ accountModule.controller('LoginController', ['$scope', '$rootScope', '$window', 
                 // if returned a valid response
                 if(responseL && !responseL.error) {
                     // refresh header
-                    //$rootScope.$emit('refreshHeader', {});
                     $window.location.reload();
+
+                    // clear the form for security
+                    resetForm();
                 }
                 else {
                     // show error
                     $scope.loginForm.errors.errorMessage = responseL.message;
                     $scope.loginForm.errors.isError = true;
-                    $scope.formInTransit = false;
+                    
+                    // clear the form for security
+                    resetForm();
                 }
             })
             .catch(function (responseL) {
@@ -114,6 +118,9 @@ accountModule.controller('LoginController', ['$scope', '$rootScope', '$window', 
                 $scope.loginForm.errors.errorMessage = responseL.message;
                 $scope.loginForm.errors.isError = true;
                 $scope.formInTransit = false;
+
+                // clear the form for security
+                resetForm();
             });
         }
     };
@@ -133,5 +140,15 @@ accountModule.controller('LoginController', ['$scope', '$rootScope', '$window', 
             $scope.loginForm.errors.email = true;
             $scope.loginForm.errors.isError = true;
         }
+    };
+
+    // clear the fields
+    function resetForm() {
+        // set to default
+        $scope.loginForm.inputs.password = '';
+        $scope.formInTransit = false;
+
+        // force apply
+        $scope.$apply()
     };
 }]);

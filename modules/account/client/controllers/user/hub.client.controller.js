@@ -16,9 +16,15 @@ accountModule.controller('HubController', ['$scope', '$rootScope', '$location', 
 
     // edit home location
     $scope.editHomeLocation = function () {
-        // holds the home location found
+        // holds the airport found
         var airport = null;
-        
+
+        // the possible airports (as objects)
+        var airports = [];
+
+        // the possible airports (as a dropdown name selection)
+        var selectOptions = [];
+
         swal({
             title: 'Enter city or airport code',
             input: 'text',
@@ -28,44 +34,22 @@ accountModule.controller('HubController', ['$scope', '$rootScope', '$location', 
             confirmButtonClass: 'btn btn-theme-primary btn-cursor-pointer mr-2',
             cancelButtonClass: 'btn btn-theme-primary btn-cursor-pointer',
             buttonsStyling: false,
-            showLoaderOnConfirm: true,
+            buttonsStyling: false,
             inputValidator: function (value) {
                 return new Promise(function (resolve, reject) {
                     // if a value is present
                     if(value && value.length >= 2) {
                         // get possible airports
-                        var airports = getPossibleAirports(value);
+                        airports = getPossibleAirports(value);
 
                         // if array
                         if(airports.length > 0 && airports.length <= maxDropdown) {
-                            // the options
-                            var selectOptions = [];
-                            
                             // add each airpot
                             _.forEach(airports, function(value) {
                                 selectOptions.push(value.name)
                             });
 
-                            // get the selected airport
-                            swal({
-                                title: 'Pick an airport',
-                                input: 'select',
-                                inputOptions: selectOptions,
-                                confirmButtonClass: 'btn btn-theme-primary btn-cursor-pointer mr-2',
-                                cancelButtonClass: 'btn btn-theme-primary btn-cursor-pointer',
-                                buttonsStyling: false,
-                                showCancelButton: true,
-                                inputPlaceholder: 'Select airport',
-                                inputValidator: function (value) {
-                                    // if a value was selected
-                                    if (value.length > 0) {
-                                        var index = parseInt(value);
-                                        airport = airports[index];
-                                    } 
-                                    
-                                    resolve();
-                                }
-                            });                          
+                            resolve();                    
                         }
                         else if(airports.length > maxDropdown) {
                             reject('Too many items. Please enter more to refine the search.');
@@ -79,22 +63,108 @@ accountModule.controller('HubController', ['$scope', '$rootScope', '$location', 
                     }
                 });
             },
-            preConfirm: function () {
-                return new Promise(function (resolve, reject) {
-                    // update home location
-                    AccountFactory.updateHubHome({ 'homeLocation': { 'iata': airport.iata, 'icao': airport.icao } }).then(function (responseUH) {
-                        // if returned a valid response
-                        if(responseUH && !responseUH.error) {
-                            // set value
-                            airport = responseUH;
+            allowOutsideClick: false
+        }).then(function () {
+            // get the selected airport
+            swal({
+                title: 'Pick an airport',
+                input: 'select',
+                inputOptions: selectOptions,
+                confirmButtonClass: 'btn btn-theme-primary btn-cursor-pointer mr-2',
+                cancelButtonClass: 'btn btn-theme-primary btn-cursor-pointer',
+                buttonsStyling: false,
+                showCancelButton: true,
+                showLoaderOnConfirm: true,
+                inputPlaceholder: 'Select airport',
+                inputValidator: function (value) {
+                        return new Promise(function (resolve, reject) {
+                        // if a value was selected
+                        if (value.length > 0) {
+                            var index = parseInt(value);
+                            airport = airports[index];
                             resolve();
                         }
                         else {
+                            reject('Please select an airport!');
+                        }
+                    });
+                },
+                preConfirm: function () {
+                    return new Promise(function (resolve, reject) {
+                        // update home location
+                        AccountFactory.updateHubHome({ 'homeLocation': { 'iata': airport.iata, 'icao': airport.icao } }).then(function (responseUH) {
+                            // if returned a valid response
+                            if(responseUH && !responseUH.error) {
+                                // set value
+                                airport = responseUH;
+                                resolve();
+                            }
+                            else {
+                                reject(responseUH.message);
+                            }
+                        })
+                        .catch(function (responseUH) {
                             reject(responseUH.message);
+                        });
+                    });
+                }
+            }).then(function () {
+                swal({
+                    type: 'success',
+                    title: 'Home location set!',
+                    timer: 3000
+                })
+                .then(function () {
+                    // set location and save
+                    $scope.hub.data.homeLocation = airport;
+
+                    // force apply
+                    $scope.$apply()
+                },
+                // handling the promise rejection
+                function (dismiss) {
+                    // set location and save
+                    $scope.hub.data.homeLocation = airport;
+
+                    // force apply
+                    $scope.$apply()
+                });
+            },
+            // handling the promise rejection
+            function (dismiss) {});
+        },
+        // handling the promise rejection
+        function (dismiss) {});
+    };
+
+    // delete home location
+    $scope.deleteHomeLocation = function () {
+        swal({
+            type: 'warning',
+            title: 'Delete Home Hub',
+            html: `Are you sure you want to delete <span class="font-weight-bold">${$scope.hub.data.homeLocation.name}</span>? You will not be able to revert this.`,
+            showCancelButton: true,
+            focusConfirm: false,
+            focusCancel: true,
+            confirmButtonText: 'Delete',
+            confirmButtonClass: 'btn btn-danger btn-cursor-pointer mr-2',
+            cancelButtonClass: 'btn btn-theme-primary btn-cursor-pointer',
+            buttonsStyling: false,
+            showLoaderOnConfirm: true,
+            preConfirm: function () {
+                return new Promise(function (resolve, reject) {
+                    // add hub
+                    AccountFactory.deleteHubHome().then(function (responseDH) {
+                        // if returned a valid response
+                        if(responseDH && !responseDH.error) {
+                            resolve();
+                        }
+                        else {
+                            reject(responseDH.message);
                         }
                     })
-                    .catch(function (responseUH) {
-                        reject(responseUH.message);
+                    .catch(function (responseDH) {
+                        reject(responseDH.message);
                     });
                 });
             },
@@ -102,25 +172,27 @@ accountModule.controller('HubController', ['$scope', '$rootScope', '$location', 
         }).then(function () {
             swal({
                 type: 'success',
-                title: 'Home location set!',
+                title: 'Home Hub deleted!',
                 timer: 3000
             })
             .then(function () {
-                // set location and save
-                $scope.hub.data.homeLocation = airport;
+                // delete
+                $scope.hub.data.homeLocation = null;
 
                 // force apply
                 $scope.$apply()
             },
             // handling the promise rejection
             function (dismiss) {
-                // set location and save
-                $scope.hub.data.homeLocation = airport;
+                // delete
+                $scope.hub.data.homeLocation = null;
 
                 // force apply
                 $scope.$apply()
             });
-        });
+        },
+        // handling the promise rejection
+        function (dismiss) {});
     };
 
     // add an additional hub
@@ -128,6 +200,12 @@ accountModule.controller('HubController', ['$scope', '$rootScope', '$location', 
         // holds the airport found
         var airport = null;
 
+        // the possible airports (as objects)
+        var airports = [];
+
+        // the possible airports (as a dropdown name selection)
+        var selectOptions = [];
+
         swal({
             title: 'Enter city or airport code',
             input: 'text',
@@ -138,44 +216,21 @@ accountModule.controller('HubController', ['$scope', '$rootScope', '$location', 
             cancelButtonClass: 'btn btn-theme-primary btn-cursor-pointer',
             buttonsStyling: false,
             buttonsStyling: false,
-            showLoaderOnConfirm: true,
             inputValidator: function (value) {
                 return new Promise(function (resolve, reject) {
                     // if a value is present
                     if(value && value.length >= 2) {
                         // get possible airports
-                        var airports = getPossibleAirports(value);
+                        airports = getPossibleAirports(value);
 
                         // if array
                         if(airports.length > 0 && airports.length <= maxDropdown) {
-                            // the options
-                            var selectOptions = [];
-                            
                             // add each airpot
                             _.forEach(airports, function(value) {
                                 selectOptions.push(value.name)
                             });
 
-                            // get the selected airport
-                            swal({
-                                title: 'Pick an airport',
-                                input: 'select',
-                                inputOptions: selectOptions,
-                                confirmButtonClass: 'btn btn-theme-primary btn-cursor-pointer mr-2',
-                                cancelButtonClass: 'btn btn-theme-primary btn-cursor-pointer',
-                                buttonsStyling: false,
-                                showCancelButton: true,
-                                inputPlaceholder: 'Select airport',
-                                inputValidator: function (value) {
-                                    // if a value was selected
-                                    if (value.length > 0) {
-                                        var index = parseInt(value);
-                                        airport = airports[index];
-                                    } 
-                                    
-                                    resolve();
-                                }
-                            });                         
+                            resolve();                    
                         }
                         else if(airports.length > maxDropdown) {
                             reject('Too many items. Please enter more to refine the search.');
@@ -189,48 +244,78 @@ accountModule.controller('HubController', ['$scope', '$rootScope', '$location', 
                     }
                 });
             },
-            preConfirm: function () {
-                return new Promise(function (resolve, reject) {
-                    // add hub
-                    AccountFactory.upsertHub({ 'newHub': { 'iata': airport.iata, 'icao': airport.icao } }).then(function (responseUH) {
-                        // if returned a valid response
-                        if(responseUH && !responseUH.error) {
-                            // set value
-                            airport = responseUH;
+            allowOutsideClick: false
+        }).then(function () {
+            // get the selected airport
+            swal({
+                title: 'Pick an airport',
+                input: 'select',
+                inputOptions: selectOptions,
+                confirmButtonClass: 'btn btn-theme-primary btn-cursor-pointer mr-2',
+                cancelButtonClass: 'btn btn-theme-primary btn-cursor-pointer',
+                buttonsStyling: false,
+                showCancelButton: true,
+                showLoaderOnConfirm: true,
+                inputPlaceholder: 'Select airport',
+                inputValidator: function (value) {
+                        return new Promise(function (resolve, reject) {
+                        // if a value was selected
+                        if (value.length > 0) {
+                            var index = parseInt(value);
+                            airport = airports[index];
                             resolve();
                         }
                         else {
-                            reject(responseUH.message);
+                            reject('Please select an airport!');
                         }
-                    })
-                    .catch(function (responseUH) {
-                        reject(responseUH.message);
                     });
+                },
+                preConfirm: function () {
+                    return new Promise(function (resolve, reject) {
+                        // add hub
+                        AccountFactory.upsertHub({ 'newHub': { 'iata': airport.iata, 'icao': airport.icao } }).then(function (responseUH) {
+                            // if returned a valid response
+                            if(responseUH && !responseUH.error) {
+                                // set value
+                                airport = responseUH;
+                                resolve();
+                            }
+                            else {
+                                reject(responseUH.message);
+                            }
+                        })
+                        .catch(function (responseUH) {
+                            reject(responseUH.message);
+                        });
+                    });
+                }
+            }).then(function () {
+                swal({
+                    type: 'success',
+                    title: 'Hub added!',
+                    timer: 3000
+                })
+                .then(function () {
+                    // push new
+                    $scope.hub.data.hubs.push(airport);
+
+                    // force apply
+                    $scope.$apply()
+                },
+                // handling the promise rejection
+                function (dismiss) {
+                    // push new
+                    $scope.hub.data.hubs.push(airport);
+
+                    // force apply
+                    $scope.$apply()
                 });
             },
-            allowOutsideClick: false
-        }).then(function () {
-            swal({
-                type: 'success',
-                title: 'Hub added!',
-                timer: 3000
-            })
-            .then(function () {
-                // push new
-                $scope.hub.data.hubs.push(airport);
-
-                // force apply
-                $scope.$apply()
-            },
             // handling the promise rejection
-            function (dismiss) {
-                // push new
-                $scope.hub.data.hubs.push(airport);
-
-                // force apply
-                $scope.$apply()
-            });
-        });
+            function (dismiss) {});
+        },
+        // handling the promise rejection
+        function (dismiss) {});
     };
 
     // edit hub
@@ -238,6 +323,12 @@ accountModule.controller('HubController', ['$scope', '$rootScope', '$location', 
         // holds the airport found
         var airport = null;
 
+        // the possible airports (as objects)
+        var airports = [];
+
+        // the possible airports (as a dropdown name selection)
+        var selectOptions = [];
+
         swal({
             title: 'Enter city or airport code',
             input: 'text',
@@ -248,44 +339,21 @@ accountModule.controller('HubController', ['$scope', '$rootScope', '$location', 
             cancelButtonClass: 'btn btn-theme-primary btn-cursor-pointer',
             buttonsStyling: false,
             buttonsStyling: false,
-            showLoaderOnConfirm: true,
             inputValidator: function (value) {
                 return new Promise(function (resolve, reject) {
                     // if a value is present
                     if(value && value.length >= 2) {
                         // get possible airports
-                        var airports = getPossibleAirports(value);
+                        airports = getPossibleAirports(value);
 
                         // if array
                         if(airports.length > 0 && airports.length <= maxDropdown) {
-                            // the options
-                            var selectOptions = [];
-                            
                             // add each airpot
                             _.forEach(airports, function(value) {
                                 selectOptions.push(value.name)
                             });
 
-                            // get the selected airport
-                            swal({
-                                title: 'Pick an airport',
-                                input: 'select',
-                                inputOptions: selectOptions,
-                                confirmButtonClass: 'btn btn-theme-primary btn-cursor-pointer mr-2',
-                                cancelButtonClass: 'btn btn-theme-primary btn-cursor-pointer',
-                                buttonsStyling: false,
-                                showCancelButton: true,
-                                inputPlaceholder: 'Select airport',
-                                inputValidator: function (value) {
-                                    // if a value was selected
-                                    if (value.length > 0) {
-                                        var index = parseInt(value);
-                                        airport = airports[index];
-                                    } 
-                                    
-                                    resolve();
-                                }
-                            });                          
+                            resolve();                    
                         }
                         else if(airports.length > maxDropdown) {
                             reject('Too many items. Please enter more to refine the search.');
@@ -299,49 +367,79 @@ accountModule.controller('HubController', ['$scope', '$rootScope', '$location', 
                     }
                 });
             },
-            preConfirm: function () {
-                return new Promise(function (resolve, reject) {
-                    // add hub
-                    AccountFactory.upsertHub({ 'newHub': { 'iata': airport.iata, 'icao': airport.icao }, 'oldHub': { 'iata': $scope.hub.data.hubs[hubIndex].iata, 'icao': $scope.hub.data.hubs[hubIndex].icao } }).then(function (responseUH) {
-                        // if returned a valid response
-                        if(responseUH && !responseUH.error) {
-                            // set value
-                            airport = responseUH;
-
+            allowOutsideClick: false
+        }).then(function () {
+            // get the selected airport
+            swal({
+                title: 'Pick an airport',
+                input: 'select',
+                inputOptions: selectOptions,
+                confirmButtonClass: 'btn btn-theme-primary btn-cursor-pointer mr-2',
+                cancelButtonClass: 'btn btn-theme-primary btn-cursor-pointer',
+                buttonsStyling: false,
+                showCancelButton: true,
+                showLoaderOnConfirm: true,
+                inputPlaceholder: 'Select airport',
+                inputValidator: function (value) {
+                        return new Promise(function (resolve, reject) {
+                        // if a value was selected
+                        if (value.length > 0) {
+                            var index = parseInt(value);
+                            airport = airports[index];
                             resolve();
                         }
                         else {
-                            reject(responseUH.message);
+                            reject('Please select an airport!');
                         }
-                    })
-                    .catch(function (responseUH) {
-                        reject(responseUH.message);
                     });
+                },
+                preConfirm: function () {
+                    return new Promise(function (resolve, reject) {
+                        // add hub
+                        AccountFactory.upsertHub({ 'newHub': { 'iata': airport.iata, 'icao': airport.icao }, 'oldHub': { 'iata': $scope.hub.data.hubs[hubIndex].iata, 'icao': $scope.hub.data.hubs[hubIndex].icao } }).then(function (responseUH) {
+                            // if returned a valid response
+                            if(responseUH && !responseUH.error) {
+                                // set value
+                                airport = responseUH;
+
+                                resolve();
+                            }
+                            else {
+                                reject(responseUH.message);
+                            }
+                        })
+                        .catch(function (responseUH) {
+                            reject(responseUH.message);
+                        });
+                    });
+                }
+            }).then(function () {
+                swal({
+                    type: 'success',
+                    title: 'Hub updated!',
+                    timer: 3000
+                })
+                .then(function () {
+                    // update
+                    $scope.hub.data.hubs[hubIndex] = airport;
+
+                    // force apply
+                    $scope.$apply()
+                },
+                // handling the promise rejection
+                function (dismiss) {
+                    // update
+                    $scope.hub.data.hubs[hubIndex] = airport;
+
+                    // force apply
+                    $scope.$apply()
                 });
             },
-            allowOutsideClick: false
-        }).then(function () {
-            swal({
-                type: 'success',
-                title: 'Hub updated!',
-                timer: 3000
-            })
-            .then(function () {
-                // update
-                $scope.hub.data.hubs[hubIndex] = airport;
-
-                // force apply
-                $scope.$apply()
-            },
             // handling the promise rejection
-            function (dismiss) {
-                // update
-                $scope.hub.data.hubs[hubIndex] = airport;
-
-                // force apply
-                $scope.$apply()
-            });
-        });
+            function (dismiss) {});
+        },
+        // handling the promise rejection
+        function (dismiss) {});
     };
 
     // delete hub
@@ -349,8 +447,10 @@ accountModule.controller('HubController', ['$scope', '$rootScope', '$location', 
         swal({
             type: 'warning',
             title: 'Delete Hub',
-            text: `Are you sure you want to delete ${$scope.hub.data.hubs[hubIndex].name}? You will not be able to revert this.`,
+            html: `Are you sure you want to delete <span class="font-weight-bold">${$scope.hub.data.hubs[hubIndex].name}</span>? You will not be able to revert this.`,
             showCancelButton: true,
+            focusConfirm: false,
+            focusCancel: true,
             confirmButtonText: 'Delete',
             confirmButtonClass: 'btn btn-danger btn-cursor-pointer mr-2',
             cancelButtonClass: 'btn btn-theme-primary btn-cursor-pointer',
@@ -395,12 +495,9 @@ accountModule.controller('HubController', ['$scope', '$rootScope', '$location', 
                 // force apply
                 $scope.$apply()
             });
-        });
-    };
-
-    // updae the search
-    $scope.updateSearch = function() {
-        $scope.searchText = $("#swal-input1").val();
+        },
+        // handling the promise rejection
+        function (dismiss) {});
     };
 
     // get page data

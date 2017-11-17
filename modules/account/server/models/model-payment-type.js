@@ -21,7 +21,11 @@ var // generate UUID's
     // the db
     db = require('./db/payment-type'),
     // the db full path
-    dbPath = 'modules/account/server/models/db/payment-type.json';
+    dbPath = 'modules/account/server/models/db/payment-type.json',
+    // get the default config
+	defaultConfig = require(path.resolve('./config/env/default')),
+    // crypto for encrypting and decrypting
+    crypto = require('crypto');;
 
 /**
  * Payment Type Schema
@@ -35,10 +39,6 @@ var PaymentTypeSchema = {
         type: Date,
         overwriteable: false
     },
-    internalName: {
-        type: String,
-        overwriteable: false
-    },
     userId: {
         type: String,
         required: true
@@ -47,11 +47,11 @@ var PaymentTypeSchema = {
         type: String,
         required: true
     },
-    expirationDate: {
+    expiration: {
         type: String,
         required: true
     },
-    holder: {
+    name: {
         type: String,
         required: true
     },
@@ -83,6 +83,9 @@ var trimmableSchemaProperties = helpers.getTrimmableProperties(PaymentTypeSchema
  * Converts to object
  */
 exports.toObject = function(obj, options) {
+    // decrypt the object
+    decryptObject(obj);
+
     // return the obj
     return _.cloneDeep(helpers.toObject(obj, options));
 };
@@ -157,6 +160,12 @@ exports.save = function(objToSave, callback) {
         // remove any keys that may have tried to been overwritten
         helpers.removeAttemptedNonOverwritableProperties(nonOverwritableSchemaProperties, objToSave);
 
+        // check and set acceptable values
+        helpers.checkAndSetAcceptableValueForProperties(acceptableValuesSchemaProperties, PaymentTypeSchema, objToSave);
+
+        // trim any values
+        helpers.trimValuesForProperties(trimmableSchemaProperties, objToSave);
+
         // the index of the possible draft
         var index = -1;
 
@@ -166,6 +175,9 @@ exports.save = function(objToSave, callback) {
 
         // if object was found
         if(obj) {
+            // encrypt information
+            encryptObject(objToSave);
+
             // merge old data with new data
             _.merge(obj, objToSave);
             
@@ -190,6 +202,9 @@ exports.save = function(objToSave, callback) {
         else {
             // set all defaults
             helpers.setNonOverwritablePropertyDefaults(defaultSchemaProperties, PaymentTypeSchema, objToSave);
+
+            // encrypt information
+            encryptObject(objToSave);
 
             // generate UUID
             objToSave._id = uuidv1();
@@ -239,6 +254,15 @@ exports.update = function(query, updatedObj, callback) {
     if(obj) {
         // remove any keys that may have tried to been overwritten
         helpers.removeAttemptedNonOverwritableProperties(nonOverwritableSchemaProperties, updatedObj);
+
+        // check and set acceptable values
+        helpers.checkAndSetAcceptableValueForProperties(acceptableValuesSchemaProperties, PaymentTypeSchema, updatedObj);
+
+        // trim any values
+        helpers.trimValuesForProperties(trimmableSchemaProperties, updatedObj);
+
+        // encrypt information
+        encryptObject(updatedObj);
 
         // merge old data with new data
         _.merge(obj, updatedObj);
@@ -297,16 +321,92 @@ exports.remove = function(obj, callback) {
     });
 };
 
-/**
- * Sort
- */
-exports.sort = function(arr, query, callback) {
-    // sort
-    helpers.sort(arr, query, function(err, objs) {
-        // if a callback
-        if(callback) {
-            // hit the callback
-            callback(err, _.cloneDeep(objs));
-        }
-    });
+// encrypt object
+function encryptObject(pt) {
+    // if there is a number
+    if(pt.number) {
+        // encrypt the value
+        pt.number = encrypt(pt.number);
+    }
+
+    // if there is an expiration
+    if(pt.expiration) {
+        // encrypt the value
+        pt.expiration = encrypt(pt.expiration);
+    }
+
+    // if there is a name
+    if(pt.name) {
+        // encrypt the value
+        pt.name = encrypt(pt.name);
+    }
+
+    // if there is a ccv
+    if(pt.ccv) {
+        // encrypt the value
+        pt.ccv = encrypt(pt.ccv);
+    } 
 };
+
+// decrypt information
+function decryptObject(pt) {
+    // if there is a number
+    if(pt.number) {
+        // encrypt the value
+        pt.number = decrypt(pt.number);
+    }
+
+    // if there is an expiration
+    if(pt.expiration) {
+        // encrypt the value
+        pt.expiration = decrypt(pt.expiration);
+    }
+
+    // if there is a name
+    if(pt.name) {
+        // encrypt the value
+        pt.name = decrypt(pt.name);
+    }
+
+    // if there is a ccv
+    if(pt.ccv) {
+        // encrypt the value
+        pt.ccv = decrypt(pt.ccv);
+    } 
+};
+
+// encrypts the text
+function encrypt(text) {
+    // copy the text to prevent overwriting
+    var copy = _.clone(text);
+
+    // create the cipher
+    var cipher = crypto.createCipher(defaultConfig.encryption.type, defaultConfig.encryption.secret);
+
+    // create the encrypting text
+    var crypted = cipher.update(copy, 'utf8', defaultConfig.encryption.digest);
+
+    // add the final value
+    crypted += cipher.final(defaultConfig.encryption.digest);
+
+    // return the crypted value
+    return crypted;
+}
+
+// decrypts the text
+function decrypt(text) {
+    // copy the text to prevent overwriting
+    var copy = _.clone(text);
+
+    // create the decipher
+    var decipher = crypto.createDecipher(defaultConfig.encryption.type, defaultConfig.encryption.secret);
+
+    // create the decrypting text
+    var decrypted = decipher.update(copy, defaultConfig.encryption.digest, 'utf8');
+
+    // add the final value
+    decrypted += decipher.final('utf8');
+
+    // return the decrypted value
+    return decrypted;
+} 

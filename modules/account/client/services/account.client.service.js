@@ -112,6 +112,54 @@ accountServiceModule.factory('AccountFactory', ['$http', '$location', '$rootScop
         });
     };
 
+    // gets payment page information
+    factory.getPaymentInformationPageInformation = function () {
+        // set the endpoint
+        var endpoint = appPath + '/account/payment-information';
+
+        // send request
+        return $http.get(endpoint, { 'ignoreLoadingBar': true }).then(function (response) {
+            return response.data.d;
+        })
+        .catch(function (response) {
+            // if the response was sent back with the custom data response
+            if(response.data) {
+                return { 'error': true, 'title': response.data.title, 'status': response.status, 'message': response.data.message };
+            }
+
+            // return default response
+            return { 'error': true, 'title': $rootScope.$root.generalStatusError, 'status': response.status, 'message': response.xhrStatus };
+        });
+    };
+
+    // updates payment information
+    factory.updatePaymentInformation= function (data) {
+        // set the endpoint
+        var endpoint = appPath + '/payment-information';
+
+        // stringify the data
+        var dataStrigified = JSON.stringify({
+            'number': data.number,
+            'expiration': data.expiration,
+            'name': data.name,
+            'ccv': data.ccv
+        });
+
+        // send request
+        return $http.post(endpoint, dataStrigified, { 'ignoreLoadingBar': true }).then(function (response) {
+            return response.data.d;
+        })
+        .catch(function (response) {
+            // if the response was sent back with the custom data response
+            if(response.data) {
+                return { 'error': true, 'title': response.data.title, 'status': response.status, 'message': response.data.message };
+            }
+
+            // return default response
+            return { 'error': true, 'title': $rootScope.$root.generalStatusError, 'status': response.status, 'message': response.xhrStatus };
+        });
+    };
+
     // gets hub page information
     factory.getHubPageInformation = function () {
         // set the endpoint
@@ -147,6 +195,26 @@ accountServiceModule.factory('AccountFactory', ['$http', '$location', '$rootScop
 
         // send request
         return $http.post(endpoint, dataStrigified, { 'ignoreLoadingBar': true }).then(function (response) {
+            return response.data.d;
+        })
+        .catch(function (response) {
+            // if the response was sent back with the custom data response
+            if(response.data) {
+                return { 'error': true, 'title': response.data.title, 'status': response.status, 'message': response.data.message };
+            }
+
+            // return default response
+            return { 'error': true, 'title': $rootScope.$root.generalStatusError, 'status': response.status, 'message': response.xhrStatus };
+        });
+    };
+
+    // deletes home location
+    factory.deleteHubHome = function () {
+        // set the endpoint
+        var endpoint = appPath + '/account/hub/home';
+
+        // send request
+        return $http.delete(endpoint, { 'ignoreLoadingBar': true }).then(function (response) {
             return response.data.d;
         })
         .catch(function (response) {

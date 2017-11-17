@@ -66,10 +66,10 @@ var defaultSchemaProperties = helpers.getDefaultProperties(TierSchema);
 var searchableSchemaProperties = helpers.getSearchableProperties(TierSchema);
 
 // the acceptable value properties
-var acceptableValuesSchemaProperties = helpers.getAcceptableValuesProperties(UserSchema);
+var acceptableValuesSchemaProperties = helpers.getAcceptableValuesProperties(TierSchema);
 
 // the trimmable value properties
-var trimmableSchemaProperties = helpers.getTrimmableProperties(UserSchema);
+var trimmableSchemaProperties = helpers.getTrimmableProperties(TierSchema);
 
 /**
  * Converts to object

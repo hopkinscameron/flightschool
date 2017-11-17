@@ -46,7 +46,9 @@ accountModule.controller('MembershipController', ['$scope', '$rootScope', '$loca
             buttonsStyling: false
         }).then(function () {
             // TODO: take them to sign up page
-        });
+        },
+        // handling the promise rejection
+        function (dismiss) {});
     };
 
     // renews membership

@@ -13,16 +13,22 @@ var // the path
     _ = require('lodash'),
     // the file system reader
     fs = require('fs'),
+    // the helper functions
+    helpers = require(path.resolve('./config/lib/global-model-helpers')),
     // airport codes
     airportCodes = require('airport-codes').toJSON(),
     // the path to the file details for this view
     accountDetailsPath = path.join(__dirname, '../data/account.json'),
     // the file details for this view
     accountDetails = {},
+    // the Payment Transaction model
+    PaymentTransaction = require(path.resolve('./modules/account/server/models/model-payment-transaction')),
+    // the Payment Type model
+    PaymentType = require(path.resolve('./modules/account/server/models/model-payment-type')),
+    // the Tier model
+    Tier = require(path.resolve('./modules/account/server/models/model-tier')),
     // the User model
-    User = require(path.resolve('./modules/account/server/models/model-user')),
-    // the helper functions
-    helpers = require(path.resolve('./config/lib/global-model-helpers'));
+    User = require(path.resolve('./modules/account/server/models/model-user'));
 
 /**
  * Show the current page
@@ -204,6 +210,93 @@ exports.updatePassword = function (req, res, next) {
 };
 
 /**
+ * Get the payment information
+ */
+exports.readPayment = function (req, res) {
+    // create safe profile object
+    var user = User.toObject(req.user, { 'hide': 'firstName lastName sex email phone lastLogin tierId renewalDate subscribed homeLocation hubs maxHubs passwordUpdatedLast notificationNews notificationReminderEmail notificationResearch notificationReminderSMS' });
+
+    // send data
+    res.json({ 'd': user.paymentInfo });
+};
+
+/**
+ * Updates the payment information
+ */
+exports.updatePayment = function (req, res) {
+    // validate existence
+    req.checkBody('number', 'You must have a credit card number.').notEmpty();
+    req.checkBody('number', 'Credit card number must be in string format of 16 digits.').isString();
+    req.checkBody('number', 'Credit card number must be of 16 digits.').isOfLength(16);
+    req.checkBody('expiration', 'You must have the expirtation date.').notEmpty();
+    req.checkBody('expiration', 'Expirtation date needs to be in the string format of MMYY.').isString();
+    req.checkBody('expiration', 'Expirtation date is not 4 digits in the format of MMYY.').isOfLength(4);
+    req.checkBody('name', 'You must have name of the holder.').notEmpty();
+    req.checkBody('name', 'You must have name of the holder.').isString();
+    req.checkBody('ccv', 'You must have the CCV number.').notEmpty();
+    req.checkBody('ccv', 'CCV number must be in string format of 3 digits.').isString();
+    req.checkBody('ccv', 'CCV number is not 3 digits.').isOfLength(3);
+
+    // validate errors
+    req.getValidationResult().then(function(errors) {
+        // if any errors exists
+        if(!errors.isEmpty()) {
+            // holds all the errors in one text
+            var errorText = '';
+
+            // add all the errors
+            for(var x = 0; x < errors.array().length; x++) {
+                // if not the last error
+                if(x < errors.array().length - 1) {
+                    errorText += errors.array()[x].msg + '\r\n';
+                }
+                else {
+                    errorText += errors.array()[x].msg;
+                }
+            }
+
+            // send bad request
+            res.status(400).send({ title: errorHandler.getErrorTitle({ code: 400 }), message: errorText });
+        }
+        else {
+            // create the updated values object
+            var updatedValues = {
+                'userId': req.user._id,
+                'number': req.body.number,
+                'expiration': req.body.expiration,
+                'name': req.body.name,
+                'ccv': req.body.ccv
+            };
+
+            // save the values
+            PaymentType.save(updatedValues, function(err, savedPayment) {
+                // if an error occurred
+                if (err) {
+                    // send internal error
+                    res.status(500).send({ error: true, title: errorHandler.getErrorTitle(err), message: errorHandler.getGenericErrorMessage(err) });
+                    console.log(clc.error(errorHandler.getDetailedErrorMessage(err)));
+                }
+                else if (savedPayment) {
+                    // create the safe payment type object
+                    var safePaymentObj = createPaymentTypeReqObject(savedPayment);
+
+                    // set the updated object
+                    req.user.paymentInfo = safePaymentObj;
+
+                    // read the profile
+                    module.exports.readProfile(req, res);
+                }
+                else {
+                    // send internal error
+                    res.status(500).send({ error: true, title: errorHandler.getErrorTitle({ code: 500 }), message: errorHandler.getGenericErrorMessage({ code: 500 }) });
+                    console.log(clc.error(`In ${path.basename(__filename)} \'updatePayment\': ` + errorHandler.getDetailedErrorMessage({ code: 500 }) + ' Couldn\'t save Payment Type.'));
+                }
+            });
+        }
+    });
+};
+
+/**
  * Get the hub details
  */
 exports.readHubs = function (req, res) {
@@ -329,21 +422,66 @@ exports.updateHubHome = function (req, res) {
 };
 
 /**
+ * Deletes the hub home location
+ */
+exports.deleteHubHome = function (req, res) {
+    // get the home location
+    var deletedHome = req.user.homeLocation;
+
+    // if there is a home location
+    if(deletedHome) {
+        // create the updated values object
+        var updatedValues = {
+            'homeLocation': null
+        };
+
+        // update the values
+        User.update(req.user, updatedValues, function(err, updatedUser) {
+            // if an error occurred
+            if (err) {
+                // send internal error
+                res.status(500).send({ error: true, title: errorHandler.getErrorTitle(err), message: errorHandler.getGenericErrorMessage(err) });
+                console.log(clc.error(errorHandler.getDetailedErrorMessage(err)));
+            }
+            else if (updatedUser) {
+                // create the safe user object
+                var safeUserObj = createUserReqObject(updatedUser);
+
+                // set the updated object
+                req.user = safeUserObj;
+
+                // send data
+                res.json({ 'd': { 'hub': deletedHome, title: errorHandler.getErrorTitle({ code: 200 }), message: 'Home Hub successfully deleted.' } });
+            }
+            else {
+                // send internal error
+                res.status(500).send({ error: true, title: errorHandler.getErrorTitle({ code: 500 }), message: errorHandler.getGenericErrorMessage({ code: 500 }) });
+                console.log(clc.error(`In ${path.basename(__filename)} \'deleteHubHome\': ` + errorHandler.getDetailedErrorMessage({ code: 500 }) + ' Couldn\'t update User.'));
+            }
+        });
+    }
+    else {
+        // send bad request
+        res.json({ 'd': { error: true, title: errorHandler.getErrorTitle({ code: 400 }), message: 'Home location does not currently exist. Cannot delete.' } });
+    }
+};
+
+/**
  * Adds/Updates the hub
  */
 exports.upsertHub = function (req, res) {
     // validate existence
-    req.checkBody('newHub', `You must have a location. Must have key of iata or icao.`).notEmpty();
-    req.checkBody('newHub.iata', `${req.body.newHub.iata} is not a valid location. Must have key of iata.`).isString();
-    req.checkBody('newHub.icao', `${req.body.newHub.icao} is not a valid location. Must have key of icao.`).isString();
+    req.checkBody('newHub', `New Hub is not a valid location. Must have key of iata or icao.`).notEmpty();
+    req.checkBody('newHub.iata', `${req.body.newHub.iata} is not a valid location. Must have key of iata in string format.`).isString();
+    req.checkBody('newHub.icao', `${req.body.newHub.icao} is not a valid location. Must have key of icao in string format.`).isString();
     req.checkBody('newHub', `There is no airport based on this this location '${req.body.newHub.iata}' & '${req.body.newHub.icao}'.`).exists(airportCodes);
 
     // if there is an old hub
-    if(req.body.oldHub) {
+    if(req.body.oldHub && (req.body.oldHub.iata != '' || req.body.oldHub.icao != '')) {
         // validate existence
-        req.checkBody('oldHub', `${req.body.oldHub} is not a valid hub. Must be airport code in string format.`).isString();
-        req.checkBody('oldHub.iata', `${req.body.oldHub.iata} is not a valid location. Must have key of iata.`).isString();
-        req.checkBody('oldHub.icao', `${req.body.oldHub.icao} is not a valid location. Must have key icao.`).isString();
+        req.checkBody('oldHub', `Old Hub is not a valid location. Must have key of iata or icao.`).notEmpty();
+        req.checkBody('oldHub.iata', `${req.body.oldHub.iata} is not a valid location. Must have key of iata in string format.`).isString();
+        req.checkBody('oldHub.icao', `${req.body.oldHub.icao} is not a valid location. Must have key icao in string format.`).isString();
         req.checkBody('oldHub', `There is no airport based on this this location '${req.body.oldHub.iata}' & '${req.body.oldHub.icao}'.`).exists(airportCodes);
     }
 
@@ -383,14 +521,14 @@ exports.upsertHub = function (req, res) {
                 newIndex = _.findIndex(req.user.hubs, newHub);
 
             // if there is an old hub
-            if(req.body.oldHub) {
+            if(req.body.oldHub && (req.body.oldHub.iata != '' || req.body.oldHub.icao != '')) {
                 oldHub = {
                     'iata': req.body.oldHub.iata.toUpperCase(),
                     'icao': req.body.oldHub.icao.toUpperCase()
                 };
 
                 // find index of old hub
-                oldIndex = _.indexOf(req.user.hubs, oldHub);
+                oldIndex = _.findIndex(req.user.hubs, oldHub);
             }
 
             // if there already a hub
@@ -471,7 +609,7 @@ exports.upsertHub = function (req, res) {
  */
 exports.deleteHub = function (req, res) {
     // find the index of the hub to delete
-    var index = _.indexOf(req.user.hubs, { 'iata': req.query.iata ? req.query.iata.toUpperCase() : null, 'icao': req.query.icao ? req.query.icao.toUpperCase() : null });
+    var index = _.findIndex(req.user.hubs, { 'iata': req.query.iata ? req.query.iata.toUpperCase() : null, 'icao': req.query.icao ? req.query.icao.toUpperCase() : null });
 
     // if found
     if(index != -1) {
@@ -538,8 +676,47 @@ exports.changeMembership = function (req, res) {
  * Cancels the membership
  */
 exports.cancelMembership = function (req, res) {
-    // send data
-    res.json({ 'd': accountDetails });
+    // get the current membership
+    var currentMembership = req.user.tierId;
+
+    // if there is a current membership
+    if(currentMembership) {
+        // create the updated values object
+        var updatedValues = {
+            'tierId': null,
+            'subscribed': false,
+            'renewalDate': null
+        };
+
+        // update the values
+        User.update(req.user, updatedValues, function(err, updatedUser) {
+            // if an error occurred
+            if (err) {
+                // send internal error
+                res.status(500).send({ error: true, title: errorHandler.getErrorTitle(err), message: errorHandler.getGenericErrorMessage(err) });
+                console.log(clc.error(errorHandler.getDetailedErrorMessage(err)));
+            }
+            else if (updatedUser) {
+                // create the safe user object
+                var safeUserObj = createUserReqObject(updatedUser);
+
+                // set the updated object
+                req.user = safeUserObj;
+
+                // send data
+                res.json({ 'd': { 'hub': currentMembership, title: errorHandler.getErrorTitle({ code: 200 }), message: 'Membership cancelled.' } });
+            }
+            else {
+                // send internal error
+                res.status(500).send({ error: true, title: errorHandler.getErrorTitle({ code: 500 }), message: errorHandler.getGenericErrorMessage({ code: 500 }) });
+                console.log(clc.error(`In ${path.basename(__filename)} \'cancelMembership\': ` + errorHandler.getDetailedErrorMessage({ code: 500 }) + ' Couldn\'t update User.'));
+            }
+        });
+    }
+    else {
+        // send bad request
+        res.json({ 'd': { error: true, title: errorHandler.getErrorTitle({ code: 400 }), message: 'There is no current membership to be cancelled.' } });
+    }
 };
 
 /**
@@ -699,16 +876,36 @@ exports.userById = function (req, res, next, id) {
 };
 */
 
-// creates the safe user objec to set in the request
+// creates the safe user object to set in the request
 function createUserReqObject(user) {
     // clone to not overwrite
     var safeObj = _.cloneDeep(user);
 
     // save the id since it will be lost when going to object
-    // hide the password for security purposes
+    // hide the information for security purposes
     var id = safeObj._id;
     safeObj = User.toObject(safeObj, { 'hide': 'password lastPasswords internalName created' });
     safeObj._id = id;
+
+    // return the safe obj
+    return safeObj;
+};
+
+// creates the safe payment type object to set in the request
+function createPaymentTypeReqObject(pt) {
+    // clone to not overwrite
+    var safeObj = _.cloneDeep(pt);
+
+    // save the id since it will be lost when going to object
+    // hide the information for security purposes
+    var id = safeObj._id;
+    safeObj = PaymentType.toObject(safeObj, { 'hide': 'created' });
+    safeObj._id = id;
+
+    // set the last 4 digits and delete the full number
+    safeObj.lastFour = safeObj.number.substring(safeObj.number.length - 4);
+    delete safeObj.number;
+    delete safeObj.ccv;
 
     // return the safe obj
     return safeObj;
