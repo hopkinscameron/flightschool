@@ -135,7 +135,7 @@ accountServiceModule.factory('AccountFactory', ['$http', '$location', '$rootScop
     // updates payment information
     factory.updatePaymentInformation= function (data) {
         // set the endpoint
-        var endpoint = appPath + '/payment-information';
+        var endpoint = appPath + '/account/payment-information';
 
         // stringify the data
         var dataStrigified = JSON.stringify({

@@ -43,6 +43,12 @@ var PaymentTypeSchema = {
         type: String,
         required: true
     },
+    type: {
+        type: String,
+        required: true,
+        enum: ['VISA', 'MASTERCARD', 'AMERICANEXPRESS', 'DISCOVER'],
+        default: null
+    },
     number: {
         type: String,
         required: true
@@ -202,6 +208,7 @@ exports.save = function(objToSave, callback) {
         else {
             // set all defaults
             helpers.setNonOverwritablePropertyDefaults(defaultSchemaProperties, PaymentTypeSchema, objToSave);
+            helpers.setNonExisistingPropertyDefaults(defaultSchemaProperties, PaymentTypeSchema, objToSave);
 
             // encrypt information
             encryptObject(objToSave);
@@ -380,6 +387,9 @@ function encrypt(text) {
     // copy the text to prevent overwriting
     var copy = _.clone(text);
 
+    var t = defaultConfig.encryption.type,
+        s = defaultConfig.encryption.secret,
+        d = defaultConfig.encryption.digest
     // create the cipher
     var cipher = crypto.createCipher(defaultConfig.encryption.type, defaultConfig.encryption.secret);
 

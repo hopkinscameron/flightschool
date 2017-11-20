@@ -88,8 +88,25 @@ exports.getDefaultProperties = function (model) {
 exports.setNonOverwritablePropertyDefaults = function (properties, model, obj) {
     // loop over all properties
     _.forEach(properties, function(value) {
-        // set the default
-        obj[value] = model[value].default;
+        // if non overwritable
+        if(model[value].overwriteable === false) {
+            // set the default
+            obj[value] = model[value].default;
+        }
+    });
+};
+
+/**
+ * Set defaults to properties of model
+ */
+exports.setNonExisistingPropertyDefaults = function (properties, model, obj) {
+    // loop over all properties
+    _.forEach(properties, function(value) {
+        // if value isn't present
+        if(obj[value] === undefined) {
+            // set the default
+            obj[value] = model[value].default;
+        }
     });
 };
 

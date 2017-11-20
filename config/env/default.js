@@ -60,7 +60,7 @@ module.exports = {
     // encryption
     encryption: {
         'secret': process.env.ENCRYPTION_SECRET || 'TEST',
-        'type': process.env.ENCRYPTION_TYPE || 'sha256',
+        'type': process.env.ENCRYPTION_TYPE || 'aes192',
         'digest': process.env.ENCRYPTION_DIGEST || 'hex',
     }, 
     logo: process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'developmentp' ? 'public/dist/img/logo.jpg' : 'modules/core/client/img/brand/favicon-32x32.png',

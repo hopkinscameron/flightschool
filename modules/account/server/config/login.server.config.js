@@ -9,8 +9,12 @@ var // passport for authentication
     path = require('path'),
     // the application configuration
     config = require(path.resolve('./config/config')),
+    // lodash
+    _ = require('lodash'),
     // the User model
-    User = require(path.resolve('./modules/account/server/models/model-user'));
+    User = require(path.resolve('./modules/account/server/models/model-user')),
+    // the Payment Type model
+    PaymentType = require(path.resolve('./modules/account/server/models/model-payment-type'));
 
 /**
  * Module init function
@@ -42,7 +46,32 @@ module.exports = function (app, db) {
                 var id = user._id;
                 user = User.toObject(user, { 'hide': 'password lastPasswords internalName created resetPasswordToken resetPasswordExpires' });
                 user._id = id;
-                done(err, user);
+
+                // get the payment object
+                PaymentType.findOne({ 'userId': id }, function(err, foundPayment) {
+                    // if an error occurred
+                    if (err) {
+                        // send internal error
+                        res.status(500).send({ error: true, title: errorHandler.getErrorTitle(err), message: errorHandler.getGenericErrorMessage(err) });
+                        console.log(clc.error(errorHandler.getDetailedErrorMessage(err)));
+                    }
+                    else if (foundPayment) {
+                        // clone to not overwrite
+                        var safePaymentObj = _.cloneDeep(foundPayment);
+
+                        // hide the information for security purposes
+                        safePaymentObj = PaymentType.toObject(safePaymentObj, { 'hide': 'created internalName ccv userId' });
+
+                        // set the last 4 digits and delete the full number
+                        safePaymentObj.lastFour = safePaymentObj.number.substring(safePaymentObj.number.length - 4);
+                        delete safePaymentObj.number;
+
+                        // set the payment object
+                        user.paymentInfo = safePaymentObj;
+                    }
+                    
+                    done(err, user);
+                });
             }
             else {
                 done(err, null);

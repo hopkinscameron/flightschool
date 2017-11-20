@@ -10,6 +10,8 @@ Next
 
 Future
 - after sign up, send an email to verify
+- when some request validations depend on one another find a way to not test each one, and instead, if one is validated, then test the other.
+    (if cc number needs to be string, 16 long and valid, then if its not a string, don't even test 16 long or valid)
 
 Done
 

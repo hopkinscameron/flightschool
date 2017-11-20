@@ -39,10 +39,11 @@
                     <div class="row mt-3">
                         <div class="col-md-6">
                             <!-- Begin Card Types -->
-                            <i class="fa fa-cc-visa" aria-hidden="true" ng-if="payment.cardType == 'VISA'"></i>
-                            <i class="fa fa-cc-mastercard" aria-hidden="true" ng-if="payment.cardType == 'MASTERCARD'"></i>
-                            <i class="fa fa-cc-discover" aria-hidden="true" ng-if="payment.cardType == 'DISCOVER'"></i>
-                            <i class="fa fa-cc-amex" aria-hidden="true" ng-if="payment.cardType == 'AMEX'"></i>
+                            <i class="fa fa-credit-card" aria-hidden="true" ng-if="payment.cardType != 'Visa' && payment.cardType != 'MasterCard' && payment.cardType != 'Discover' && payment.cardType != 'American Express'"></i>
+                            <i class="fa fa-cc-visa" aria-hidden="true" ng-if="payment.cardType == 'Visa'"></i>
+                            <i class="fa fa-cc-mastercard" aria-hidden="true" ng-if="payment.cardType == 'MasterCard'"></i>
+                            <i class="fa fa-cc-discover" aria-hidden="true" ng-if="payment.cardType == 'Discover'"></i>
+                            <i class="fa fa-cc-amex" aria-hidden="true" ng-if="payment.cardType == 'American Express'"></i>
                             <!-- End Card Types -->
                             <span class="">&middot;&middot;&middot;&middot; &middot;&middot;&middot;&middot; &middot;&middot;&middot;&middot; {{payment.cardDigits}}</span>
                             <p class="mb-0">${{payment.price}} (+${{payment.tax}} tax)</p>

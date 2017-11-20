@@ -30,6 +30,15 @@ var // the path
     // the User model
     User = require(path.resolve('./modules/account/server/models/model-user'));
 
+// the valid credit card types
+var validCCTypes = [
+    // credit card regex
+    { 'type': 'VISA', 'regex': /^4[0-9]{12}(?:[0-9]{3})?$/ },
+    { 'type': 'MASTERCARD', 'regex': /^(?:5[1-5][0-9]{2}|222[1-9]|22[3-9][0-9]|2[3-6][0-9]{2}|27[01][0-9]|2720)[0-9]{12}$/ },
+    { 'type': 'AMERICANEXPRESS', 'regex': /^3[47][0-9]{13}$/ },
+    { 'type': 'DISCOVER', 'regex': /^6(?:011|5[0-9]{2})[0-9]{12}$/ }
+];
+
 /**
  * Show the current page
  */
@@ -216,6 +225,11 @@ exports.readPayment = function (req, res) {
     // create safe profile object
     var user = User.toObject(req.user, { 'hide': 'firstName lastName sex email phone lastLogin tierId renewalDate subscribed homeLocation hubs maxHubs passwordUpdatedLast notificationNews notificationReminderEmail notificationResearch notificationReminderSMS' });
 
+    // if card on file
+    if(user.paymentInfo) {
+        user.paymentInfo.cardOnFile = true;
+    }
+
     // send data
     res.json({ 'd': user.paymentInfo });
 };
@@ -224,13 +238,31 @@ exports.readPayment = function (req, res) {
  * Updates the payment information
  */
 exports.updatePayment = function (req, res) {
+    // get next valid date
+    var nextValidMonthYear = new Date();
+    nextValidMonthYear.setMonth(nextValidMonthYear.getMonth() + 1);
+    var minMonth = nextValidMonthYear.getMonth();
+    minMonth++;
+    minMonth = minMonth < 10 ? `0${minMonth.toString()}` : minMonth.toString();
+
+    // get the next 5 years based on the next valid date
+    var fiveComing = new Date(nextValidMonthYear);
+    fiveComing.setFullYear(fiveComing.getFullYear() + 5);
+    var acceptableDateRangeForExpiration = { 
+        'minMonth': parseInt(minMonth), 
+        'maxMonth': 12, 
+        'minYear': parseInt(nextValidMonthYear.getFullYear().toString().substring(2)), 
+        'maxYear': parseInt(fiveComing.getFullYear().toString().substring(2))
+    };
+
     // validate existence
     req.checkBody('number', 'You must have a credit card number.').notEmpty();
     req.checkBody('number', 'Credit card number must be in string format of 16 digits.').isString();
-    req.checkBody('number', 'Credit card number must be of 16 digits.').isOfLength(16);
+    req.checkBody('number', 'Invalid Credit card number.').isValidCC(validCCTypes);
     req.checkBody('expiration', 'You must have the expirtation date.').notEmpty();
     req.checkBody('expiration', 'Expirtation date needs to be in the string format of MMYY.').isString();
     req.checkBody('expiration', 'Expirtation date is not 4 digits in the format of MMYY.').isOfLength(4);
+    req.checkBody('expiration', `Expirtation date is not a valid date (must be the minumum date ${acceptableDateRangeForExpiration.minMonth}/${acceptableDateRangeForExpiration.minYear} and maximum date${acceptableDateRangeForExpiration.maxMonth}/${acceptableDateRangeForExpiration.maxYear} ).`).isValidExpMonthYear(acceptableDateRangeForExpiration);
     req.checkBody('name', 'You must have name of the holder.').notEmpty();
     req.checkBody('name', 'You must have name of the holder.').isString();
     req.checkBody('ccv', 'You must have the CCV number.').notEmpty();
@@ -259,39 +291,60 @@ exports.updatePayment = function (req, res) {
             res.status(400).send({ title: errorHandler.getErrorTitle({ code: 400 }), message: errorText });
         }
         else {
-            // create the updated values object
-            var updatedValues = {
-                'userId': req.user._id,
-                'number': req.body.number,
-                'expiration': req.body.expiration,
-                'name': req.body.name,
-                'ccv': req.body.ccv
-            };
+            // holds the type of card
+            var type = null;
 
-            // save the values
-            PaymentType.save(updatedValues, function(err, savedPayment) {
-                // if an error occurred
-                if (err) {
-                    // send internal error
-                    res.status(500).send({ error: true, title: errorHandler.getErrorTitle(err), message: errorHandler.getGenericErrorMessage(err) });
-                    console.log(clc.error(errorHandler.getDetailedErrorMessage(err)));
-                }
-                else if (savedPayment) {
-                    // create the safe payment type object
-                    var safePaymentObj = createPaymentTypeReqObject(savedPayment);
-
-                    // set the updated object
-                    req.user.paymentInfo = safePaymentObj;
-
-                    // read the profile
-                    module.exports.readProfile(req, res);
-                }
-                else {
-                    // send internal error
-                    res.status(500).send({ error: true, title: errorHandler.getErrorTitle({ code: 500 }), message: errorHandler.getGenericErrorMessage({ code: 500 }) });
-                    console.log(clc.error(`In ${path.basename(__filename)} \'updatePayment\': ` + errorHandler.getDetailedErrorMessage({ code: 500 }) + ' Couldn\'t save Payment Type.'));
+            // go through each valid credit card types and test validity
+            _.forEach(validCCTypes, function(value) {
+                // if valid for this type
+                if(value.regex.test(req.body.number)) {
+                    type = value.type;
+                    return;
                 }
             });
+
+            // if type wasn't found
+            if(!type) {
+                // send internal error
+                res.status(500).send({ error: true, title: errorHandler.getErrorTitle({ code: 500 }), message: errorHandler.getGenericErrorMessage({ code: 500 }) });
+                console.log(clc.error(`In ${path.basename(__filename)} \'updatePayment\': ` + errorHandler.getDetailedErrorMessage({ code: 500 }) + ' Couldn\'t get credit card type.'));
+            }
+            else {
+                // create the updated values object
+                var updatedValues = {
+                    'userId': req.user._id,
+                    'type': type,
+                    'number': req.body.number,
+                    'expiration': req.body.expiration,
+                    'name': req.body.name,
+                    'ccv': req.body.ccv
+                };
+
+                // save the values
+                PaymentType.save(updatedValues, function(err, savedPayment) {
+                    // if an error occurred
+                    if (err) {
+                        // send internal error
+                        res.status(500).send({ error: true, title: errorHandler.getErrorTitle(err), message: errorHandler.getGenericErrorMessage(err) });
+                        console.log(clc.error(errorHandler.getDetailedErrorMessage(err)));
+                    }
+                    else if (savedPayment) {
+                        // create the safe payment type object
+                        var safePaymentObj = createPaymentTypeReqObject(savedPayment);
+
+                        // set the updated object
+                        req.user.paymentInfo = safePaymentObj;
+
+                        // read the profile
+                        module.exports.readProfile(req, res);
+                    }
+                    else {
+                        // send internal error
+                        res.status(500).send({ error: true, title: errorHandler.getErrorTitle({ code: 500 }), message: errorHandler.getGenericErrorMessage({ code: 500 }) });
+                        console.log(clc.error(`In ${path.basename(__filename)} \'updatePayment\': ` + errorHandler.getDetailedErrorMessage({ code: 500 }) + ' Couldn\'t save Payment Type.'));
+                    }
+                });
+            }
         }
     });
 };
@@ -896,16 +949,12 @@ function createPaymentTypeReqObject(pt) {
     // clone to not overwrite
     var safeObj = _.cloneDeep(pt);
 
-    // save the id since it will be lost when going to object
     // hide the information for security purposes
-    var id = safeObj._id;
-    safeObj = PaymentType.toObject(safeObj, { 'hide': 'created' });
-    safeObj._id = id;
+    safeObj = PaymentType.toObject(safeObj, { 'hide': 'created internalName ccv userId' });
 
     // set the last 4 digits and delete the full number
     safeObj.lastFour = safeObj.number.substring(safeObj.number.length - 4);
     delete safeObj.number;
-    delete safeObj.ccv;
 
     // return the safe obj
     return safeObj;

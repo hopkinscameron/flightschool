@@ -892,11 +892,14 @@ hr.blog-post-bar {
   .highlight-text-foreground {
     color: #0076FF !important; }
 
-.text-color--white {
-  color: #F5F7F9; }
-
-.text-color--black {
-  color: #000; }
+.text-color {
+  color: #2C3035 !important; }
+  .text-color--white {
+    color: #F5F7F9 !important; }
+  .text-color--black {
+    color: #000 !important; }
+  .text-color--theme-secondary {
+    color: #FFFFFF !important; }
 
 /* Begin Media Queries */
 /* If [device width] is less than or equal to 425px */

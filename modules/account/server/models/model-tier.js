@@ -182,6 +182,7 @@ exports.save = function(objToSave, callback) {
         else {
             // set all defaults
             helpers.setNonOverwritablePropertyDefaults(defaultSchemaProperties, TierSchema, objToSave);
+            helpers.setNonExisistingPropertyDefaults(defaultSchemaProperties, TierSchema, objToSave);
 
             // generate UUID
             objToSave._id = uuidv1();

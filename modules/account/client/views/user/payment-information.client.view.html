@@ -2,13 +2,53 @@
 <section ng-controller="PaymentInformationController">
     <!-- Begin Container -->
     <div class="card-body">
-        <!-- Begin Payment Information Form -->
-        <div class="col-md-10 mx-auto">
+        <!-- Begin Current Payment Information -->
+        <div class="col-md-10 mx-auto" ng-if="paymentInformation.data.cardOnFile && !editingCard">
+            <div class="card card-body card--light-light">
+                <!-- Begin Card Name & Edit Button -->
+                <div class="row">
+                    <!-- Begin Card Name -->
+                    <div class="col-md-10">
+                        <p class="mb-1 d-inline-block">{{paymentInformation.data.name}}</p>
+                    </div>
+                    <!-- End Card Name -->
+                    <!-- Begin Edit Button -->
+                    <div class="col">
+                        <button class="btn btn-theme-primary btn-cursor-pointer" ng-click="editCard()">Edit</button>
+                    </div>
+                    <!-- End Edit Button -->
+                </div>
+                <!-- End Card Name & Edit Button -->
+                <!-- Begin Card Number & Expiration -->
+                <div class="row">
+                    <!-- Begin Card Number -->
+                    <div class="col-md-4">
+                        <!-- Begin Card Types -->
+                        <i class="fa fa-credit-card" aria-hidden="true" ng-if="paymentInformation.data.type != 'Visa' && paymentInformation.data.type != 'MasterCard' && paymentInformation.data.type != 'Discover' && paymentInformation.data.type != 'American Express'"></i>
+                        <i class="fa fa-cc-visa" aria-hidden="true" ng-if="paymentInformation.data.type == 'Visa'"></i>
+                        <i class="fa fa-cc-mastercard" aria-hidden="true" ng-if="paymentInformation.data.type == 'MasterCard'"></i>
+                        <i class="fa fa-cc-discover" aria-hidden="true" ng-if="paymentInformation.data.type == 'Discover'"></i>
+                        <i class="fa fa-cc-amex" aria-hidden="true" ng-if="paymentInformation.data.type == 'American Express'"></i>
+                        <!-- End Card Types -->
+                        <p class="mb-0 d-inline-block">{{paymentInformation.data.type}} ending in {{paymentInformation.data.lastFour}}</p>
+                    </div>
+                    <!-- End Card Number -->
+                    <!-- Begin Card Expiration -->
+                    <div class="col-md-4">
+                        <p class="mb-0 d-inline-block">Expires: {{paymentInformation.data.expiration.substring(0, 2)}}/{{paymentInformation.data.expiration.substring(2)}}</p>
+                    </div>
+                    <!-- End Card Expiration -->
+                </div>
+                <!-- End Card Number & Expiration -->
+            </div>
+        </div>
+        <!-- End Current Payment Information -->
+        <!-- Begin New Payment Information Form -->
+        <div class="col-md-10 mx-auto" ng-if="!paymentInformation.data.cardOnFile || editingCard">
             <div style="padding-bottom: 24px;" ng-if="!paymentInformationForm.errors.isError"></div>
             <div ng-if="paymentInformationForm.errors.isError">
                 <span style="color: red;">{{paymentInformationForm.errors.errorMessage}}</span>
             </div>
-            <!-- Begin Payment Information Form -->
             <form class="form-group mb-0" ng-submit="updatePaymentInformation()">
                 <!-- Begin Name On Card -->
                 <div class="form-group">
@@ -17,7 +57,7 @@
                         <span class="input-group-addon">
                             <i class="fa fa-user" aria-hidden="true"></i>
                         </span>
-                        <input class="form-control form-control-danger" type="number" name="name" id="name" ng-model="paymentInformationForm.inputs.name" ng-focus="viewFocusEnter(paymentInformationForm.views.name)" ng-blur="viewFocusLeave(paymentInformationForm.views.name)" ng-disabled="formInTransit">
+                        <input class="form-control form-control-danger" type="text" name="name" id="name" ng-model="paymentInformationForm.inputs.name" ng-focus="viewFocusEnter(paymentInformationForm.views.name)" ng-blur="viewFocusLeave(paymentInformationForm.views.name)" ng-disabled="formInTransit">
                     </div>
                 </div>
                 <!-- End Name On Card -->
@@ -26,7 +66,13 @@
                     <label class="col-form-label" for="number">Credit Card Number <span style="color: red;">*</span></label>
                     <div class="input-group" ng-class="{'has-danger': paymentInformationForm.errors.number}">
                         <span class="input-group-addon">
-                            <i class="fa fa-credit-card" aria-hidden="true"></i>
+                            <!-- Begin Card Types -->
+                            <i class="fa fa-credit-card" aria-hidden="true" ng-if="!paymentInformationForm.cardType.visa && !paymentInformationForm.cardType.mc && !paymentInformationForm.cardType.discover && !paymentInformationForm.cardType.amex"></i>
+                            <i class="fa fa-cc-visa" aria-hidden="true" ng-if="paymentInformationForm.cardType.visa"></i>
+                            <i class="fa fa-cc-mastercard" aria-hidden="true" ng-if="paymentInformationForm.cardType.mc"></i>
+                            <i class="fa fa-cc-discover" aria-hidden="true" ng-if="paymentInformationForm.cardType.discover"></i>
+                            <i class="fa fa-cc-amex" aria-hidden="true" ng-if="paymentInformationForm.cardType.amex"></i>
+                            <!-- End Card Types -->
                         </span>
                         <input class="form-control form-control-danger" type="number" name="number" id="number" ng-model="paymentInformationForm.inputs.number" ng-focus="viewFocusEnter(paymentInformationForm.views.number)" ng-blur="viewFocusLeave(paymentInformationForm.views.number)" ng-disabled="formInTransit">
                     </div>
@@ -34,12 +80,25 @@
                 <!-- End Credit Card Number -->
                 <!-- Begin Expiration Date -->
                 <div class="form-group">
-                    <label class="col-form-label" for="expiration">Expiration Date <span style="color: red;">*</span></label>
-                    <div class="input-group" ng-class="{'has-danger': paymentInformationForm.errors.expiration}">
-                        <span class="input-group-addon">
-                            <i class="fa fa-calendar" aria-hidden="true"></i>
-                        </span>
-                        <input class="form-control form-control-danger" type="number" name="expiration" id="expiration" ng-model="paymentInformationForm.inputs.expiration" ng-focus="viewFocusEnter(paymentInformationForm.views.expiration)" ng-blur="viewFocusLeave(paymentInformationForm.views.expiration)" ng-disabled="formInTransit">
+                    <div class="form-row">
+                        <div class="col">
+                            <label class="col-form-label" for="expirationMM">Expiration Month <span style="color: red;">*</span></label>
+                            <div class="input-group" ng-class="{'has-danger': paymentInformationForm.errors.expirationMM}">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-calendar" aria-hidden="true"></i>
+                                </span>
+                                <input class="form-control form-control-danger" type="number" name="expirationMM" id="expirationMM" placeholder="MM" ng-min="1" ng-max="12" ng-model="paymentInformationForm.inputs.expirationMM" ng-focus="viewFocusEnter(paymentInformationForm.views.expirationMM)" ng-blur="viewFocusLeave(paymentInformationForm.views.expirationMM)" ng-disabled="formInTransit">
+                            </div>
+                        </div>
+                        <div class="col">
+                            <label class="col-form-label" for="expirationYY">Expiration Year <span style="color: red;">*</span></label>
+                            <div class="input-group" ng-class="{'has-danger': paymentInformationForm.errors.expirationYY}">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-calendar" aria-hidden="true"></i>
+                                </span>
+                                <input class="form-control form-control-danger" type="number" name="expirationYY" id="expirationYY" placeholder="YY" ng-min="acceptableDateRangeForExpiration.minYear" ng-max="acceptableDateRangeForExpiration.maxYear" ng-model="paymentInformationForm.inputs.expirationYY" ng-focus="viewFocusEnter(paymentInformationForm.views.expirationYY)" ng-blur="viewFocusLeave(paymentInformationForm.views.expirationYY)" ng-disabled="formInTransit">
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <!-- End Expiration Date -->
@@ -50,21 +109,23 @@
                         <span class="input-group-addon">
                             <i class="fa fa-check" aria-hidden="true"></i>
                         </span>
-                        <input class="form-control form-control-danger" type="number" name="ccv" id="ccv" ng-model="paymentInformationForm.inputs.ccv" ng-focus="viewFocusEnter(paymentInformationForm.views.ccv)" ng-blur="viewFocusLeave(paymentInformationForm.views.ccv)" ng-disabled="formInTransit">
+                        <input class="form-control form-control-danger" type="number" name="ccv" id="ccv" min="000" max="999" ng-model="paymentInformationForm.inputs.ccv" ng-focus="viewFocusEnter(paymentInformationForm.views.ccv)" ng-blur="viewFocusLeave(paymentInformationForm.views.ccv)" ng-disabled="formInTransit">
                     </div>
                 </div>
                 <!-- End CCV -->
-                <!-- Begin Payment Information Button -->
+                <!-- Begin Save/Update & Cancel Button -->
                 <div class="row mb-2">
                     <div class="col text-left">
-                        <button type="submit" class="btn btn-theme-primary btn-cursor-pointer" ng-class="{'w-100': $root.isDeviceWidthSmallerThan(426)}" ng-disabled="formInTransit || paymentInformationForm.errors.isError">Update</button>
+                        <button type="submit" class="btn btn-theme-primary btn-cursor-pointer" ng-class="{'w-100': $root.isDeviceWidthSmallerThan(426)}" ng-disabled="formInTransit || paymentInformationForm.errors.isError">{{editingCard ? 'Update' : 'Save'}}</button>
+                    </div>
+                    <div class="col text-right" ng-if="editingCard">
+                        <a type="cancel" class="btn btn-theme-primary btn-cursor-pointer text-color--theme-secondary" ng-class="{'w-100': $root.isDeviceWidthSmallerThan(426)}" ng-click="cancelEditing()" ng-disabled="formInTransit || paymentInformationForm.errors.isError">Cancel</a>
                     </div>
                 </div>
-                <!-- End Payment Information Button -->
+                <!-- End Save/Update & Cancel Button -->
             </form>
-            <!-- End Payment Information Form -->
         </div>
-        <!-- End Payment Information Form -->
+        <!-- End New Payment Information Form -->
     </div>
     <!-- End Container -->
 </section>

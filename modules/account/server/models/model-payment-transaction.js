@@ -186,6 +186,7 @@ exports.save = function(objToSave, callback) {
         else {
             // set all defaults
             helpers.setNonOverwritablePropertyDefaults(defaultSchemaProperties, PaymentTransactionSchema, objToSave);
+            helpers.setNonExisistingPropertyDefaults(defaultSchemaProperties, PaymentTransactionSchema, objToSave);
 
             // generate UUID
             objToSave._id = uuidv1();

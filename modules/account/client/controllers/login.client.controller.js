@@ -102,7 +102,8 @@ accountModule.controller('LoginController', ['$scope', '$rootScope', '$window', 
                     $window.location.reload();
 
                     // clear the form for security
-                    resetForm();
+                    $scope.loginForm.inputs.email = '';
+                    $scope.loginForm.inputs.password = '';
                 }
                 else {
                     // show error
@@ -147,8 +148,5 @@ accountModule.controller('LoginController', ['$scope', '$rootScope', '$window', 
         // set to default
         $scope.loginForm.inputs.password = '';
         $scope.formInTransit = false;
-
-        // force apply
-        $scope.$apply()
     };
 }]);

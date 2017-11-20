@@ -173,6 +173,58 @@ module.exports.initMiddleware = function (app) {
                     var icao = o.icao.toLowerCase().includes(value.icao && value.icao.length > 0 ? value.icao.toLowerCase() : '');
                     return iata && icao; 
                 });
+            },
+            // determines if valid credit card number
+            isValidCC: (value, validCreditCardTypes) => {
+                var found = false;
+
+                // go through each valid credit card types and test validity
+                _.forEach(validCreditCardTypes, function(type) {
+                    // if valid for this type
+                    if(type.regex.test(value)) {
+                        found = true;
+                        return;
+                    }
+                });
+
+                return found;
+            },
+            // determines if in range
+            isValidExpMonthYear: (value, range) => {
+                // check if string
+                if(typeof(value) !== 'string') {
+                    return false;
+                }
+                // check if 4 digits long
+                else if(value.length != 4) {
+                    return false;
+                }
+
+                // holds the values for month and year
+                var month = '';
+                var year = '';
+
+                // check if parseable
+                try {
+                    // parse numeric values
+                    var numericValue = parseInt(value);
+                    month = parseInt(value.substring(0, 2));
+                    year = parseInt(value.substring(2));
+
+                    // if month is not between these two values
+                    if(month < range.minMonth || month > range.maxMonth) {
+                        return false;
+                    }
+                    // if year is not between these two values
+                    else if(year < range.minYear || year > range.maxYear) {
+                        return false;
+                    }
+                }
+                catch (e) {
+                    return false;
+                }
+                 
+                return true;
             }
         }
     }));

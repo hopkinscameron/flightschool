@@ -274,6 +274,7 @@ exports.save = function(objToSave, callback) {
         else {
             // set all defaults
             helpers.setNonOverwritablePropertyDefaults(defaultSchemaProperties, UserSchema, objToSave);
+            helpers.setNonExisistingPropertyDefaults(defaultSchemaProperties, UserSchema, objToSave);
 
             // encrypt password
             encryptPassword(objToSave, function(err) {
