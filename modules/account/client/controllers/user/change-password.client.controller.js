@@ -24,11 +24,22 @@ accountModule.controller('ChangePasswordController', ['$scope', '$rootScope', '$
             'confirm': 'confirm'
         },
         'errors': {
-            'errorMessage': '',
-            'isError': false,
-            'old': false,
-            'new': false,
-            'confirm': false
+            'generic': {
+                'message': '',
+                'isError': false,
+            },
+            'old': {
+                'isError': false,
+                'message': 'Please enter the old password'
+            },
+            'new': {
+                'isError': false,
+                'message': 'Please enter a new password'
+            },
+            'confirm': {
+                'isError': false,
+                'message': 'Please enter the new password again'
+            }
         }
     };
 
@@ -73,7 +84,7 @@ accountModule.controller('ChangePasswordController', ['$scope', '$rootScope', '$
             if ($scope.changePasswordForm.inputs.old.length == 0) {
                 // set error
                 $scope.changePasswordForm.errors.old = true;
-                $scope.changePasswordForm.errors.isError = true;
+                $scope.changePasswordForm.errors.generic.isError = true;
             }
         }
         // if leaving the new password view
@@ -82,13 +93,13 @@ accountModule.controller('ChangePasswordController', ['$scope', '$rootScope', '$
             if ($scope.changePasswordForm.inputs.new.length == 0) {
                 // set error
                 $scope.changePasswordForm.errors.new = true;
-                $scope.changePasswordForm.errors.isError = true;
+                $scope.changePasswordForm.errors.generic.isError = true;
             }
             // if password is the same as current
             else if($scope.changePasswordForm.inputs.old == $scope.changePasswordForm.inputs.new) {
                 // set error
                 $scope.changePasswordForm.errors.new = true;
-                $scope.changePasswordForm.errors.isError = true;
+                $scope.changePasswordForm.errors.generic.isError = true;
             }
         }
         // if leaving the confirm password view
@@ -97,33 +108,33 @@ accountModule.controller('ChangePasswordController', ['$scope', '$rootScope', '$
             if ($scope.changePasswordForm.inputs.confirm.length == 0) {
                 // set error
                 $scope.changePasswordForm.errors.confirm = true;
-                $scope.changePasswordForm.errors.isError = true;
+                $scope.changePasswordForm.errors.generic.isError = true;
             }
             // if passwords don't match
             else if($scope.changePasswordForm.inputs.new != $scope.changePasswordForm.inputs.confirm) {
                 // set error
                 $scope.changePasswordForm.errors.confirm = true;
-                $scope.changePasswordForm.errors.isError = true;
+                $scope.changePasswordForm.errors.generic.isError = true;
             }
         }
         
         // check to see if there is an error
         if ($scope.changePasswordForm.errors.old) {
             // set error
-            $scope.changePasswordForm.errors.errorMessage = 'You must enter your old password';
+            $scope.changePasswordForm.errors.generic.message = 'You must enter your old password';
         }
         else if ($scope.changePasswordForm.errors.new) {
             // set error
-            $scope.changePasswordForm.errors.errorMessage = $scope.changePasswordForm.inputs.new.length == 0 ? 'You must enter your new password' : 'Your new password cannot be the same as your old password';
+            $scope.changePasswordForm.errors.generic.message = $scope.changePasswordForm.inputs.new.length == 0 ? 'You must enter your new password' : 'Your new password cannot be the same as your old password';
         }
         else if ($scope.changePasswordForm.errors.confirm) {
             // set error
-            $scope.changePasswordForm.errors.errorMessage = $scope.changePasswordForm.inputs.confirm.length == 0 ? 'You must enter your new password again' : 'The new password does not match';
+            $scope.changePasswordForm.errors.generic.message = $scope.changePasswordForm.inputs.confirm.length == 0 ? 'You must enter your new password again' : 'The new password does not match';
         }
         else {
             // remove error
-            $scope.changePasswordForm.errors.errorMessage = '';
-            $scope.changePasswordForm.errors.isError = false;
+            $scope.changePasswordForm.errors.generic.message = '';
+            $scope.changePasswordForm.errors.generic.isError = false;
         }
     };
 
@@ -133,7 +144,7 @@ accountModule.controller('ChangePasswordController', ['$scope', '$rootScope', '$
         checkEmptyValues();
 
         // check if an error exists
-        if(!$scope.changePasswordForm.errors.old && !$scope.changePasswordForm.errors.new && !$scope.changePasswordForm.errors.confirm) {
+        if(!$scope.changePasswordForm.errors.old.isError && !$scope.changePasswordForm.errors.new.isError && !$scope.changePasswordForm.errors.confirm.isError) {
             // disable button but showing the form has been submitted
             $scope.formInTransit = true;
 
@@ -175,8 +186,8 @@ accountModule.controller('ChangePasswordController', ['$scope', '$rootScope', '$
                         buttonsStyling: false
                     }).then(function () {
                         // show error
-                        $scope.changePasswordForm.errors.errorMessage = responseUP.message;
-                        $scope.changePasswordForm.errors.isError = true;
+                        $scope.changePasswordForm.errors.generic.message = responseUP.message;
+                        $scope.changePasswordForm.errors.generic.isError = true;
 
                         // clear the form for security
                         resetForm();
@@ -198,8 +209,8 @@ accountModule.controller('ChangePasswordController', ['$scope', '$rootScope', '$
                     buttonsStyling: false
                 }).then(function () {
                     // show error
-                    $scope.changePasswordForm.errors.errorMessage = responseUP.message;
-                    $scope.changePasswordForm.errors.isError = true;
+                    $scope.changePasswordForm.errors.generic.message = responseUP.message;
+                    $scope.changePasswordForm.errors.generic.isError = true;
 
                     // clear the form for security
                     resetForm();
@@ -207,8 +218,8 @@ accountModule.controller('ChangePasswordController', ['$scope', '$rootScope', '$
                 // handling the promise rejection
                 function (dismiss) {
                     // show error
-                    $scope.changePasswordForm.errors.errorMessage = responseUP.message;
-                    $scope.changePasswordForm.errors.isError = true;
+                    $scope.changePasswordForm.errors.generic.message = responseUP.message;
+                    $scope.changePasswordForm.errors.generic.isError = true;
 
                     // clear the form for security
                     resetForm();               
@@ -254,24 +265,9 @@ accountModule.controller('ChangePasswordController', ['$scope', '$rootScope', '$
     // checks for any empty values
     function checkEmptyValues() {
         // check for any empty values
-        if (!$scope.changePasswordForm.inputs.confirm || $scope.changePasswordForm.inputs.confirm.length == 0) {
-            // set error
-            $scope.changePasswordForm.errors.errorMessage = $scope.changePasswordForm.inputs.confirm.length == 0 ? 'You must enter your new password again' : 'The new password does not match';
-            $scope.changePasswordForm.errors.confirm = true;
-            $scope.changePasswordForm.errors.isError = true;
-        }
-        if (!$scope.changePasswordForm.inputs.new || $scope.changePasswordForm.inputs.new.length == 0) {
-            // set error
-            $scope.changePasswordForm.errors.errorMessage = $scope.changePasswordForm.inputs.new.length == 0 ? 'You must enter your new password' : 'Your new password cannot be the same as your old password';
-            $scope.changePasswordForm.errors.new = true;
-            $scope.changePasswordForm.errors.isError = true;
-        }
-        if (!$scope.changePasswordForm.inputs.old || $scope.changePasswordForm.inputs.old.length == 0) {
-            // set error
-            $scope.changePasswordForm.errors.errorMessage = 'You must enter your old password';
-            $scope.changePasswordForm.errors.old = true;
-            $scope.changePasswordForm.errors.isError = true;
-        }
+        $scope.changePasswordForm.errors.old.isError = !$scope.changePasswordForm.inputs.old || $scope.changePasswordForm.inputs.old.length == 0;
+        $scope.changePasswordForm.errors.new.isError = !$scope.changePasswordForm.inputs.new || $scope.changePasswordForm.inputs.new.length == 0;
+        $scope.changePasswordForm.errors.confirm.isError = !$scope.changePasswordForm.inputs.confirm || $scope.changePasswordForm.inputs.confirm.length == 0;
     };
 
     // clear the fields

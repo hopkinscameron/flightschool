@@ -40,12 +40,26 @@ accountModule.controller('SignUpController', ['$scope', '$rootScope', '$compile'
             'password': 'password'
         },
         'errors': {
-            'errorMessage': '',
-            'isError': false,
-            'firstName': false,
-            'lastName': false,
-            'email': false,
-            'password': false            
+            'generic': {
+                'message': '',
+                'isError': false,
+            },
+            'firstName': {
+                'isError': false,
+                'message': 'Please provide your first name'
+            },
+            'lastName': {
+                'isError': false,
+                'message': 'Please provide your last name'
+            },
+            'email': {
+                'isError': false,
+                'message': 'Please provide an email'
+            },
+            'password': {
+                'isError': false,
+                'message': 'Please a password'
+            }            
         }
     };
 
@@ -94,100 +108,13 @@ accountModule.controller('SignUpController', ['$scope', '$rootScope', '$compile'
         }
     });
 
-    // on call event when the focus enters
-    $scope.viewFocusEnter = function (viewId) {
-        // if entering the first name view
-        if (viewId == $scope.signUpForm.views.firstName) {
-            // reset the error
-            $scope.signUpForm.errors.firstName = false;
-        }
-        // if entering the last name view
-        else if (viewId == $scope.signUpForm.views.lastName) {
-            // reset the error
-            $scope.signUpForm.errors.lastName = false;
-        }
-        // if entering the email view
-        else if (viewId == $scope.signUpForm.views.email) {
-            // reset the error
-            $scope.signUpForm.errors.email = false;
-        }
-        // if entering the password view
-        else if (viewId == $scope.signUpForm.views.password) {
-            // reset the error
-            $scope.signUpForm.errors.password = false;
-        }
-    };
-
-    // on call event when the focus leaves
-    $scope.viewFocusLeave = function (viewId) {
-        // if leaving the first name view
-        if (viewId == $scope.signUpForm.views.firstName) {
-            // if user left field blank
-            if ($scope.signUpForm.inputs.firstName.length == 0) {
-                // set error
-                $scope.signUpForm.errors.firstName = true;
-                $scope.signUpForm.errors.isError = true;
-            }
-        }
-        // if leaving the last name view
-        else if (viewId == $scope.signUpForm.views.lastName) {
-            // if user left field blank
-            if ($scope.signUpForm.inputs.lastName.length == 0) {
-                // set error
-                $scope.signUpForm.errors.lastName = true;
-                $scope.signUpForm.errors.isError = true;
-            }
-        }
-        // if leaving the email view
-        else if (viewId == $scope.signUpForm.views.email) {
-            // if user left field blank
-            if (!$scope.signUpForm.inputs.email || $scope.signUpForm.inputs.email.length == 0) {
-                // set error
-                $scope.signUpForm.errors.email = true;
-                $scope.signUpForm.errors.isError = true;
-            }
-        }
-        // if leaving the password view
-        else if (viewId == $scope.signUpForm.views.password) {
-            // if user left field blank
-            if ($scope.signUpForm.inputs.password.length == 0) {
-                // set error
-                $scope.signUpForm.errors.password = true;
-                $scope.signUpForm.errors.isError = true;
-            }
-        }
-        
-        // check to see if there is an error
-        if ($scope.signUpForm.errors.firstName) {
-            // set error
-            $scope.signUpForm.errors.errorMessage = 'You must enter your first name';
-        }
-        else if ($scope.signUpForm.errors.lastName) {
-            // set error
-            $scope.signUpForm.errors.errorMessage = 'You must enter your last name';
-        }
-        else if ($scope.signUpForm.errors.email) {
-            // set error
-            $scope.signUpForm.errors.errorMessage = 'You must enter your email';
-        }
-        else if ($scope.signUpForm.errors.password) {
-            // set error
-            $scope.signUpForm.errors.errorMessage = 'You must enter a password';
-        }
-        else {
-            // remove error
-            $scope.signUpForm.errors.errorMessage = '';
-            $scope.signUpForm.errors.isError = false;
-        }
-    };
-
     // sign up
     $scope.signUp = function () {
         // check for empty values
         checkEmptyValues();
 
         // check if an error exists
-        if(!$scope.signUpForm.errors.firstName && !$scope.signUpForm.errors.lastName && !$scope.signUpForm.errors.email && !$scope.signUpForm.errors.password) {
+        if(!$scope.signUpForm.errors.firstName.isError && !$scope.signUpForm.errors.lastName.isError && !$scope.signUpForm.errors.email.isError && !$scope.signUpForm.errors.password.isError) {
             // disable button but showing the form has been submitted
             $scope.formInTransit = true;
 
@@ -227,8 +154,8 @@ accountModule.controller('SignUpController', ['$scope', '$rootScope', '$compile'
                         type: 'error'
                     }).then(function () {
                         // show error
-                        $scope.signUpForm.errors.errorMessage = responseSU.message;
-                        $scope.signUpForm.errors.isError = true;
+                        $scope.signUpForm.errors.generic.message = responseSU.message;
+                        $scope.signUpForm.errors.generic.isError = true;
                         $scope.formInTransit = false;
 
                         // force apply
@@ -237,8 +164,8 @@ accountModule.controller('SignUpController', ['$scope', '$rootScope', '$compile'
                     // handling the promise rejection
                     function (dismiss) {
                         // show error
-                        $scope.signUpForm.errors.errorMessage = responseSU.message;
-                        $scope.signUpForm.errors.isError = true;
+                        $scope.signUpForm.errors.generic.message = responseSU.message;
+                        $scope.signUpForm.errors.generic.isError = true;
                         $scope.formInTransit = false;
 
                         // force apply
@@ -254,8 +181,8 @@ accountModule.controller('SignUpController', ['$scope', '$rootScope', '$compile'
                     type: 'error'
                 }).then(function () {
                     // show error
-                    $scope.signUpForm.errors.errorMessage = responseSU.message;
-                    $scope.signUpForm.errors.isError = true;
+                    $scope.signUpForm.errors.generic.message = responseSU.message;
+                    $scope.signUpForm.errors.generic.isError = true;
                     $scope.formInTransit = false;
 
                     // force apply
@@ -264,8 +191,8 @@ accountModule.controller('SignUpController', ['$scope', '$rootScope', '$compile'
                 // handling the promise rejection
                 function (dismiss) {
                     // show error
-                    $scope.signUpForm.errors.errorMessage = responseSU.message;
-                    $scope.signUpForm.errors.isError = true;
+                    $scope.signUpForm.errors.generic.message = responseSU.message;
+                    $scope.signUpForm.errors.generic.isError = true;
                     $scope.formInTransit = false;
 
                     // force apply
@@ -330,15 +257,15 @@ accountModule.controller('SignUpController', ['$scope', '$rootScope', '$compile'
             }
             else {
                 // show error
-                $scope.signUpForm.errors.errorMessage = responseL.message;
-                $scope.signUpForm.errors.isError = true;
+                $scope.signUpForm.errors.generic.message = responseL.message;
+                $scope.signUpForm.errors.generic.isError = true;
                 $scope.formInTransit = false;
             }
         })
         .catch(function (responseL) {
             // show error
-            $scope.signUpForm.errors.errorMessage = responseL.message;
-            $scope.signUpForm.errors.isError = true;
+            $scope.signUpForm.errors.generic.message = responseL.message;
+            $scope.signUpForm.errors.generic.isError = true;
             $scope.formInTransit = false;
         });
     };
@@ -390,29 +317,9 @@ accountModule.controller('SignUpController', ['$scope', '$rootScope', '$compile'
     // checks for any empty values
     function checkEmptyValues() {
         // check for any empty values
-        if (!$scope.signUpForm.inputs.password || $scope.signUpForm.inputs.password.length == 0) {
-            // set error
-            $scope.signUpForm.errors.errorMessage = 'You must enter a password';
-            $scope.signUpForm.errors.password = true;
-            $scope.signUpForm.errors.isError = true;
-        }
-        if (!$scope.signUpForm.inputs.email || $scope.signUpForm.inputs.email.length == 0) {
-            // set error
-            $scope.signUpForm.errors.errorMessage = 'You must enter your email';
-            $scope.signUpForm.errors.email = true;
-            $scope.signUpForm.errors.isError = true;
-        }
-        if (!$scope.signUpForm.inputs.lastName || $scope.signUpForm.inputs.lastName.length == 0) {
-            // set error
-            $scope.signUpForm.errors.errorMessage = 'You must enter your last name';
-            $scope.signUpForm.errors.lastName = true;
-            $scope.signUpForm.errors.isError = true;
-        }
-        if (!$scope.signUpForm.inputs.firstName || $scope.signUpForm.inputs.firstName.length == 0) {
-            // set error
-            $scope.signUpForm.errors.errorMessage = 'You must enter your first name';
-            $scope.signUpForm.errors.firstName = true;
-            $scope.signUpForm.errors.isError = true;
-        }
+        $scope.signUpForm.errors.firstName.isError = !$scope.signUpForm.inputs.firstName || $scope.signUpForm.inputs.firstName.length == 0;
+        $scope.signUpForm.errors.lastName.isError = !$scope.signUpForm.inputs.lastName || $scope.signUpForm.inputs.lastName.length == 0;
+        $scope.signUpForm.errors.email.isError = !$scope.signUpForm.inputs.email || $scope.signUpForm.inputs.email.length == 0;
+        $scope.signUpForm.errors.password.isError = !$scope.signUpForm.inputs.password || $scope.signUpForm.inputs.password.length == 0;
     };
 }]);

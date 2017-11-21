@@ -11,6 +11,9 @@ accountModule.controller('PaymentInformationController', ['$scope', '$rootScope'
     // set the path
     Service.afterPath = $location.path();
 
+    // set the range for expiration date
+    setAcceptableExpDateRange();
+
     // holds the payment information form data
     $scope.paymentInformationForm = {
         'inputs': {
@@ -28,13 +31,30 @@ accountModule.controller('PaymentInformationController', ['$scope', '$rootScope'
             'ccv': 'ccv'
         },
         'errors': {
-            'errorMessage': '',
-            'isError': false,
-            'name': false,
-            'number': false,
-            'expirationMM': false,
-            'expirationYY': false,
-            'ccv': false
+            'generic': {
+                'message': '',
+                'isError': false,
+            },
+            'name': {
+                'isError': false,
+                'message': 'Please enter the name on the card'
+            },
+            'number': {
+                'isError': false,
+                'message': 'Please enter the 16 digit card number'
+            },
+            'expirationMM': {
+                'isError': false,
+                'message': 'Please enter the expiration month (01-12)'
+            },
+            'expirationYY': {
+                'isError': false,
+                'message': `Please enter the expiration year (${$scope.acceptableDateRangeForExpiration.minYear}-${$scope.acceptableDateRangeForExpiration.maxYear})`
+            },
+            'ccv': {
+                'isError': false,
+                'message': 'Please enter the ccv number on the back of the card'
+            }
         },
         'cardType': {
             'visa': false,
@@ -44,163 +64,8 @@ accountModule.controller('PaymentInformationController', ['$scope', '$rootScope'
         }
     };
 
-    // set the range for expiration date
-    setAcceptableExpDateRange();
-
     // determines if form is in transit
     $scope.formInTransit = false;
-
-    // on call event when the focus enters
-    $scope.viewFocusEnter = function (viewId) {
-        // if entering the name view
-        if (viewId == $scope.paymentInformationForm.views.name) {
-            // reset the error
-            $scope.paymentInformationForm.errors.name = false;
-        }
-        // if entering the number view
-        else if (viewId == $scope.paymentInformationForm.views.number) {
-            // reset the error
-            $scope.paymentInformationForm.errors.number = false;
-        }
-        // if entering the expirationMM view
-        else if (viewId == $scope.paymentInformationForm.views.expirationMM) {
-            // reset the error
-            $scope.paymentInformationForm.errors.expirationMM = false;
-        }
-        // if entering the expirationYY view
-        else if (viewId == $scope.paymentInformationForm.views.expirationYY) {
-            // reset the error
-            $scope.paymentInformationForm.errors.expirationYY = false;
-        }
-        // if entering the ccv view
-        else if (viewId == $scope.paymentInformationForm.views.ccv) {
-            // reset the error
-            $scope.paymentInformationForm.errors.ccv = false;
-        }
-    };
-
-    // on call event when the focus leaves
-    $scope.viewFocusLeave = function (viewId) {
-        // if leaving the name view
-        if (viewId == $scope.paymentInformationForm.views.name) {
-            // if user left field blank
-            if ($scope.paymentInformationForm.inputs.name.length == 0) {
-                // set error
-                $scope.paymentInformationForm.errors.name = true;
-                $scope.paymentInformationForm.errors.isError = true;
-            }
-        }
-        // if leaving the number view
-        else if (viewId == $scope.paymentInformationForm.views.number) {
-            // if user left field blank
-            if (!$scope.paymentInformationForm.inputs.number || !matchesCCNumbers($scope.paymentInformationForm.inputs.number)) {
-                // set error
-                $scope.paymentInformationForm.errors.number = true;
-                $scope.paymentInformationForm.errors.isError = true;
-            }
-        }
-        // if leaving the expirationMM view
-        else if (viewId == $scope.paymentInformationForm.views.expirationMM) {
-            // if user left field blank
-            if (!$scope.paymentInformationForm.inputs.expirationMM) {
-                // set error
-                $scope.paymentInformationForm.errors.expirationMM = true;
-                $scope.paymentInformationForm.errors.isError = true;
-            }
-            // if valid number
-            else if ($scope.paymentInformationForm.inputs.expirationMM) {
-                // set two digits
-                document.getElementById('expirationMM').value = $scope.paymentInformationForm.inputs.expirationMM < 10 ? '0' + $scope.paymentInformationForm.inputs.expirationMM.toString() : $scope.paymentInformationForm.inputs.expirationMM;
-            }
-
-            // if not a valid date
-            if ($scope.paymentInformationForm.inputs.expirationYY && !expDateVaild($scope.paymentInformationForm.inputs.expirationMM, $scope.paymentInformationForm.inputs.expirationYY)) {
-                // set error
-                $scope.paymentInformationForm.errors.expirationYY = true;
-                $scope.paymentInformationForm.errors.expirationMM = true;
-                $scope.paymentInformationForm.errors.isError = true;
-            }
-
-            // if valid date
-            if (expDateVaild($scope.paymentInformationForm.inputs.expirationMM, $scope.paymentInformationForm.inputs.expirationYY)) {
-                // set error
-                $scope.paymentInformationForm.errors.expirationYY = false;
-                $scope.paymentInformationForm.errors.expirationMM = false;
-            }
-        }
-        // if leaving the expirationYY view
-        else if (viewId == $scope.paymentInformationForm.views.expirationYY) {
-            // if user left field blank
-            if (!$scope.paymentInformationForm.inputs.expirationYY) {
-                // set error
-                $scope.paymentInformationForm.errors.expirationYY = true;
-                $scope.paymentInformationForm.errors.isError = true;
-            }
-            // if valid number
-            else if ($scope.paymentInformationForm.inputs.expirationMM) {
-                // set two digits
-                document.getElementById('expirationYY').value = $scope.paymentInformationForm.inputs.expirationYY < 10 ? '0' + $scope.paymentInformationForm.inputs.expirationYY.toString() : $scope.paymentInformationForm.inputs.expirationYY;
-            }
-
-            // if not a valid date
-            if ($scope.paymentInformationForm.inputs.expirationYY && !expDateVaild($scope.paymentInformationForm.inputs.expirationMM, $scope.paymentInformationForm.inputs.expirationYY)) {
-                // set error
-                $scope.paymentInformationForm.errors.expirationYY = true;
-                $scope.paymentInformationForm.errors.expirationMM = true;
-                $scope.paymentInformationForm.errors.isError = true;
-            }
-
-            // if valid date
-            if (expDateVaild($scope.paymentInformationForm.inputs.expirationMM, $scope.paymentInformationForm.inputs.expirationYY)) {
-                // set error
-                $scope.paymentInformationForm.errors.expirationYY = false;
-                $scope.paymentInformationForm.errors.expirationMM = false;
-            }
-        }
-        // if leaving the ccv view
-        else if (viewId == $scope.paymentInformationForm.views.ccv) {
-            // get the actual value (integer value will not have leading zero)
-            var actual = document.getElementById('ccv').value;
-
-            // if user left field blank or has inccorect length
-            if (!$scope.paymentInformationForm.inputs.ccv || actual.length != 3) {
-                // set error
-                $scope.paymentInformationForm.errors.ccv = true;
-                $scope.paymentInformationForm.errors.isError = true;
-            }
-        }
-        
-        // check to see if there is an error
-        if ($scope.paymentInformationForm.errors.name) {
-            // set error
-            $scope.paymentInformationForm.errors.errorMessage = 'You must enter the name on the card';
-        }
-        else if ($scope.paymentInformationForm.errors.number) {
-            // set error
-            $scope.paymentInformationForm.errors.errorMessage = 'You must enter the 16 digit number on the front of the card';
-        }
-        else if ($scope.paymentInformationForm.errors.expirationMM && $scope.paymentInformationForm.errors.expirationYY) {
-            // set error
-            $scope.paymentInformationForm.errors.errorMessage = `The expiration date is invalid (must be the minumum date ${$scope.acceptableDateRangeForExpiration.minMonth}/${$scope.acceptableDateRangeForExpiration.minYear})`;
-        }
-        else if ($scope.paymentInformationForm.errors.expirationMM) {
-            // set error
-            $scope.paymentInformationForm.errors.errorMessage = 'You must enter the month for the expiration date (between 1 and 12)';
-        }
-        else if ($scope.paymentInformationForm.errors.expirationYY) {
-            // set error
-            $scope.paymentInformationForm.errors.errorMessage = `You must enter the year for the expiration date (between ${$scope.acceptableDateRangeForExpiration.minYear} and ${$scope.acceptableDateRangeForExpiration.maxYear})`;
-        }
-        else if ($scope.paymentInformationForm.errors.ccv) {
-            // set error
-            $scope.paymentInformationForm.errors.errorMessage = 'You must enter the ccv number on the back of the card (needs to be 3 digits in length)';
-        }
-        else {
-            // remove error
-            $scope.paymentInformationForm.errors.errorMessage = '';
-            $scope.paymentInformationForm.errors.isError = false;
-        }
-    };
 
     // update payment information
     $scope.updatePaymentInformation = function () {
@@ -208,15 +73,19 @@ accountModule.controller('PaymentInformationController', ['$scope', '$rootScope'
         checkEmptyValues();
 
         // check if an error exists
-        if(!$scope.paymentInformationForm.errors.name && !$scope.paymentInformationForm.errors.number && !$scope.paymentInformationForm.errors.expirationMM && !$scope.paymentInformationForm.errors.expirationYY && !$scope.paymentInformationForm.errors.ccv) {
+        if(!$scope.paymentInformationForm.errors.name.isError && !$scope.paymentInformationForm.errors.number.isError && !$scope.paymentInformationForm.errors.expirationMM.isError && !$scope.paymentInformationForm.errors.expirationYY.isError && !$scope.paymentInformationForm.errors.ccv.isError) {
             // disable button but showing the form has been submitted
             $scope.formInTransit = true;
+
+            // get the two digit version of both the month and year
+            var twoDigitMonth = $scope.paymentInformationForm.inputs.expirationMM < 10 ? '0' + $scope.paymentInformationForm.inputs.expirationMM.toString() : $scope.paymentInformationForm.inputs.expirationMM;
+            var twoDigitYear = $scope.paymentInformationForm.inputs.expirationYY < 10 ? '0' + $scope.paymentInformationForm.inputs.expirationYY.toString() : $scope.paymentInformationForm.inputs.expirationYY;
 
             // the data to send
             var changePaymentInformationData = {
                 'name': $scope.paymentInformationForm.inputs.name,
                 'number': document.getElementById('number').value,
-                'expiration': document.getElementById('expirationMM').value + document.getElementById('expirationYY').value,
+                'expiration': twoDigitMonth + twoDigitYear,
                 'ccv': document.getElementById('ccv').value
             };
 
@@ -235,22 +104,22 @@ accountModule.controller('PaymentInformationController', ['$scope', '$rootScope'
                         // get the updated information
                         $scope.paymentInformation.data = responseUPI;
 
-                        // clear the form for security
-                        resetForm();
-
                         // cancel out editing
                         $scope.cancelEditing();
+
+                        // clear the form for security
+                        resetForm();
                     },
                     // handling the promise rejection
                     function (dismiss) {
                         // get the updated information
                         $scope.paymentInformation.data = responseUPI;
 
-                        // clear the form for security
-                        resetForm();
-                        
                         // cancel out editing
                         $scope.cancelEditing();
+
+                        // clear the form for security
+                        resetForm();
                     });
                 }
                 else {
@@ -263,8 +132,8 @@ accountModule.controller('PaymentInformationController', ['$scope', '$rootScope'
                         buttonsStyling: false
                     }).then(function () {
                         // show error
-                        $scope.paymentInformationForm.errors.errorMessage = responseUPI.message;
-                        $scope.paymentInformationForm.errors.isError = true;
+                        $scope.paymentInformationForm.errors.generic.message = responseUPI.message;
+                        $scope.paymentInformationForm.errors.generic.isError = true;
 
                         // clear the form for security
                         resetForm();
@@ -286,8 +155,8 @@ accountModule.controller('PaymentInformationController', ['$scope', '$rootScope'
                     buttonsStyling: false
                 }).then(function () {
                     // show error
-                    $scope.paymentInformationForm.errors.errorMessage = responseUPI.message;
-                    $scope.paymentInformationForm.errors.isError = true;
+                    $scope.paymentInformationForm.errors.generic.message = responseUPI.message;
+                    $scope.paymentInformationForm.errors.generic.isError = true;
 
                     // clear the form for security
                     resetForm();
@@ -295,8 +164,8 @@ accountModule.controller('PaymentInformationController', ['$scope', '$rootScope'
                 // handling the promise rejection
                 function (dismiss) {
                     // show error
-                    $scope.paymentInformationForm.errors.errorMessage = responseUPI.message;
-                    $scope.paymentInformationForm.errors.isError = true;
+                    $scope.paymentInformationForm.errors.generic.message = responseUPI.message;
+                    $scope.paymentInformationForm.errors.generic.isError = true;
 
                     // clear the form for security
                     resetForm();               
@@ -312,9 +181,9 @@ accountModule.controller('PaymentInformationController', ['$scope', '$rootScope'
 
         // set the form values
         $scope.paymentInformationForm.inputs.name = $scope.paymentInformation.data.name;
-        $scope.paymentInformationForm.inputs.number = $scope.paymentInformation.data.number;
-        $scope.paymentInformationForm.inputs.expirationMM = $scope.paymentInformation.data.expiration.substring(0, 2);
-        $scope.paymentInformationForm.inputs.expirationYY = $scope.paymentInformation.data.expiration.substring(2);
+        $scope.paymentInformationForm.inputs.number = parseInt($scope.paymentInformation.data.number);
+        $scope.paymentInformationForm.inputs.expirationMM = parseInt($scope.paymentInformation.data.expiration.substring(0, 2));
+        $scope.paymentInformationForm.inputs.expirationYY = parseInt($scope.paymentInformation.data.expiration.substring(2));
         $scope.paymentInformationForm.inputs.ccv = '';
     };
 
@@ -347,7 +216,13 @@ accountModule.controller('PaymentInformationController', ['$scope', '$rootScope'
                 $scope.paymentInformation.data = responsePI;
                 $scope.paymentInformation.title = 'Payment Information';
                 $scope.paymentInformation.pageHeader = $scope.paymentInformation.title;
-                $scope.paymentInformation.pageSubHeader = 'Your payment information, look okay?';
+                $scope.paymentInformation.pageSubHeader = $scope.paymentInformation.data.cardOnFile ? 'Your payment information, look okay?' : 'Looks like you haven\'t set up a payment method yet';
+
+                // if there is a card on file
+                if($scope.paymentInformation.data.cardOnFile) {
+                    // set the last 4 digits and delete the full number
+                    $scope.paymentInformation.data.lastFour = $scope.paymentInformation.data.number.substring($scope.paymentInformation.data.number.length - 4);
+                }
 
                 // holds the page title
                 $scope.pageTitle = $scope.paymentInformation.title + ' | ' + ApplicationConfiguration.applicationName;
@@ -422,42 +297,18 @@ accountModule.controller('PaymentInformationController', ['$scope', '$rootScope'
         var yearActual = document.getElementById('expirationYY').value;
 
         // check for any empty values
-        if (!$scope.paymentInformationForm.inputs.ccv || ccvActual.length != 3) {
-            // set error
-            $scope.paymentInformationForm.errors.errorMessage = 'You must enter the ccv number on the back of the card (needs to be 3 digits in length)';
-            $scope.paymentInformationForm.errors.ccv = true;
-            $scope.paymentInformationForm.errors.isError = true;
+        $scope.paymentInformationForm.errors.name.isError = !$scope.paymentInformationForm.inputs.name || $scope.paymentInformationForm.inputs.name.length == 0;
+        $scope.paymentInformationForm.errors.number.isError = !$scope.paymentInformationForm.inputs.number || !matchesCCNumbers($scope.paymentInformationForm.inputs.number);
+        $scope.paymentInformationForm.errors.expirationMM.isError = !expDateVaild($scope.paymentInformationForm.inputs.expirationMM, $scope.paymentInformationForm.inputs.expirationYY);
+        $scope.paymentInformationForm.errors.expirationYY.isError = !expDateVaild($scope.paymentInformationForm.inputs.expirationMM, $scope.paymentInformationForm.inputs.expirationYY);
+        $scope.paymentInformationForm.errors.ccv.isError = !$scope.paymentInformationForm.inputs.ccv || ccvActual.length != 3;
+
+        // set two digits if valid
+        if($scope.paymentInformationForm.inputs.expirationMM) {
+            document.getElementById('expirationMM').value = $scope.paymentInformationForm.inputs.expirationMM < 10 ? '0' + $scope.paymentInformationForm.inputs.expirationMM.toString() : $scope.paymentInformationForm.inputs.expirationMM;
         }
-        if (!$scope.paymentInformationForm.inputs.expirationYY) {
-            // set error
-            $scope.paymentInformationForm.errors.errorMessage = `You must enter the year for the expiration date (between ${$scope.acceptableDateRangeForExpiration.minYear} and ${$scope.acceptableDateRangeForExpiration.maxYear})`;
-            $scope.paymentInformationForm.errors.expirationYY = true;
-            $scope.paymentInformationForm.errors.isError = true;
-        }
-        if (!$scope.paymentInformationForm.inputs.expirationMM) {
-            // set error
-            $scope.paymentInformationForm.errors.errorMessage = 'You must enter the month for the expiration date (between 1 and 12)';
-            $scope.paymentInformationForm.errors.expirationMM = true;
-            $scope.paymentInformationForm.errors.isError = true;
-        }
-        if (!expDateVaild($scope.paymentInformationForm.inputs.expirationMM, $scope.paymentInformationForm.inputs.expirationYY)) {
-            // set error
-            $scope.paymentInformationForm.errors.errorMessage = `The expiration date is invalid (must be the minumum date ${$scope.acceptableDateRangeForExpiration.minMonth}/${$scope.acceptableDateRangeForExpiration.minYear})`;
-            $scope.paymentInformationForm.errors.expirationYY = true;
-            $scope.paymentInformationForm.errors.expirationMM = true;
-            $scope.paymentInformationForm.errors.isError = true;
-        }
-        if (!$scope.paymentInformationForm.inputs.number || !matchesCCNumbers($scope.paymentInformationForm.inputs.number)) {
-            // set error
-            $scope.paymentInformationForm.errors.errorMessage = 'You must enter the 16 digit number on the front of the card';
-            $scope.paymentInformationForm.errors.number = true;
-            $scope.paymentInformationForm.errors.isError = true;
-        }
-        if (!$scope.paymentInformationForm.inputs.name || $scope.paymentInformationForm.inputs.name.length == 0) {
-            // set error
-            $scope.paymentInformationForm.errors.errorMessage = 'You must enter the name on the card';
-            $scope.paymentInformationForm.errors.name = true;
-            $scope.paymentInformationForm.errors.isError = true;
+        if($scope.paymentInformationForm.inputs.expirationYY) {
+            document.getElementById('expirationYY').value = $scope.paymentInformationForm.inputs.expirationYY < 10 ? '0' + $scope.paymentInformationForm.inputs.expirationYY.toString() : $scope.paymentInformationForm.inputs.expirationYY;
         }
     };
 
@@ -478,7 +329,8 @@ accountModule.controller('PaymentInformationController', ['$scope', '$rootScope'
             return false;
         }
 
-        return month >= $scope.acceptableDateRangeForExpiration.minMonth && year >= $scope.acceptableDateRangeForExpiration.minYear;
+        // year must be greater than minium year or year must be the minimum year and the month has to be greater than the current month of the minimum year
+        return year > $scope.acceptableDateRangeForExpiration.minYear || (month > $scope.acceptableDateRangeForExpiration.minMonth && year >= $scope.acceptableDateRangeForExpiration.minYear);
     };
 
     // clear the fields

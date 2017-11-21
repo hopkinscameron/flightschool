@@ -60,11 +60,9 @@ module.exports = function (app, db) {
                         var safePaymentObj = _.cloneDeep(foundPayment);
 
                         // hide the information for security purposes
+                        var id = safePaymentObj._id;
                         safePaymentObj = PaymentType.toObject(safePaymentObj, { 'hide': 'created internalName ccv userId' });
-
-                        // set the last 4 digits and delete the full number
-                        safePaymentObj.lastFour = safePaymentObj.number.substring(safePaymentObj.number.length - 4);
-                        delete safePaymentObj.number;
+                        safePaymentObj._id = id;    
 
                         // set the payment object
                         user.paymentInfo = safePaymentObj;

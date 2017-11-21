@@ -1,5 +1,9 @@
-﻿<!-- Begin Home Page -->
-<section ng-controller="HomeController">
+﻿<!-- Begin User logged in -->
+<div ng-include="'/modules/home/client/views/user/home.client.view.html'" ng-if="$root.isLoggedIn">
+</div>
+<!-- End User logged in -->
+<!-- Begin Home Page (User not logged in) -->
+<section ng-controller="HomeController" ng-if="!$root.isLoggedIn">
     <!-- Begin Container -->
     <div class="container">
         <!-- Begin Page Fully Loaded With Errors -->
@@ -27,4 +31,4 @@
     </div>
     <!-- End Container -->
 </section>
-<!-- Begin Home Page -->
+<!-- End Home Page (User not logged in) -->

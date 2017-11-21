@@ -17,66 +17,23 @@ accountModule.controller('LoginController', ['$scope', '$rootScope', '$window', 
             'password': 'password'
         },
         'errors': {
-            'errorMessage': '',
-            'isError': false,
-            'email': false,
-            'password': false
+            'generic': {
+                'message': '',
+                'isError': false,
+            },
+            'email': {
+                'isError': false,
+                'message': 'Please enter your email'
+            },
+            'password': {
+                'isError': false,
+                'message': 'Please enter your password'
+            }
         }
     };
 
     // determines if form is in transit
     $scope.formInTransit = false;
-
-    // on call event when the focus enters
-    $scope.viewFocusEnter = function (viewId) {
-        // if entering the email view
-        if (viewId == $scope.loginForm.views.email) {
-            // reset the error
-            $scope.loginForm.errors.email = false;
-        }
-        // if entering the password view
-        else if (viewId == $scope.loginForm.views.password) {
-            // reset the error
-            $scope.loginForm.errors.password = false;
-        }
-    };
-
-    // on call event when the focus leaves
-    $scope.viewFocusLeave = function (viewId) {
-        // if leaving the email view
-        if (viewId == $scope.loginForm.views.email) {
-            // if user left field blank
-            if ($scope.loginForm.inputs.email.length == 0) {
-                // set error
-                $scope.loginForm.errors.email = true;
-                $scope.loginForm.errors.isError = true;
-            }
-        }
-        // if leaving the password view
-        else if (viewId == $scope.loginForm.views.password) {
-            // if user left field blank
-            if ($scope.loginForm.inputs.password.length == 0) {
-                // set error
-                $scope.loginForm.errors.password = true;
-                $scope.loginForm.errors.isError = true;
-            }
-        }
-        
-        // check to see if there is an error
-        if ($scope.loginForm.errors.email) {
-            // set error
-            $scope.loginForm.errors.errorMessage = 'You must enter your email';
-        }
-        else if ($scope.loginForm.errors.password) {
-            // set error
-            $scope.loginForm.errors.errorMessage = 'You must enter your password';
-        }
-        else {
-            // remove error
-            $scope.loginForm.errors.errorMessage = '';
-            $scope.loginForm.errors.isError = false;
-        }
-    };
 
     // login
     $scope.login = function () {
@@ -84,7 +41,7 @@ accountModule.controller('LoginController', ['$scope', '$rootScope', '$window', 
         checkEmptyValues();
 
         // check if an error exists
-        if(!$scope.loginForm.errors.email && !$scope.loginForm.errors.password) {
+        if(!$scope.loginForm.errors.email.isError && !$scope.loginForm.errors.password.isError) {
             // disable button but showing the form has been submitted
             $scope.formInTransit = true;
 
@@ -107,8 +64,8 @@ accountModule.controller('LoginController', ['$scope', '$rootScope', '$window', 
                 }
                 else {
                     // show error
-                    $scope.loginForm.errors.errorMessage = responseL.message;
-                    $scope.loginForm.errors.isError = true;
+                    $scope.loginForm.errors.generic.message = responseL.message;
+                    $scope.loginForm.errors.generic.isError = true;
                     
                     // clear the form for security
                     resetForm();
@@ -116,8 +73,8 @@ accountModule.controller('LoginController', ['$scope', '$rootScope', '$window', 
             })
             .catch(function (responseL) {
                 // show error
-                $scope.loginForm.errors.errorMessage = responseL.message;
-                $scope.loginForm.errors.isError = true;
+                $scope.loginForm.errors.generic.message = responseL.message;
+                $scope.loginForm.errors.generic.isError = true;
                 $scope.formInTransit = false;
 
                 // clear the form for security
@@ -129,18 +86,8 @@ accountModule.controller('LoginController', ['$scope', '$rootScope', '$window', 
     // checks for any empty values
     function checkEmptyValues() {
         // check for any empty values
-        if (!$scope.loginForm.inputs.password || $scope.loginForm.inputs.password.length == 0) {
-            // set error
-            $scope.loginForm.errors.errorMessage = 'You must enter your password';
-            $scope.loginForm.errors.password = true;
-            $scope.loginForm.errors.isError = true;
-        }
-        if (!$scope.loginForm.inputs.email || $scope.loginForm.inputs.email.length == 0) {
-            // set error
-            $scope.loginForm.errors.errorMessage = 'You must enter your email';
-            $scope.loginForm.errors.email = true;
-            $scope.loginForm.errors.isError = true;
-        }
+        $scope.loginForm.errors.email.isError = !$scope.loginForm.inputs.email || $scope.loginForm.inputs.email.length == 0;
+        $scope.loginForm.errors.password.isError = !$scope.loginForm.inputs.password || $scope.loginForm.inputs.password.length == 0;
     };
 
     // clear the fields

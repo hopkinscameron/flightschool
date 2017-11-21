@@ -35,164 +35,35 @@ accountModule.controller('EditProfileController', ['$scope', '$rootScope', '$loc
             'email': 'email'
         },
         'errors': {
-            'errorMessage': '',
-            'isError': false,
-            'first': false,
-            'last': false,
-            'phone': false,
-            'email': false
+            'generic': {
+                'message': '',
+                'isError': false,
+            },
+            'first': {
+                'isError': false,
+                'message': 'Please enter your first name'
+            },
+            'last': {
+                'isError': false,
+                'message': 'Please enter your last name'
+            },
+            'sex': {
+                'isError': false,
+                'message': 'Please enter your sex'
+            },
+            'phone': {
+                'isError': false,
+                'message': 'Please enter your phone number'
+            },
+            'email': {
+                'isError': false,
+                'message': 'Please enter your email'
+            }
         }
     };
 
     // determines if form is in transit
     $scope.formInTransit = false;
-
-     // on call event when the focus enters
-    $scope.viewFocusEnter = function (viewId) {
-        // if entering the first name view
-        if (viewId == $scope.profileForm.views.first) {
-            // reset the error
-            $scope.profileForm.errors.first = false;
-        }
-        // if entering the last name view
-        else if (viewId == $scope.profileForm.views.last) {
-            // reset the error
-            $scope.profileForm.errors.last = false;
-        }
-        // if entering the sex view
-        else if (viewId == $scope.profileForm.views.sex) {
-            // reset the error
-            $scope.profileForm.errors.sex = false;
-        }
-        // if entering the phone number view
-        else if (viewId == $scope.profileForm.views.phone) {
-            // reset the error
-            $scope.profileForm.errors.phone = false;
-        }
-        // if entering the email view
-        else if (viewId == $scope.profileForm.views.email) {
-            // reset the error
-            $scope.profileForm.errors.email = false;
-        }
-
-        // check if there are any other errors
-        if(!$scope.profileForm.errors.first && !$scope.profileForm.errors.last && !$scope.profileForm.errors.sex && !$scope.profileForm.errors.phone && !$scope.profileForm.errors.email) {
-            // remove error
-            $scope.profileForm.errors.errorMessage = '';
-            $scope.profileForm.errors.isError = false;
-        }
-    };
-
-    // on call event when the focus leaves
-    $scope.viewFocusLeave = function (viewId) {
-        // if leaving the first name view
-        if (viewId == $scope.profileForm.views.first) {
-            // if user left field blank
-            if ($scope.profileForm.inputs.first.length == 0) {
-                // set error
-                $scope.profileForm.errors.first = true;
-                $scope.profileForm.errors.isError = true;
-            }
-        }
-        // if leaving the last name view
-        else if (viewId == $scope.profileForm.views.last) {
-            // if user left field blank
-            if ($scope.profileForm.inputs.last.length == 0) {
-                // set error
-                $scope.profileForm.errors.last = true;
-                $scope.profileForm.errors.isError = true;
-            }
-        }
-        // if leaving the sex view
-        else if (viewId == $scope.profileForm.views.sex) {
-            // if user left field blank
-            if ($scope.profileForm.inputs.sex.length == 0) {
-                // set error
-                $scope.profileForm.errors.sex = true;
-                $scope.profileForm.errors.isError = true;
-            }
-        }
-        // if leaving the phone number view
-        else if (viewId == $scope.profileForm.views.phone) {
-            // if user left field blank
-            if ($scope.profileForm.inputs.phone.length == 0) {
-                // set error
-                $scope.profileForm.errors.phone = true;
-                $scope.profileForm.errors.isError = true;
-            }
-            // if not correct format
-            else if(!$rootScope.$root.phoneRegex.test($scope.profileForm.inputs.phone)) {
-                // set error
-                $scope.profileForm.errors.phone = true;
-                $scope.profileForm.errors.isError = true;
-            }
-        }
-        // if leaving the email view
-        else if (viewId == $scope.profileForm.views.email) {
-            // if user left field blank
-            if (!$scope.profileForm.inputs.email || $scope.profileForm.inputs.email.length == 0) {
-                // set error
-                $scope.profileForm.errors.email = true;
-                $scope.profileForm.errors.isError = true;
-            }
-        }
-        
-        // check to see if there is an error
-        if ($scope.profileForm.errors.first) {
-            // set error
-            $scope.profileForm.errors.errorMessage = 'You must enter your first name';
-        }
-        else if ($scope.profileForm.errors.last) {
-            // set error
-            $scope.profileForm.errors.errorMessage = 'You must enter your last name';
-        }
-        else if ($scope.profileForm.errors.sex) {
-            // set error
-            $scope.profileForm.errors.errorMessage = 'You must select your sex';
-        }
-        else if ($scope.profileForm.errors.phone) {
-            // set error
-            $scope.profileForm.errors.errorMessage = $scope.profileForm.inputs.phone.length == 0 ? 'You must enter your phone number' : 'Not a valid phone number';
-        }
-        else if ($scope.profileForm.errors.email) {
-            // set error
-            $scope.profileForm.errors.errorMessage = 'You must enter your email';
-        }
-        else {
-            // remove error
-            $scope.profileForm.errors.errorMessage = '';
-            $scope.profileForm.errors.isError = false;
-        }
-    };
-
-    // check the dropdown selection
-    $scope.checkSelection = function (viewId) {
-        // if entering the service view
-        if (viewId == $scope.profileForm.views.sex) {
-            // if user left field blank
-            if (!$scope.sexOptions.selected || $scope.sexOptions.selected.length == 0 || $scope.sexOptions.selected == $scope.initialText) {
-                // set error
-                $scope.profileForm.errors.sex = true;
-                $scope.profileForm.errors.isError = true;
-            }
-            else {
-                // delete error
-                $scope.profileForm.errors.sex = false;
-            }
-        }
-
-        // check to see if there is an error
-        if ($scope.profileForm.errors.sex) {
-            // set error
-            $scope.profileForm.errors.errorMessage = 'You must select a sex';
-        }
-        // check if there are any other errors
-        else if(!$scope.profileForm.errors.first && !$scope.profileForm.errors.last && !$scope.profileForm.errors.sex && !$scope.profileForm.errors.phone && !$scope.profileForm.errors.email) {
-            // delete error
-            $scope.profileForm.errors.errorMessage = '';
-            $scope.profileForm.errors.isError = false;
-        }
-    };
 
     // update profile
     $scope.updateProfile = function () {
@@ -200,7 +71,7 @@ accountModule.controller('EditProfileController', ['$scope', '$rootScope', '$loc
         checkEmptyValues();
 
         // check if an error exists
-        if(!$scope.profileForm.errors.first && !$scope.profileForm.errors.last && !$scope.profileForm.errors.sex && !$scope.profileForm.errors.phone && !$scope.profileForm.errors.email) {
+        if(!$scope.profileForm.errors.first.isError && !$scope.profileForm.errors.last.isError && !$scope.profileForm.errors.sex.isError && !$scope.profileForm.errors.phone.isError && !$scope.profileForm.errors.email.isError) {
             // disable button but showing the form has been submitted
             $scope.formInTransit = true;
 
@@ -247,8 +118,8 @@ accountModule.controller('EditProfileController', ['$scope', '$rootScope', '$loc
                         buttonsStyling: false
                     }).then(function () {
                         // show error
-                        $scope.profileForm.errors.errorMessage = responseUP.message;
-                        $scope.profileForm.errors.isError = true;
+                        $scope.profileForm.errors.generic.message = responseUP.message;
+                        $scope.profileForm.errors.generic.isError = true;
 
                         // show the form is no longer in transit
                         $scope.formInTransit = false;
@@ -259,8 +130,8 @@ accountModule.controller('EditProfileController', ['$scope', '$rootScope', '$loc
                     // handling the promise rejection
                     function (dismiss) {
                         // show error
-                        $scope.profileForm.errors.errorMessage = responseUP.message;
-                        $scope.profileForm.errors.isError = true;
+                        $scope.profileForm.errors.generic.message = responseUP.message;
+                        $scope.profileForm.errors.generic.isError = true;
 
                         // show the form is no longer in transit
                         $scope.formInTransit = false;
@@ -280,8 +151,8 @@ accountModule.controller('EditProfileController', ['$scope', '$rootScope', '$loc
                     buttonsStyling: false
                 }).then(function () {
                     // show error
-                    $scope.profileForm.errors.errorMessage = responseUP.message;
-                    $scope.profileForm.errors.isError = true;
+                    $scope.profileForm.errors.generic.message = responseUP.message;
+                    $scope.profileForm.errors.generic.isError = true;
 
                     // show the form is no longer in transit
                     $scope.formInTransit = false;
@@ -292,8 +163,8 @@ accountModule.controller('EditProfileController', ['$scope', '$rootScope', '$loc
                 // handling the promise rejection
                 function (dismiss) {
                     // show error
-                    $scope.profileForm.errors.errorMessage = responseUP.message;
-                    $scope.profileForm.errors.isError = true;
+                    $scope.profileForm.errors.generic.message = responseUP.message;
+                    $scope.profileForm.errors.generic.isError = true;
 
                     // show the form is no longer in transit
                     $scope.formInTransit = false;
@@ -378,35 +249,10 @@ accountModule.controller('EditProfileController', ['$scope', '$rootScope', '$loc
     // checks for any empty values
     function checkEmptyValues() {
         // check for any empty values
-        if (!$scope.profileForm.inputs.email || $scope.profileForm.inputs.email.length == 0) {
-            // set error
-            $scope.profileForm.errors.errorMessage = 'You must enter your email';
-            $scope.profileForm.errors.email = true;
-            $scope.profileForm.errors.isError = true;
-        }
-        if (!$scope.profileForm.inputs.phone || $scope.profileForm.inputs.phone.length == 0) {
-            // set error
-            $scope.profileForm.errors.errorMessage = $scope.profileForm.inputs.phone.length == 0 ? 'You must enter your phone number' : 'Not a valid phone number';
-            $scope.profileForm.errors.phone = true;
-            $scope.profileForm.errors.isError = true;
-        }
-        if (!$scope.sexOptions.selected || $scope.sexOptions.selected.length == 0 || $scope.sexOptions.selected == $scope.initialText) {
-            // set error
-            $scope.serviceForm.errors.errorMessage = 'You must select a sex';
-            $scope.serviceForm.errors.sex = true;
-            $scope.serviceForm.errors.isError = true;
-        }
-        if (!$scope.profileForm.inputs.last || $scope.profileForm.inputs.last.length == 0) {
-            // set error
-            $scope.profileForm.errors.errorMessage = 'You must enter your last name';
-            $scope.profileForm.errors.last = true;
-            $scope.profileForm.errors.isError = true;
-        }
-        if (!$scope.profileForm.inputs.first || $scope.profileForm.inputs.first.length == 0) {
-            // set error
-            $scope.profileForm.errors.errorMessage = 'You must enter your first name';
-            $scope.profileForm.errors.first = true;
-            $scope.profileForm.errors.isError = true;
-        }
+        $scope.profileForm.errors.first.isError = !$scope.profileForm.inputs.first || $scope.profileForm.inputs.first.length == 0;
+        $scope.profileForm.errors.last.isError = !$scope.profileForm.inputs.last || $scope.profileForm.inputs.last.length == 0;
+        $scope.profileForm.errors.sex.isError = !$scope.sexOptions.selected || $scope.sexOptions.selected.length == 0 || $scope.sexOptions.selected == $scope.initialText;
+        $scope.profileForm.errors.phone.isError = !$scope.profileForm.inputs.phone || $scope.profileForm.inputs.phone.length == 0;
+        $scope.profileForm.errors.email.isError = !$scope.profileForm.inputs.email || $scope.profileForm.inputs.email.length == 0;
     };
 }]);

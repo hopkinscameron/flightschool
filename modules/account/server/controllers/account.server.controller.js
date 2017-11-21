@@ -33,10 +33,10 @@ var // the path
 // the valid credit card types
 var validCCTypes = [
     // credit card regex
-    { 'type': 'VISA', 'regex': /^4[0-9]{12}(?:[0-9]{3})?$/ },
-    { 'type': 'MASTERCARD', 'regex': /^(?:5[1-5][0-9]{2}|222[1-9]|22[3-9][0-9]|2[3-6][0-9]{2}|27[01][0-9]|2720)[0-9]{12}$/ },
-    { 'type': 'AMERICANEXPRESS', 'regex': /^3[47][0-9]{13}$/ },
-    { 'type': 'DISCOVER', 'regex': /^6(?:011|5[0-9]{2})[0-9]{12}$/ }
+    { 'type': 'Visa', 'regex': /^4[0-9]{12}(?:[0-9]{3})?$/ },
+    { 'type': 'MasterCard', 'regex': /^(?:5[1-5][0-9]{2}|222[1-9]|22[3-9][0-9]|2[3-6][0-9]{2}|27[01][0-9]|2720)[0-9]{12}$/ },
+    { 'type': 'American Express', 'regex': /^3[47][0-9]{13}$/ },
+    { 'type': 'Discover', 'regex': /^6(?:011|5[0-9]{2})[0-9]{12}$/ }
 ];
 
 /**
@@ -52,7 +52,7 @@ exports.read = function (req, res) {
  */
 exports.readProfile = function (req, res) {
     // create safe profile object
-    var user = User.toObject(req.user, { 'hide': 'tierId renewalDate subscribed homeLocation hubs maxHubs passwordUpdatedLast notificationNews notificationReminderEmail notificationResearch notificationReminderSMS' });
+    var user = User.toObject(req.user, { 'hide': 'tierId renewalDate subscribed homeLocation hubs maxHubs passwordUpdatedLast notificationNews notificationReminderEmail notificationResearch notificationReminderSMS paymentInfo' });
 
     // send data
     res.json({ 'd': user });
@@ -97,7 +97,7 @@ exports.updateProfile = function (req, res) {
             else {
                 // send internal error
                 res.status(500).send({ error: true, title: errorHandler.getErrorTitle({ code: 500 }), message: errorHandler.getGenericErrorMessage({ code: 500 }) });
-                console.log(clc.error(`In ${path.basename(__filename)} \'updateProfile\': ` + errorHandler.getDetailedErrorMessage({ code: 500 }) + ' Couldn\'t update User.'));
+                console.log(clc.error(`In ${path.basename(__filename)} \'updateProfile\': ` + errorHandler.getGenericErrorMessage({ code: 500 }) + ' Couldn\'t update User.'));
             }
         });
     }
@@ -200,7 +200,7 @@ exports.updatePassword = function (req, res, next) {
                                         else {
                                             // send internal error
                                             res.status(500).send({ error: true, title: errorHandler.getErrorTitle({ code: 500 }), message: errorHandler.getGenericErrorMessage({ code: 500 }) });
-                                            console.log(clc.error(`In ${path.basename(__filename)} \'changePassword\': ` + errorHandler.getDetailedErrorMessage({ code: 500 }) + ' Couldn\'t update User.'));
+                                            console.log(clc.error(`In ${path.basename(__filename)} \'changePassword\': ` + errorHandler.getGenericErrorMessage({ code: 500 }) + ' Couldn\'t update User.'));
                                         }
                                     });
                                 }
@@ -211,7 +211,7 @@ exports.updatePassword = function (req, res, next) {
                 else {
                     // send internal error
                     res.status(500).send({ error: true, title: errorHandler.getErrorTitle({ code: 500 }), message: errorHandler.getGenericErrorMessage({ code: 500 }) });
-                    console.log(clc.error(`In ${path.basename(__filename)} \'changePassword\': ` + errorHandler.getDetailedErrorMessage({ code: 500 }) + ' Couldn\'t find User.'));
+                    console.log(clc.error(`In ${path.basename(__filename)} \'changePassword\': ` + errorHandler.getGenericErrorMessage({ code: 500 }) + ' Couldn\'t find User.'));
                 }
             });
         }
@@ -227,11 +227,17 @@ exports.readPayment = function (req, res) {
 
     // if card on file
     if(user.paymentInfo) {
+        // set up some additional data
         user.paymentInfo.cardOnFile = true;
+        delete user.paymentInfo._id;
+
+        // merge payment info with main user object and delete nested object
+        _.merge(user, user.paymentInfo);
+        delete user.paymentInfo;
     }
 
     // send data
-    res.json({ 'd': user.paymentInfo });
+    res.json({ 'd': user });
 };
 
 /**
@@ -262,7 +268,7 @@ exports.updatePayment = function (req, res) {
     req.checkBody('expiration', 'You must have the expirtation date.').notEmpty();
     req.checkBody('expiration', 'Expirtation date needs to be in the string format of MMYY.').isString();
     req.checkBody('expiration', 'Expirtation date is not 4 digits in the format of MMYY.').isOfLength(4);
-    req.checkBody('expiration', `Expirtation date is not a valid date (must be the minumum date ${acceptableDateRangeForExpiration.minMonth}/${acceptableDateRangeForExpiration.minYear} and maximum date${acceptableDateRangeForExpiration.maxMonth}/${acceptableDateRangeForExpiration.maxYear} ).`).isValidExpMonthYear(acceptableDateRangeForExpiration);
+    req.checkBody('expiration', `Expirtation date is not a valid date (must be the minumum date ${acceptableDateRangeForExpiration.minMonth}/${acceptableDateRangeForExpiration.minYear} and maximum date ${acceptableDateRangeForExpiration.maxMonth}/${acceptableDateRangeForExpiration.maxYear} ).`).isValidExpMonthYear(acceptableDateRangeForExpiration);
     req.checkBody('name', 'You must have name of the holder.').notEmpty();
     req.checkBody('name', 'You must have name of the holder.').isString();
     req.checkBody('ccv', 'You must have the CCV number.').notEmpty();
@@ -307,7 +313,7 @@ exports.updatePayment = function (req, res) {
             if(!type) {
                 // send internal error
                 res.status(500).send({ error: true, title: errorHandler.getErrorTitle({ code: 500 }), message: errorHandler.getGenericErrorMessage({ code: 500 }) });
-                console.log(clc.error(`In ${path.basename(__filename)} \'updatePayment\': ` + errorHandler.getDetailedErrorMessage({ code: 500 }) + ' Couldn\'t get credit card type.'));
+                console.log(clc.error(`In ${path.basename(__filename)} \'updatePayment\': ` + errorHandler.getGenericErrorMessage({ code: 500 }) + ' Couldn\'t get credit card type.'));
             }
             else {
                 // create the updated values object
@@ -320,30 +326,59 @@ exports.updatePayment = function (req, res) {
                     'ccv': req.body.ccv
                 };
 
-                // save the values
-                PaymentType.save(updatedValues, function(err, savedPayment) {
-                    // if an error occurred
-                    if (err) {
-                        // send internal error
-                        res.status(500).send({ error: true, title: errorHandler.getErrorTitle(err), message: errorHandler.getGenericErrorMessage(err) });
-                        console.log(clc.error(errorHandler.getDetailedErrorMessage(err)));
-                    }
-                    else if (savedPayment) {
-                        // create the safe payment type object
-                        var safePaymentObj = createPaymentTypeReqObject(savedPayment);
+                // if there was a previous payment
+                if(req.user.paymentInfo) {
+                    // update the values
+                    PaymentType.update(req.user.paymentInfo, updatedValues, function(err, updatedPayment) {
+                        // if an error occurred
+                        if (err) {
+                            // send internal error
+                            res.status(500).send({ error: true, title: errorHandler.getErrorTitle(err), message: errorHandler.getGenericErrorMessage(err) });
+                            console.log(clc.error(errorHandler.getDetailedErrorMessage(err)));
+                        }
+                        else if (updatedPayment) {
+                            // create the safe payment type object
+                            var safePaymentObj = createPaymentTypeReqObject(updatedPayment);
 
-                        // set the updated object
-                        req.user.paymentInfo = safePaymentObj;
+                            // set the updated object
+                            req.user.paymentInfo = safePaymentObj;
 
-                        // read the profile
-                        module.exports.readProfile(req, res);
-                    }
-                    else {
-                        // send internal error
-                        res.status(500).send({ error: true, title: errorHandler.getErrorTitle({ code: 500 }), message: errorHandler.getGenericErrorMessage({ code: 500 }) });
-                        console.log(clc.error(`In ${path.basename(__filename)} \'updatePayment\': ` + errorHandler.getDetailedErrorMessage({ code: 500 }) + ' Couldn\'t save Payment Type.'));
-                    }
-                });
+                            // read the payment
+                            module.exports.readPayment(req, res);
+                        }
+                        else {
+                            // send internal error
+                            res.status(500).send({ error: true, title: errorHandler.getErrorTitle({ code: 500 }), message: errorHandler.getGenericErrorMessage({ code: 500 }) });
+                            console.log(clc.error(`In ${path.basename(__filename)} \'updatePayment\': ` + errorHandler.getGenericErrorMessage({ code: 500 }) + ' Couldn\'t update Payment Type.'));
+                        }
+                    });
+                }
+                else {
+                    // save the values
+                    PaymentType.save(updatedValues, function(err, savedPayment) {
+                        // if an error occurred
+                        if (err) {
+                            // send internal error
+                            res.status(500).send({ error: true, title: errorHandler.getErrorTitle(err), message: errorHandler.getGenericErrorMessage(err) });
+                            console.log(clc.error(errorHandler.getDetailedErrorMessage(err)));
+                        }
+                        else if (savedPayment) {
+                            // create the safe payment type object
+                            var safePaymentObj = createPaymentTypeReqObject(savedPayment);
+
+                            // set the updated object
+                            req.user.paymentInfo = safePaymentObj;
+
+                            // read the payment
+                            module.exports.readPayment(req, res);
+                        }
+                        else {
+                            // send internal error
+                            res.status(500).send({ error: true, title: errorHandler.getErrorTitle({ code: 500 }), message: errorHandler.getGenericErrorMessage({ code: 500 }) });
+                            console.log(clc.error(`In ${path.basename(__filename)} \'updatePayment\': ` + errorHandler.getGenericErrorMessage({ code: 500 }) + ' Couldn\'t save Payment Type.'));
+                        }
+                    });
+                }
             }
         }
     });
@@ -354,7 +389,7 @@ exports.updatePayment = function (req, res) {
  */
 exports.readHubs = function (req, res) {
     // create safe profile object
-    var user = User.toObject(req.user, { 'hide': 'firstName lastName sex email phone lastLogin tierId renewalDate subscribed passwordUpdatedLast notificationNews notificationReminderEmail notificationResearch notificationReminderSMS' });
+    var user = User.toObject(req.user, { 'hide': 'firstName lastName sex email phone lastLogin tierId renewalDate subscribed passwordUpdatedLast notificationNews notificationReminderEmail notificationResearch notificationReminderSMS paymentInfo' });
 
     // if home location exists
     if(user.homeLocation) {
@@ -467,7 +502,7 @@ exports.updateHubHome = function (req, res) {
                 else {
                     // send internal error
                     res.status(500).send({ error: true, title: errorHandler.getErrorTitle({ code: 500 }), message: errorHandler.getGenericErrorMessage({ code: 500 }) });
-                    console.log(clc.error(`In ${path.basename(__filename)} \'updateHubHome\': ` + errorHandler.getDetailedErrorMessage({ code: 500 }) + ' Couldn\'t update User.'));
+                    console.log(clc.error(`In ${path.basename(__filename)} \'updateHubHome\': ` + errorHandler.getGenericErrorMessage({ code: 500 }) + ' Couldn\'t update User.'));
                 }
             });
         }
@@ -509,7 +544,7 @@ exports.deleteHubHome = function (req, res) {
             else {
                 // send internal error
                 res.status(500).send({ error: true, title: errorHandler.getErrorTitle({ code: 500 }), message: errorHandler.getGenericErrorMessage({ code: 500 }) });
-                console.log(clc.error(`In ${path.basename(__filename)} \'deleteHubHome\': ` + errorHandler.getDetailedErrorMessage({ code: 500 }) + ' Couldn\'t update User.'));
+                console.log(clc.error(`In ${path.basename(__filename)} \'deleteHubHome\': ` + errorHandler.getGenericErrorMessage({ code: 500 }) + ' Couldn\'t update User.'));
             }
         });
     }
@@ -648,7 +683,7 @@ exports.upsertHub = function (req, res) {
                         else {
                             // send internal error
                             res.status(500).send({ error: true, title: errorHandler.getErrorTitle({ code: 500 }), message: errorHandler.getGenericErrorMessage({ code: 500 }) });
-                            console.log(clc.error(`In ${path.basename(__filename)} \'upsertHub\': ` + errorHandler.getDetailedErrorMessage({ code: 500 }) + ' Couldn\'t update User.'));
+                            console.log(clc.error(`In ${path.basename(__filename)} \'upsertHub\': ` + errorHandler.getGenericErrorMessage({ code: 500 }) + ' Couldn\'t update User.'));
                         }
                     });
                 }
@@ -696,7 +731,7 @@ exports.deleteHub = function (req, res) {
             else {
                 // send internal error
                 res.status(500).send({ error: true, title: errorHandler.getErrorTitle({ code: 500 }), message: errorHandler.getGenericErrorMessage({ code: 500 }) });
-                console.log(clc.error(`In ${path.basename(__filename)} \'deleteHub\': ` + errorHandler.getDetailedErrorMessage({ code: 500 }) + ' Couldn\'t update User.'));
+                console.log(clc.error(`In ${path.basename(__filename)} \'deleteHub\': ` + errorHandler.getGenericErrorMessage({ code: 500 }) + ' Couldn\'t update User.'));
             }
         });
     }
@@ -711,7 +746,7 @@ exports.deleteHub = function (req, res) {
  */
 exports.readMembership = function (req, res) {
     // create safe profile object
-    var user = User.toObject(req.user, { 'hide': 'firstName lastName sex email phone lastLogin passwordUpdatedLast homeLocation hubs maxHubs notificationNews notificationReminderEmail notificationResearch notificationReminderSMS' });
+    var user = User.toObject(req.user, { 'hide': 'firstName lastName sex email phone lastLogin passwordUpdatedLast homeLocation hubs maxHubs notificationNews notificationReminderEmail notificationResearch notificationReminderSMS paymentInfo' });
 
     // send data
     res.json({ 'd': user });
@@ -762,7 +797,7 @@ exports.cancelMembership = function (req, res) {
             else {
                 // send internal error
                 res.status(500).send({ error: true, title: errorHandler.getErrorTitle({ code: 500 }), message: errorHandler.getGenericErrorMessage({ code: 500 }) });
-                console.log(clc.error(`In ${path.basename(__filename)} \'cancelMembership\': ` + errorHandler.getDetailedErrorMessage({ code: 500 }) + ' Couldn\'t update User.'));
+                console.log(clc.error(`In ${path.basename(__filename)} \'cancelMembership\': ` + errorHandler.getGenericErrorMessage({ code: 500 }) + ' Couldn\'t update User.'));
             }
         });
     }
@@ -777,7 +812,7 @@ exports.cancelMembership = function (req, res) {
  */
 exports.readNotifications = function (req, res) {
     // create safe profile object
-    var user = User.toObject(req.user, { 'hide': 'firstName lastName sex email phone lastLogin tierId renewalDate subscribed passwordUpdatedLast homeLocation hubs maxHubs' });
+    var user = User.toObject(req.user, { 'hide': 'firstName lastName sex email phone lastLogin tierId renewalDate subscribed passwordUpdatedLast homeLocation hubs maxHubs paymentInfo' });
 
     // send data
     res.json({ 'd': user });
@@ -789,7 +824,10 @@ exports.readNotifications = function (req, res) {
 exports.updateNotifications = function (req, res) {
     // create the updated values object
     var updatedValues = {
-        
+        'notificationNews': req.body.notificationNews,
+        'notificationReminderEmail': req.body.notificationReminderEmail,
+        'notificationResearch': req.body.notificationResearch,
+        'notificationReminderSMS': req.body.notificationReminderSMS
     };
 
     // remove all undefined members
@@ -797,7 +835,30 @@ exports.updateNotifications = function (req, res) {
 
     // if there is something to update
     if(Object.keys(updatedValues).length > 0) {
+        // update the values
+        User.update(req.user, updatedValues, function(err, updatedUser) {
+            // if an error occurred
+            if (err) {
+                // send internal error
+                res.status(500).send({ error: true, title: errorHandler.getErrorTitle(err), message: errorHandler.getGenericErrorMessage(err) });
+                console.log(clc.error(errorHandler.getDetailedErrorMessage(err)));
+            }
+            else if (updatedUser) {
+                // create the safe user object
+                var safeUserObj = createUserReqObject(updatedUser);
 
+                // set the updated object
+                req.user = safeUserObj;
+
+                // read the notifications
+                module.exports.readNotifications(req, res);
+            }
+            else {
+                // send internal error
+                res.status(500).send({ error: true, title: errorHandler.getErrorTitle({ code: 500 }), message: errorHandler.getGenericErrorMessage({ code: 500 }) });
+                console.log(clc.error(`In ${path.basename(__filename)} \'updateNotifications\': ` + errorHandler.getGenericErrorMessage({ code: 500 }) + ' Couldn\'t update User.'));
+            }
+        });
     }
     else {
         // read the notifications
@@ -949,12 +1010,11 @@ function createPaymentTypeReqObject(pt) {
     // clone to not overwrite
     var safeObj = _.cloneDeep(pt);
 
+    // save the id since it will be lost when going to object
     // hide the information for security purposes
+    var id = safeObj._id;
     safeObj = PaymentType.toObject(safeObj, { 'hide': 'created internalName ccv userId' });
-
-    // set the last 4 digits and delete the full number
-    safeObj.lastFour = safeObj.number.substring(safeObj.number.length - 4);
-    delete safeObj.number;
+    safeObj._id = id;
 
     // return the safe obj
     return safeObj;

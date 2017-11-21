@@ -253,8 +253,11 @@ exports.update = function(query, updatedObj, callback) {
     // the error to return
     var err = null;
 
+    // the query to search on (only seach on _id since all other data is encrypted)
+    var newQuery = { '_id': query._id };
+
     // find the object matching the object index
-    var index = _.findIndex(db, query);
+    var index = _.findIndex(db, newQuery);
     obj = index != -1 ? db[index] : null;
 
     // if object was found

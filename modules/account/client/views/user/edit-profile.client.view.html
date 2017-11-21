@@ -4,68 +4,52 @@
     <div class="card-body">
         <!-- Begin Profile Form -->
         <div class="col-md-10 mx-auto">
-            <div style="padding-bottom: 24px;" ng-if="!profileForm.errors.isError"></div>
-            <div ng-if="profileForm.errors.isError">
-                <span style="color: red;">{{profileForm.errors.errorMessage}}</span>
+            <div ng-if="profileForm.errors.generic.isError">
+                <span style="color: red;">{{profileForm.errors.generic.message}}</span>
             </div>
             <!-- Begin Profile Form -->
-            <form class="form-group mb-0" ng-submit="updateProfile()">
+            <form class="form-group mb-0" ng-submit="updateProfile()" novalidate>
                 <!-- Begin First Name -->
                 <div class="form-group">
                     <label class="col-form-label" for="first">First Name <span style="color: red;">*</span></label>
-                    <div class="input-group" ng-class="{'has-danger': profileForm.errors.first}">
-                        <span class="input-group-addon">
-                            <i class="fa fa-user" aria-hidden="true"></i>
-                        </span>
-                        <input class="form-control form-control-danger" type="text" name="first" placeholder="First Name" id="first" ng-model="profileForm.inputs.first" ng-focus="viewFocusEnter(profileForm.views.first)" ng-blur="viewFocusLeave(profileForm.views.first)" ng-disabled="formInTransit">
-                    </div>
+                    <input class="form-control" ng-class="{'is-invalid': profileForm.errors.first.isError}" type="text" name="first" placeholder="First Name" id="first" ng-model="profileForm.inputs.first" ng-disabled="formInTransit" required>
+                    <small class="invalid-feedback">{{profileForm.errors.first.message}}</small>
                 </div>
                 <!-- End First Name -->
                 <!-- Begin Last Name -->
                 <div class="form-group">
                     <label class="col-form-label" for="last">Last Name <span style="color: red;">*</span></label>
-                    <div class="input-group" ng-class="{'has-danger': profileForm.errors.last}">
-                        <span class="input-group-addon">
-                            <i class="fa fa-user" aria-hidden="true"></i>
-                        </span>
-                        <input class="form-control form-control-danger" type="text" name="last" placeholder="Last Name" id="last" ng-model="profileForm.inputs.last" ng-focus="viewFocusEnter(profileForm.views.last)" ng-blur="viewFocusLeave(profileForm.views.last)" ng-disabled="formInTransit">
-                    </div>
+                    <input class="form-control" ng-class="{'is-invalid': profileForm.errors.last.isError}" type="text" name="last" placeholder="Last Name" id="last" ng-model="profileForm.inputs.last" ng-disabled="formInTransit" required>
+                    <small class="invalid-feedback">{{profileForm.errors.last.message}}</small>
                 </div>
                 <!-- End Last Name -->
                 <!-- Begin Sex -->
                 <div class="form-group">
                     Select your sex
-                    <select id="serviceTypeOptionsSelect" ng-model="sexOptions.selected" class="form-control" ng-change="checkSelection(profileForm.views.sex)" ng-disabled="formInTransit">
+                    <select id="serviceTypeOptionsSelect" ng-model="sexOptions.selected" class="form-control" ng-class="{'is-invalid': profileForm.errors.sex.isError}" ng-disabled="formInTransit" required>
                         <option ng-repeat="s in sexOptions.options">{{s}}</option>
                     </select>
+                    <small class="invalid-feedback">{{profileForm.errors.sex.message}}</small>
                 </div>
                 <!-- End Sex -->
                 <!-- Begin Phone Number -->
                 <div class="form-group">
                     <label class="col-form-label" for="phone">Phone Number <span style="color: red;">*</span></label>
-                    <div class="input-group" ng-class="{'has-danger': profileForm.errors.phone}">
-                        <span class="input-group-addon">
-                            <i class="fa fa-phone" aria-hidden="true"></i>
-                        </span>
-                        <input class="form-control form-control-danger" type="phone" name="phone" placeholder="555-555-5555" id="phone" ng-model="profileForm.inputs.phone" ng-focus="viewFocusEnter(profileForm.views.phone)" ng-blur="viewFocusLeave(profileForm.views.phone)" ng-disabled="formInTransit">
-                    </div>
+                    <input class="form-control" ng-class="{'is-invalid': profileForm.errors.phone.isError}" type="phone" name="phone" placeholder="555-555-5555" id="phone" ng-model="profileForm.inputs.phone" ng-disabled="formInTransit" required>
+                    <small class="invalid-feedback">{{profileForm.errors.phone.message}}</small>
                 </div>
                 <!-- End Phone Number -->
                 <!-- Begin Email -->
                 <div class="form-group">
                     <label class="col-form-label" for="email">Email <span style="color: red;">*</span></label>
-                    <div class="input-group" ng-class="{'has-danger': profileForm.errors.email}">
-                        <span class="input-group-addon">
-                            <i class="fa fa-envelope-o" aria-hidden="true"></i>
-                        </span>
-                        <input class="form-control form-control-danger" type="email" name="email" placeholder="example@example.com" id="email" ng-model="profileForm.inputs.email" ng-focus="viewFocusEnter(profileForm.views.email)" ng-blur="viewFocusLeave(profileForm.views.email)" ng-disabled="formInTransit">
-                    </div>
+                    <input class="form-control" ng-class="{'is-invalid': profileForm.errors.email.isError}" type="email" name="email" placeholder="example@example.com" id="email" ng-model="profileForm.inputs.email" ng-disabled="formInTransit" required>
+                    <small class="invalid-feedback">{{profileForm.errors.email.message}}</small>
                 </div>
                 <!-- End Email -->
                 <!-- Begin Save Button -->
                 <div class="row mb-2">
                     <div class="col text-left">
-                        <button type="submit" class="btn btn-theme-primary btn-cursor-pointer" ng-class="{'w-100': $root.isDeviceWidthSmallerThan(426)}" ng-disabled="formInTransit || profileForm.errors.isError">Save</button>
+                        <button type="submit" class="btn btn-theme-primary btn-cursor-pointer" ng-class="{'w-100': $root.isDeviceWidthSmallerThan(426)}" ng-disabled="formInTransit">Save</button>
                     </div>
                 </div>
                 <!-- End Save Button -->

@@ -211,14 +211,13 @@ module.exports.initMiddleware = function (app) {
                     month = parseInt(value.substring(0, 2));
                     year = parseInt(value.substring(2));
 
-                    // if month is not between these two values
-                    if(month < range.minMonth || month > range.maxMonth) {
+                    // if not valid
+                    if(numericValue == NaN) {
                         return false;
                     }
-                    // if year is not between these two values
-                    else if(year < range.minYear || year > range.maxYear) {
-                        return false;
-                    }
+
+                    // year must be greater than minium year or year must be the minimum year and the month has to be greater than the current month of the minimum year
+                    return year > range.minYear || (month > range.minMonth && year >= range.minYear);
                 }
                 catch (e) {
                     return false;

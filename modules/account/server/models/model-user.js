@@ -326,7 +326,7 @@ exports.update = function(query, updatedObj, callback) {
     var err = null;
 
     // find the object matching the object index
-    var index = _.findIndex(db, query);
+    var index = _.findIndex(db, { '_id': query._id });
     obj = index != -1 ? db[index] : null;
 
     // if object was found

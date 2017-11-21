@@ -1,0 +1,79 @@
+﻿<!-- Begin User Home Page -->
+<section ng-controller="UserHomeController">
+    <!-- Begin Container -->
+    <div class="container">
+        <!-- Begin Page Fully Loaded With Errors -->
+        <div id="pageShow" class="collapse" ng-if="pageFullyLoaded && error.error">
+            <div ng-controller="ErrorController" ng-init="init(error.title, error.status, error.message)">
+                <div ng-include="'/modules/core/client/views/error.client.view.html'"></div>
+            </div>
+        </div>
+        <!-- End Page Fully Loaded With Errors -->
+        <!-- Begin Page Fully Loaded With No Errors -->
+        <div id="pageShow" class="animated animation-delay--md fadeIn collapse" ng-if="pageFullyLoaded && !error.error">
+            <!-- Begin Content Header -->
+            <div class="jumbotron jumbotron-radius--none jumbotron-color--opacity-black jumbotron-fixed-height text-center mb-0">
+                <h1 class="font-fancy--2 text-color--white" ng-class="{'mb-0': home.pageSubHeader.length == 0}">{{home.pageHeader}}</h1>
+                <h5 class="mb-0 text-color--white">{{home.pageSubHeader}}</h5>
+            </div>
+            <!-- End Content Header -->
+            <!-- Begin Content Body -->
+            <div class="card card--border--none card--radius--none card-body box-shadow--sm card-min-height">
+                <!-- Begin Flight Search -->
+                <div id="home-search-form" class="col-md-12">
+                    <form class="form-group" ng-submit="searchFlights()" novalidate>
+                        <div class="form-row">
+                            <!-- Begin Depart -->
+                            <div class="form-group col">
+                                <label class="col-form-label" for="depart">Depart</label>
+                                <input class="form-control form-control-lg form-control-danger" ng-class="{'is-invalid': searchForm.errors.depart.isError}" type="text" name="depart" placeholder="LAX" id="depart" ng-model="searchForm.inputs.depart" ng-disabled="formInTransit" required>
+                                <small class="invalid-feedback">{{searchForm.errors.depart.message}}</small>
+                            </div>
+                            <!-- End Depart -->
+                            <!-- Begin Arrive -->
+                            <div class="form-group col">
+                                <label class="col-form-label" for="arrive">Arrive</label>
+                                <input class="form-control form-control-lg form-control-danger" ng-class="{'is-invalid': searchForm.errors.arrive.isError}" type="text" name="arrive" placeholder="DTW" id="arrive" ng-model="searchForm.inputs.arrive" ng-disabled="formInTransit" required>
+                                <small class="invalid-feedback">{{searchForm.errors.arrive.message}}</small>
+                            </div>
+                            <!-- End Arrive -->
+                            <!-- Begin Depart Date -->
+                            <div class="form-group col-md-3">
+                                <label class="col-form-label" for="departDate">Depart Date</label>
+                                <input class="form-control form-control-lg form-control-danger" ng-class="{'is-invalid': searchForm.errors.departDate.isError}" type="date" name="departDate" placeholder="Depart Date" id="departDate" ng-model="searchForm.inputs.departDate" ng-disabled="formInTransit" required>
+                                <small class="invalid-feedback">{{searchForm.errors.departDate.message}}</small>
+                            </div>
+                            <!-- End Depart Date -->
+                            <!-- Begin Return Date -->
+                            <div class="form-group col-md-3">
+                                <label class="col-form-label" for="returnDate">Return Date</label>
+                                <input class="form-control form-control-lg form-control-danger" ng-class="{'is-invalid': searchForm.errors.returnDate.isError}" type="date" name="returnDate" placeholder="Return Date" id="returnDate" ng-model="searchForm.inputs.returnDate" ng-disabled="formInTransit" required>
+                                <small class="invalid-feedback">{{searchForm.errors.returnDate.message}}</small>
+                            </div>
+                            <!-- End Return Date -->
+                            <!-- Begin Adults -->
+                            <div class="form-group col-md-1">
+                                <label class="col-form-label" for="adults">Adults</label>
+                                <input class="form-control form-control-lg form-control-danger" ng-class="{'is-invalid': searchForm.errors.adults.isError}" type="number" name="adults" id="adults" min="1" max="8" ng-model="searchForm.inputs.adults" ng-disabled="formInTransit" required>
+                                <small class="invalid-feedback">{{searchForm.errors.adults.message}}</small>
+                            </div>
+                            <!-- End Adults -->
+                        </div>
+                        <!-- Begin Search Button -->
+                        <div class="row">
+                            <div class="col text-right">
+                                <button type="submit" class="btn btn-theme-primary btn-cursor-pointer" ng-class="{'w-100': $root.isDeviceWidthSmallerThan(426)}" ng-disabled="formInTransit">Search</button>
+                            </div>
+                        </div>
+                        <!-- End Search Button -->
+                    </form>
+                </div>                
+                <!-- End Flight Search -->
+            </div>
+            <!-- End Content Body -->
+        </div>
+        <!-- End Page Fully Loaded With No Errors -->
+    </div>
+    <!-- End Container -->
+</section>
+<!-- Begin User Home Page -->

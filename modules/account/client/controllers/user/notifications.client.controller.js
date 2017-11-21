@@ -73,10 +73,6 @@ accountModule.controller('NotificationsController', ['$scope', '$rootScope', '$l
                     confirmButtonClass: 'btn btn-theme-primary btn-cursor-pointer',
                     buttonsStyling: false
                 }).then(function () {
-                    // show error
-                    $scope.notificationsForm.errors.errorMessage = responseUN.message;
-                    $scope.notificationsForm.errors.isError = true;
-
                     // show the form is no longer in transit
                     $scope.formInTransit = false;
 
@@ -85,10 +81,6 @@ accountModule.controller('NotificationsController', ['$scope', '$rootScope', '$l
                 },
                 // handling the promise rejection
                 function (dismiss) {
-                    // show error
-                    $scope.notificationsForm.errors.errorMessage = responseUN.message;
-                    $scope.notificationsForm.errors.isError = true;
-
                     // show the form is no longer in transit
                     $scope.formInTransit = false;
 
@@ -106,10 +98,6 @@ accountModule.controller('NotificationsController', ['$scope', '$rootScope', '$l
                 confirmButtonClass: 'btn btn-theme-primary btn-cursor-pointer',
                 buttonsStyling: false
             }).then(function () {
-                // show error
-                $scope.notificationsForm.errors.errorMessage = responseUN.message;
-                $scope.notificationsForm.errors.isError = true;
-
                 // show the form is no longer in transit
                 $scope.formInTransit = false;
 
@@ -118,10 +106,6 @@ accountModule.controller('NotificationsController', ['$scope', '$rootScope', '$l
             },
             // handling the promise rejection
             function (dismiss) {
-                // show error
-                $scope.notificationsForm.errors.errorMessage = responseUN.message;
-                $scope.notificationsForm.errors.isError = true;
-
                 // show the form is no longer in transit
                 $scope.formInTransit = false;
 

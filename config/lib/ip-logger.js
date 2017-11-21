@@ -169,7 +169,7 @@ function logPageRequest(accessedBy, pageRequested, requestType) {
 				}
 				else if(!updatedBlog) {
 					// log internal error
-                    console.log(clc.error(`In ${path.basename(__filename)} \'logPageRequest\': ` + errorHandler.getDetailedErrorMessage({ code: 500 }) + ' Couldn\'t update Analytics.'));
+                    console.log(clc.error(`In ${path.basename(__filename)} \'logPageRequest\': ` + errorHandler.getGenericErrorMessage({ code: 500 }) + ' Couldn\'t update Analytics.'));
 				}
 			});
 			*/
@@ -192,7 +192,7 @@ function logPageRequest(accessedBy, pageRequested, requestType) {
 				}
 				else if(!newAnalyticsPage) {
 					// log internal error
-                    console.log(clc.error(`In ${path.basename(__filename)} \'logPageRequest\': ` + errorHandler.getDetailedErrorMessage({ code: 500 }) + ' Couldn\'t save Analytics.'));
+                    console.log(clc.error(`In ${path.basename(__filename)} \'logPageRequest\': ` + errorHandler.getGenericErrorMessage({ code: 500 }) + ' Couldn\'t save Analytics.'));
 				}
 			});
 			*/

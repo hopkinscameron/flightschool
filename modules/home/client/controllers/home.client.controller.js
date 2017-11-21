@@ -98,7 +98,7 @@ homeModule.controller('HomeController', ['$scope', '$rootScope', '$compile', '$l
                 $scope.home.data = responseH;
                 $scope.home.title = 'Home';
                 $scope.home.pageHeader = $scope.home.title;
-                $scope.home.pageSubHeader = 'Oh no! Can\'t find what you\'re looking for?';
+                $scope.home.pageSubHeader = 'Welcome, take a stroll through what WanderLust is all about!';
 
                 // holds the page title
                 $scope.pageTitle = $scope.home.title + ' | ' + ApplicationConfiguration.applicationName;
@@ -168,8 +168,7 @@ homeModule.controller('HomeController', ['$scope', '$rootScope', '$compile', '$l
 
         // initialize the waypoint list
         var waypointList = [
-            { id: 'home-services', offset: startOffset, class: 'animated fadeIn' },
-            { id: 'home-slider', offset: startOffset, class: 'animated fadeIn' }
+            { id: 'home-FIXME', offset: startOffset, class: 'animated fadeIn' }
         ];
 
         // set up waypoints

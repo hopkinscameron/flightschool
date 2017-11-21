@@ -2,6 +2,7 @@
 - finsih account getting/updating on server side
 
 Next
+- add a "confirm password" input during a sign up
 - add an "error dashboard" so if there are errors in server, we can view them
 - if I have the html editor up on page load, and I exit out, I can't get the other content to show
 - use 'https://api.ipify.org?format=json' if can't use other tool to get ip address
@@ -29,3 +30,23 @@ Ideas
     - when correct login, login like normal
     - when incorrect login, show form with error
 - User can only change Hubs every so often (to prevent people from continuously changing)
+
+ $routeProvider.when('/someRoute', {
+    templateUrl: 'someTemplate.html',
+    resolve: {
+        factory: checkAuth
+    }
+ });
+
+
+var checkAuth = function ($q, $rootScope, $location) {
+    var deferred = $q.defer();
+
+    if authenticated
+        $location.path('/login');
+        deferred.resolve(true);
+    else
+        deferred.reject();
+        $location.path('/home');
+    return deferred.promise;
+ };
