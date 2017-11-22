@@ -130,6 +130,14 @@ var UserSchema = {
         type: Number,
         default: 0
     },
+    airlinePreferences: {
+        type: Array,
+        default: new Array()
+    },
+    airlineNonPreferences: {
+        type: Array,
+        default: new Array()
+    },
     notificationNews: {
         type: Boolean,
         default: true

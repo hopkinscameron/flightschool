@@ -26,6 +26,7 @@ module.exports = {
                 'public/lib/angular/angular-mocks.js',
                 'public/lib/angular/angular-resource.js',
                 'public/lib/angular-loading-bar/loading-bar.js',
+                'public/lib/angular-ui-bootstrap/ui-bootstrap-tpls-2.5.0.js',
                 'public/lib/tinymce/tinymce.js',
                 'public/lib/angular-ui-tinymce/src/tinymce.js',
                 'public/lib/bootstrap/bootstrap.js',

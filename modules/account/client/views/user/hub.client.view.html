@@ -12,7 +12,8 @@
                     <div class="card card-body card--light-light">
                         <span class="d-block text-right" style="margin-top: -15px; margin-right: -5px;"><i class="fa fa-times text-danger btn-cursor-pointer" aria-hidden="true" ng-click="deleteHomeLocation()"></i></span>
                         <h4 class="font-weight-bold">{{hub.data.homeLocation.name}}</h4>
-                        <p>Airport: <span class="font-weight-bold">{{hub.data.homeLocation.iata}} ({{hub.data.homeLocation.city}})</span></p>
+                        <p class="mb-0">Airport: <span class="font-weight-bold">{{hub.data.homeLocation.iata}}</span></p>
+                        <p>City: <span class="font-weight-bold">{{hub.data.homeLocation.city}}</span></p>
                         <button class="btn btn-theme-primary btn-cursor-pointer" ng-click="editHomeLocation(tmpHub)">Edit</button>
                     </div>
                 </div>
@@ -40,7 +41,8 @@
                     <div class="card card-body card--light-light">
                         <span class="d-block text-right" style="margin-top: -15px; margin-right: -5px;"><i class="fa fa-times text-danger btn-cursor-pointer" aria-hidden="true" ng-click="deleteHub($index)"></i></span>
                         <p class="mb-0 font-weight-bold">{{tmpHub.name}}</p>
-                        <p class="">Airport: <span class="font-weight-bold">{{tmpHub.iata}}</span></p>
+                        <p class="mb-0">Airport: <span class="font-weight-bold">{{tmpHub.iata}}</span></p>
+                        <p>City: <span class="font-weight-bold">{{tmpHub.city}}</span></p>
                         <button class="btn btn-theme-primary btn-cursor-pointer w-100" ng-click="editHub($index)">Edit</button>
                     </div>
                 </div>

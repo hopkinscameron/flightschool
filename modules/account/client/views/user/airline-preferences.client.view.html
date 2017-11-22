@@ -1,0 +1,41 @@
+<!-- Begin Airline Preferences Page -->
+<section ng-controller="AirlinePreferencesController">
+    <!-- Begin Container -->
+    <div class="card-body">
+        <!-- Begin Airline Preferences Form -->
+        <div class="col-md-10 mx-auto">
+            <form class="form-group mb-0 typeahead-custom" ng-submit="updateAirlinePreferences()" autocomplete="off" novalidate>
+                <!-- Begin Preferences -->
+                <p>What airlines do you <span class="font-weight-bold">prefer</span>?</p>
+                <div class="form-row">
+                    <div class="form-group col-md-6" ng-repeat="p in preferencesForm.inputs.preferences track by $index">
+                        <label class="col-form-label" for="preference{{$index}}">Preference {{$index + 1}}</label>
+                        <input class="col-md-9 form-control" ng-class="{'is-invalid': p.error.isError}" type="text" name="preference{{$index}}" placeholder="Search for..." id="preference{{$index}}" ng-model="p.value" uib-typeahead="airport.name for airport in $root.airlines | filter : $viewValue | limitTo : 8" ng-disabled="formInTransit" required>
+                        <small class="invalid-feedback">{{p.error.message}}</small>  
+                    </div>
+                </div>
+                <!-- End Preferences -->
+                <!-- Begin Non Preferences -->
+                <p class="mt-2">What airlines do you prefer <span class="font-weight-bold">not</span> to be on?</p>
+                <div class="form-row">
+                    <div class="form-group col-md-6" ng-repeat="np in preferencesForm.inputs.nonPreferences track by $index">
+                        <label class="col-form-label" for="nonPreference{{$index}}">Non Preference {{$index + 1}}</label>                        
+                        <input class="col-md-9 form-control" ng-class="{'is-invalid': np.error.isError}" type="text" name="nonPreference{{$index}}" placeholder="Search for..." id="nonPreference{{$index}}" ng-model="np.value" uib-typeahead="airport.name for airport in $root.airlines | filter : $viewValue | limitTo : 8" ng-disabled="formInTransit" required>
+                        <small class="invalid-feedback">{{np.error.message}}</small>    
+                    </div>
+                </div>
+                <!-- End Non Preferences -->
+                <!-- Begin Save Button -->
+                <div class="row mb-2">
+                    <div class="col text-left">
+                        <button type="submit" class="btn btn-theme-primary btn-cursor-pointer" ng-class="{'w-100': $root.isDeviceWidthSmallerThan(426)}" ng-disabled="formInTransit">Save</button>
+                    </div>
+                </div>
+                <!-- End Save Button -->
+            </form>
+        </div>
+        <!-- End Airline Preferences Form -->
+    </div>
+    <!-- End Container -->
+</section>
+<!-- End Airline Preferences Page -->

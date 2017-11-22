@@ -69,8 +69,8 @@ accountModule.controller('PaymentInformationController', ['$scope', '$rootScope'
 
     // update payment information
     $scope.updatePaymentInformation = function () {
-        // check for empty values
-        checkEmptyValues();
+        // check for any errors in the values
+        checkErrorValues();
 
         // check if an error exists
         if(!$scope.paymentInformationForm.errors.name.isError && !$scope.paymentInformationForm.errors.number.isError && !$scope.paymentInformationForm.errors.expirationMM.isError && !$scope.paymentInformationForm.errors.expirationYY.isError && !$scope.paymentInformationForm.errors.ccv.isError) {
@@ -289,8 +289,8 @@ accountModule.controller('PaymentInformationController', ['$scope', '$rootScope'
         };
     };
 
-    // checks for any empty values
-    function checkEmptyValues() {
+    // checks for any errors in the values
+    function checkErrorValues() {
         // get the actual value (integer value will not have leading zero)
         var ccvActual = document.getElementById('ccv').value;
         var monthActual = document.getElementById('expirationMM').value;

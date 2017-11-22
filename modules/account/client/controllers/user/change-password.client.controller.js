@@ -59,8 +59,8 @@ accountModule.controller('ChangePasswordController', ['$scope', '$rootScope', '$
 
     // update password
     $scope.updatePassword = function () {
-        // check for empty values
-        checkEmptyValues();
+        // check for any errors in the values
+        checkErrorValues();
 
         // check if an error exists
         if(!$scope.changePasswordForm.errors.old.isError && !$scope.changePasswordForm.errors.new.isError && !$scope.changePasswordForm.errors.confirm.isError) {
@@ -181,8 +181,8 @@ accountModule.controller('ChangePasswordController', ['$scope', '$rootScope', '$
         $scope.$emit('updateAccountPage', data);
     };
 
-    // checks for any empty values
-    function checkEmptyValues() {
+    // checks for any errors in the values
+    function checkErrorValues() {
         // get strength result
         var strengthResult = owasp.test($scope.changePasswordForm.inputs.new).errors.length;
 

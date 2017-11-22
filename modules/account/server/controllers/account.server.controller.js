@@ -17,8 +17,18 @@ var // the path
     fs = require('fs'),
     // the helper functions
     helpers = require(path.resolve('./config/lib/global-model-helpers')),
+    // the path to credit card types
+    ccTypesDetailsPath = path.join(__dirname, '../data/ccTypes.json'),
+    // valid credit card types
+    validCCTypes = [],
+    // the path to airport codes
+    airportCodesDetailsPath = path.join(__dirname, '../data/airports.json'),
     // airport codes
-    airportCodes = require('airport-codes').toJSON(),
+    airportCodes = [],
+    // the path to airlines
+    airlinesDetailsPath = path.join(__dirname, '../data/airlines.json'),
+    // airlines
+    airlines = [],
     // the path to the file details for this view
     accountDetailsPath = path.join(__dirname, '../data/account.json'),
     // the file details for this view
@@ -31,15 +41,6 @@ var // the path
     Tier = require(path.resolve('./modules/account/server/models/model-tier')),
     // the User model
     User = require(path.resolve('./modules/account/server/models/model-user'));
-
-// the valid credit card types
-var validCCTypes = [
-    // credit card regex
-    { 'type': 'Visa', 'regex': /^4[0-9]{12}(?:[0-9]{3})?$/ },
-    { 'type': 'MasterCard', 'regex': /^(?:5[1-5][0-9]{2}|222[1-9]|22[3-9][0-9]|2[3-6][0-9]{2}|27[01][0-9]|2720)[0-9]{12}$/ },
-    { 'type': 'American Express', 'regex': /^3[47][0-9]{13}$/ },
-    { 'type': 'Discover', 'regex': /^6(?:011|5[0-9]{2})[0-9]{12}$/ }
-];
 
 /**
  * Show the current page
@@ -54,7 +55,7 @@ exports.read = function (req, res) {
  */
 exports.readProfile = function (req, res) {
     // create safe profile object
-    var user = User.toObject(req.user, { 'hide': 'tierId renewalDate subscribed homeLocation hubs maxHubs passwordUpdatedLast notificationNews notificationReminderEmail notificationResearch notificationReminderSMS paymentInfo' });
+    var user = User.toObject(req.user, { 'hide': 'tierId renewalDate subscribed homeLocation hubs maxHubs airlinePreferences airlineNonPreferences passwordUpdatedLast notificationNews notificationReminderEmail notificationResearch notificationReminderSMS paymentInfo' });
 
     // send data
     res.json({ 'd': user });
@@ -226,7 +227,7 @@ exports.updatePassword = function (req, res, next) {
  */
 exports.readPayment = function (req, res) {
     // create safe profile object
-    var user = User.toObject(req.user, { 'hide': 'created displayName firstName lastName sex email phone lastLogin tierId renewalDate subscribed homeLocation hubs maxHubs passwordUpdatedLast notificationNews notificationReminderEmail notificationResearch notificationReminderSMS' });
+    var user = User.toObject(req.user, { 'hide': 'created displayName firstName lastName sex email phone lastLogin tierId renewalDate subscribed homeLocation hubs maxHubs airlinePreferences airlineNonPreferences passwordUpdatedLast notificationNews notificationReminderEmail notificationResearch notificationReminderSMS' });
 
     // if card on file
     if(user.paymentInfo) {
@@ -392,7 +393,7 @@ exports.updatePayment = function (req, res) {
  */
 exports.readHubs = function (req, res) {
     // create safe profile object
-    var user = User.toObject(req.user, { 'hide': 'created displayName firstName lastName sex email phone lastLogin tierId renewalDate subscribed passwordUpdatedLast notificationNews notificationReminderEmail notificationResearch notificationReminderSMS paymentInfo' });
+    var user = User.toObject(req.user, { 'hide': 'created displayName firstName lastName sex email phone lastLogin tierId renewalDate subscribed passwordUpdatedLast airlinePreferences airlineNonPreferences notificationNews notificationReminderEmail notificationResearch notificationReminderSMS paymentInfo' });
 
     // if home location exists
     if(user.homeLocation) {
@@ -438,7 +439,7 @@ exports.updateHubHome = function (req, res) {
     req.checkBody('homeLocation', `You must have a location. Must have key of iata or icao.`).notEmpty();
     req.checkBody('homeLocation.iata', `${req.body.homeLocation.iata} is not a valid location. Must have key of iata or icao.`).isString();
     req.checkBody('homeLocation.icao', `${req.body.homeLocation.icao} is not a valid location. Must have key of iata or icao.`).isString();
-    req.checkBody('homeLocation', `There is no airport based on this this location '${req.body.homeLocation.iata}' & '${req.body.homeLocation.icao}'.`).exists(airportCodes);
+    req.checkBody('homeLocation', `There is no airport based on this this location '${req.body.homeLocation.iata}' & '${req.body.homeLocation.icao}'.`).existsInArray(airportCodes);
 
     // validate errors
     req.getValidationResult().then(function(errors) {
@@ -565,7 +566,7 @@ exports.upsertHub = function (req, res) {
     req.checkBody('newHub', `New Hub is not a valid location. Must have key of iata or icao.`).notEmpty();
     req.checkBody('newHub.iata', `${req.body.newHub.iata} is not a valid location. Must have key of iata in string format.`).isString();
     req.checkBody('newHub.icao', `${req.body.newHub.icao} is not a valid location. Must have key of icao in string format.`).isString();
-    req.checkBody('newHub', `There is no airport based on this this location '${req.body.newHub.iata}' & '${req.body.newHub.icao}'.`).exists(airportCodes);
+    req.checkBody('newHub', `There is no airport based on this this location '${req.body.newHub.iata}' & '${req.body.newHub.icao}'.`).existsInArray(airportCodes);
 
     // if there is an old hub
     if(req.body.oldHub && (req.body.oldHub.iata != '' || req.body.oldHub.icao != '')) {
@@ -573,7 +574,7 @@ exports.upsertHub = function (req, res) {
         req.checkBody('oldHub', `Old Hub is not a valid location. Must have key of iata or icao.`).notEmpty();
         req.checkBody('oldHub.iata', `${req.body.oldHub.iata} is not a valid location. Must have key of iata in string format.`).isString();
         req.checkBody('oldHub.icao', `${req.body.oldHub.icao} is not a valid location. Must have key icao in string format.`).isString();
-        req.checkBody('oldHub', `There is no airport based on this this location '${req.body.oldHub.iata}' & '${req.body.oldHub.icao}'.`).exists(airportCodes);
+        req.checkBody('oldHub', `There is no airport based on this this location '${req.body.oldHub.iata}' & '${req.body.oldHub.icao}'.`).existsInArray(airportCodes);
     }
 
     // validate errors
@@ -745,11 +746,118 @@ exports.deleteHub = function (req, res) {
 };
 
 /**
+ * Gets airline preferences
+ */
+exports.readAirlinePreferences = function (req, res) {
+    // create safe profile object
+    var user = User.toObject(req.user, { 'hide': 'created displayName firstName lastName sex email phone lastLogin tierId renewalDate subscribed passwordUpdatedLast homeLocation hubs maxHubs  notificationNews notificationReminderEmail notificationResearch notificationReminderSMS paymentInfo' });
+    user.maxPreferences = 5;
+    user.maxNonPreferences = 5;
+
+    // send data
+    res.json({ 'd': user });
+};
+
+/**
+ * Updates the airline preferences
+ */
+exports.updateAirlinePreferences = function (req, res) {
+    // validate existence
+    req.checkBody('airlinePreferences', 'You must have your airport preferences.').exists();
+    req.checkBody('airlineNonPreferences', 'You must have your non airport preferences.').exists();
+
+    // validate errors
+    req.getValidationResult().then(function(errors) {
+        // if any errors exists
+        if(!errors.isEmpty()) {
+            // holds all the errors in one text
+            var errorText = '';
+
+            // add all the errors
+            for(var x = 0; x < errors.array().length; x++) {
+                // if not the last error
+                if(x < errors.array().length - 1) {
+                    errorText += errors.array()[x].msg + '\r\n';
+                }
+                else {
+                    errorText += errors.array()[x].msg;
+                }
+            }
+
+            // send bad request
+            res.status(400).send({ title: errorHandler.getErrorTitle({ code: 400 }), message: errorText });
+        }
+        else {
+            // create the updated values object
+            var updatedValues = {
+                'airlinePreferences': req.body.airlinePreferences,
+                'airlineNonPreferences': req.body.airlineNonPreferences
+            };
+
+            // the found preferences/non preferences
+            var foundPreferences = [];
+            var foundNonPreferences = [];
+
+            // go through all values and check if airport exists
+            _.forEach(updatedValues.airlinePreferences, function(value) {
+                // find index
+                var index = _.findIndex(airlines, value);
+
+                // if index found
+                if(index != -1) {
+                    foundPreferences.push(value);
+                }
+            });
+
+            // go through all values and check if airport exists
+            _.forEach(updatedValues.airlineNonPreferences, function(value) {
+                // find index
+                var index = _.findIndex(airlines, value);
+
+                // if index found
+                if(index != -1) {
+                    foundNonPreferences.push(value);
+                }
+            });
+
+            // update values
+            updatedValues.airlinePreferences = foundPreferences;
+            updatedValues.airlineNonPreferences = foundNonPreferences;
+
+            // update the values
+            User.update(req.user, updatedValues, function(err, updatedUser) {
+                // if an error occurred
+                if (err) {
+                    // send internal error
+                    res.status(500).send({ error: true, title: errorHandler.getErrorTitle(err), message: errorHandler.getGenericErrorMessage(err) });
+                    console.log(clc.error(errorHandler.getDetailedErrorMessage(err)));
+                }
+                else if (updatedUser) {
+                    // create the safe user object
+                    var safeUserObj = createUserReqObject(updatedUser);
+
+                    // set the updated object
+                    req.user = safeUserObj;
+
+                    // read the airline preferences
+                    module.exports.readAirlinePreferences(req, res);
+                }
+                else {
+                    // send internal error
+                    res.status(500).send({ error: true, title: errorHandler.getErrorTitle({ code: 500 }), message: errorHandler.getGenericErrorMessage({ code: 500 }) });
+                    console.log(clc.error(`In ${path.basename(__filename)} \'updateNotifications\': ` + errorHandler.getGenericErrorMessage({ code: 500 }) + ' Couldn\'t update User.'));
+                }
+            });
+        }
+    });
+};
+
+/**
  * Get the membership details
  */
 exports.readMembership = function (req, res) {
     // create safe profile object
-    var user = User.toObject(req.user, { 'hide': 'created displayName firstName lastName sex email phone lastLogin passwordUpdatedLast homeLocation hubs maxHubs notificationNews notificationReminderEmail notificationResearch notificationReminderSMS paymentInfo' });
+    var user = User.toObject(req.user, { 'hide': 'created displayName firstName lastName sex email phone lastLogin passwordUpdatedLast homeLocation hubs maxHubs airlinePreferences airlineNonPreferences notificationNews notificationReminderEmail notificationResearch notificationReminderSMS paymentInfo' });
 
     // send data
     res.json({ 'd': user });
@@ -815,7 +923,7 @@ exports.cancelMembership = function (req, res) {
  */
 exports.readNotifications = function (req, res) {
     // create safe profile object
-    var user = User.toObject(req.user, { 'hide': 'created displayName firstName lastName sex email phone lastLogin tierId renewalDate subscribed passwordUpdatedLast homeLocation hubs maxHubs paymentInfo' });
+    var user = User.toObject(req.user, { 'hide': 'created displayName firstName lastName sex email phone lastLogin tierId renewalDate subscribed passwordUpdatedLast homeLocation hubs maxHubs airlinePreferences airlineNonPreferences paymentInfo' });
 
     // send data
     res.json({ 'd': user });
@@ -873,10 +981,16 @@ exports.updateNotifications = function (req, res) {
  * Read the DB middleware
  */
 exports.readDB = function (req, res, next) {
+    // holds the needed number of completed reads
+    var needCompleted = 4;
+
+    // holds the number of completed reads
+    var completed = 0;
+
     // check if file exists
-    fs.exists(accountDetailsPath, (exists) => {
+    fs.stat(accountDetailsPath, function(err, stats) {
         // if the file exists
-        if(exists) {
+        if (stats.isFile()) {
             // read content
             fs.readFile(accountDetailsPath, 'utf8', (err, data) => {
                 // if error occurred
@@ -890,8 +1004,14 @@ exports.readDB = function (req, res, next) {
                         // read content
                         accountDetails = JSON.parse(data);
 
-                        // go to next
-                        next();
+                        // increase the count
+                        completed++;
+
+                        // if reached the needed count
+                        if(needCompleted == completed) {
+                            // go to next
+                            next();
+                        }
                     }
                     catch (e) {
                         // set error
@@ -907,6 +1027,176 @@ exports.readDB = function (req, res, next) {
         else {
             // reinitialize
             accountDetails = {};
+
+            // increase the count
+            completed++;
+            
+            // if reached the needed count
+            if(needCompleted == completed) {
+                // go to next
+                next();
+            }
+        }
+    });
+
+    // check if file exists
+    fs.stat(airlinesDetailsPath, function(err, stats) {
+        // if the file exists
+        if (stats.isFile()) {
+            // read content
+            fs.readFile(airlinesDetailsPath, 'utf8', (err, data) => {
+                // if error occurred
+                if (err) {
+                    // send internal error
+                    res.status(500).send({ error: true, title: errorHandler.getErrorTitle(err), message: errorHandler.getGenericErrorMessage(err) });
+                    console.log(clc.error(errorHandler.getDetailedErrorMessage(err)));
+                }
+                else {
+                    try {
+                        // read content
+                        airlines = JSON.parse(data);
+
+                        // increase the count
+                        completed++;
+                        
+                        // if reached the needed count
+                        if(needCompleted == completed) {
+                            // go to next
+                            next();
+                        }
+                    }
+                    catch (e) {
+                        // set error
+                        err = e;
+
+                        // send internal error
+                        res.status(500).send({ error: true, title: errorHandler.getErrorTitle(err), message: errorHandler.getGenericErrorMessage(err) });
+                        console.log(clc.error(errorHandler.getDetailedErrorMessage(err)));
+                    }
+                }
+            });
+        }
+        else {
+            // reinitialize
+            airlines = [];
+
+            // increase the count
+            completed++;
+            
+            // if reached the needed count
+            if(needCompleted == completed) {
+                // go to next
+                next();
+            }
+        }
+    });
+
+    // check if file exists
+    fs.stat(airportCodesDetailsPath, function(err, stats) {
+        // if the file exists
+        if (stats.isFile()) {
+            // read content
+            fs.readFile(airportCodesDetailsPath, 'utf8', (err, data) => {
+                // if error occurred
+                if (err) {
+                    // send internal error
+                    res.status(500).send({ error: true, title: errorHandler.getErrorTitle(err), message: errorHandler.getGenericErrorMessage(err) });
+                    console.log(clc.error(errorHandler.getDetailedErrorMessage(err)));
+                }
+                else {
+                    try {
+                        // read content
+                        airportCodes = JSON.parse(data);
+
+                        // increase the count
+                        completed++;
+                        
+                        // if reached the needed count
+                        if(needCompleted == completed) {
+                            // go to next
+                            next();
+                        }
+                    }
+                    catch (e) {
+                        // set error
+                        err = e;
+
+                        // send internal error
+                        res.status(500).send({ error: true, title: errorHandler.getErrorTitle(err), message: errorHandler.getGenericErrorMessage(err) });
+                        console.log(clc.error(errorHandler.getDetailedErrorMessage(err)));
+                    }
+                }
+            });
+        }
+        else {
+            // reinitialize
+            airportCodes = [];
+
+            // increase the count
+            completed++;
+            
+            // if reached the needed count
+            if(needCompleted == completed) {
+                // go to next
+                next();
+            }
+        }
+    });
+
+    // check if file exists
+    fs.stat(ccTypesDetailsPath, function(err, stats) {
+        // if the file exists
+        if (stats.isFile()) {
+            // read content
+            fs.readFile(ccTypesDetailsPath, 'utf8', (err, data) => {
+                // if error occurred
+                if (err) {
+                    // send internal error
+                    res.status(500).send({ error: true, title: errorHandler.getErrorTitle(err), message: errorHandler.getGenericErrorMessage(err) });
+                    console.log(clc.error(errorHandler.getDetailedErrorMessage(err)));
+                }
+                else {
+                    try {
+                        // read content
+                        validCCTypes = JSON.parse(data);
+
+                        // go through each cc and transform regex to regex object
+                        _.forEach(validCCTypes, function(value) {
+                            value.regex = new RegExp(value.regex);
+                        });
+
+                        // increase the count
+                        completed++;
+                        
+                        // if reached the needed count
+                        if(needCompleted == completed) {
+                            // go to next
+                            next();
+                        }
+                    }
+                    catch (e) {
+                        // set error
+                        err = e;
+
+                        // send internal error
+                        res.status(500).send({ error: true, title: errorHandler.getErrorTitle(err), message: errorHandler.getGenericErrorMessage(err) });
+                        console.log(clc.error(errorHandler.getDetailedErrorMessage(err)));
+                    }
+                }
+            });
+        }
+        else {
+            // reinitialize
+            validCCTypes = [];
+
+            // increase the count
+            completed++;
+            
+            // if reached the needed count
+            if(needCompleted == completed) {
+                // go to next
+                next();
+            }
         }
     });
 };

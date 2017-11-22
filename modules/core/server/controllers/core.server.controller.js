@@ -167,9 +167,9 @@ exports.testBasicHelloWorld = function (req, res) {
  */
 exports.readDB = function (req, res, next) {
     // check if file exists
-    fs.exists(coreDetailsPath, (exists) => {
+    fs.stat(coreDetailsPath, function(err, stats) {
         // if the file exists
-        if(exists) {
+        if (stats.isFile()) {
             // read content
             fs.readFile(coreDetailsPath, 'utf8', (err, data) => {
                 // if error occurred
@@ -200,6 +200,9 @@ exports.readDB = function (req, res, next) {
         else {
             // reinitialize
             coreDetails = {};
+
+            // go to next
+            next();
         }
     });
 };

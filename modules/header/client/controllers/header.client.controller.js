@@ -26,6 +26,11 @@ headerModule.controller('HeaderController', ['$scope', '$rootScope', '$location'
         $rootScope.$root.airportCodes = json;
     });
 
+    // get the airlines
+    $.getJSON('/lib/airlines/airlines.json', function(json) {
+        $rootScope.$root.airlines = json;
+    });
+
     // on refresh
     $rootScope.$on('refreshHeader', function (event, data) {
         // initialize variables

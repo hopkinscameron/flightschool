@@ -37,9 +37,9 @@ exports.searchFlights = function (req, res) {
  */
 exports.readDB = function (req, res, next) {
     // check if file exists
-    fs.exists(flightsDetailsPath, (exists) => {
+    fs.stat(flightsDetailsPath, function(err, stats) {
         // if the file exists
-        if(exists) {
+        if (stats.isFile()) {
             // read content
             fs.readFile(flightsDetailsPath, 'utf8', (err, data) => {
                 // if error occurred
@@ -70,6 +70,9 @@ exports.readDB = function (req, res, next) {
         else {
             // reinitialize
             flightsDetails = {};
+
+            // go to next
+            next();
         }
     });
 };

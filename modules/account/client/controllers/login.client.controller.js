@@ -33,8 +33,8 @@ accountModule.controller('LoginController', ['$scope', '$rootScope', '$window', 
 
     // login
     $scope.login = function () {
-        // check for empty values
-        checkEmptyValues();
+        // check for any errors in the values
+        checkErrorValues();
 
         // check if an error exists
         if(!$scope.loginForm.errors.email.isError && !$scope.loginForm.errors.password.isError) {
@@ -79,8 +79,8 @@ accountModule.controller('LoginController', ['$scope', '$rootScope', '$window', 
         }
     };
 
-    // checks for any empty values
-    function checkEmptyValues() {
+    // checks for any errors in the values
+    function checkErrorValues() {
         // check for any empty values
         $scope.loginForm.errors.email.isError = !$scope.loginForm.inputs.email || $scope.loginForm.inputs.email.length == 0;
         $scope.loginForm.errors.password.isError = !$scope.loginForm.inputs.password || $scope.loginForm.inputs.password.length == 0;

@@ -20,6 +20,20 @@
         color: $light-light;
     }
 }
+.input-radius {
+    &--top-left-none {
+        border-top-left-radius: 0;
+    }
+    &--top-right-none {
+        border-top-right-radius: 0;
+    }
+    &--bottom-left-none {
+        border-bottom-left-radius: 0;
+    }
+    &--bottom-right-none {
+        border-bottom-right-radius: 0;
+    }
+}
 /* Begin Media Queries */
 /* If [device width] is greater than or equal to 426px */
 @media (min-width: 426px) {

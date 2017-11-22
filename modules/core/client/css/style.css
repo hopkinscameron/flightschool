@@ -389,6 +389,18 @@ body::-webkit-scrollbar-thumb {
   .form-login-dropdown a {
     color: #F5F7F9; }
 
+.input-radius--top-left-none {
+  border-top-left-radius: 0; }
+
+.input-radius--top-right-none {
+  border-top-right-radius: 0; }
+
+.input-radius--bottom-left-none {
+  border-bottom-left-radius: 0; }
+
+.input-radius--bottom-right-none {
+  border-bottom-right-radius: 0; }
+
 /* Begin Media Queries */
 /* If [device width] is greater than or equal to 426px */
 @media (min-width: 426px) {
@@ -678,6 +690,22 @@ nav {
   background-color: #0076FF; }
 
 /* End Custom Table Styles */
+/* Begin Custom TypeAhead */
+.typeahead-custom .dropdown-menu li {
+  padding: 0.25rem 1.5rem; }
+  .typeahead-custom .dropdown-menu li:hover, .typeahead-custom .dropdown-menu li:focus {
+    color: #F5F7F9 !important;
+    background-color: #0076FF;
+    cursor: pointer; }
+  .typeahead-custom .dropdown-menu li.active, .typeahead-custom .dropdown-menu li:active {
+    color: #F5F7F9 !important;
+    background-color: #0076FF; }
+
+.typeahead-custom .dropdown-menu a {
+  color: #F5F7F9;
+  text-decoration: none; }
+
+/* End Custom TypeAhead */
 /* Begin Custom Utilities */
 /* Begin Custom Images */
 .img--xxs {

@@ -20,6 +20,11 @@
         "view": "/modules/account/client/views/user/hub.client.view.html"
     },
     {
+        "title": "Airline Preferences",
+        "pageLink": "airlines",
+        "view": "/modules/account/client/views/user/airline-preferences.client.view.html"
+    },
+    {
         "title": "Membership",
         "pageLink": "membership",
         "view": "/modules/account/client/views/user/membership.client.view.html"

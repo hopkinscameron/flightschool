@@ -84,6 +84,18 @@ module.exports = function (app) {
 
 
     // =========================================================================
+    // Airline Preferences Routes ==============================================
+    // =========================================================================
+    
+    // GET gets user's airline preferences information
+    // POST updates user's airline preferences
+	// format /api/airline-preferences
+    app.route('/api/account/airline-preferences').get([accountPolicy.isAllowed, ipLogger.log], accountController.readAirlinePreferences);
+    app.route('/api/account/airline-preferences').post([accountPolicy.isAllowed, ipLogger.log], accountController.updateAirlinePreferences);
+
+
+
+    // =========================================================================
     // Membership Routes =======================================================
     // =========================================================================
 

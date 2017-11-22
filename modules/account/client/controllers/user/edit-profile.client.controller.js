@@ -61,8 +61,8 @@ accountModule.controller('EditProfileController', ['$scope', '$rootScope', '$loc
 
     // update profile
     $scope.updateProfile = function () {
-        // check for empty values
-        checkEmptyValues();
+        // check for any errors in the values
+        checkErrorValues();
 
         // check if an error exists
         if(!$scope.profileForm.errors.first.isError && !$scope.profileForm.errors.last.isError && !$scope.profileForm.errors.sex.isError && !$scope.profileForm.errors.phone.isError && !$scope.profileForm.errors.email.isError) {
@@ -240,8 +240,8 @@ accountModule.controller('EditProfileController', ['$scope', '$rootScope', '$loc
         $scope.$emit('updateAccountPage', data);
     };
 
-    // checks for any empty values
-    function checkEmptyValues() {
+    // checks for any errors in the values
+    function checkErrorValues() {
         // check for any empty values
         $scope.profileForm.errors.first.isError = !$scope.profileForm.inputs.first || $scope.profileForm.inputs.first.length == 0;
         $scope.profileForm.errors.last.isError = !$scope.profileForm.inputs.last || $scope.profileForm.inputs.last.length == 0;

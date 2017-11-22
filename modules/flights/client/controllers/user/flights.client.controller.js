@@ -128,8 +128,8 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
 
     // searches for flights
     $scope.searchFlights = function () {
-        // check for empty values
-        checkEmptyValues();
+        // check for any errors in the values
+        checkErrorValues();
 
         // check if an error exists
         if(!$scope.searchForm.errors.depart.isError && !$scope.searchForm.errors.arrive.isError && !$scope.searchForm.errors.departDate.isError && !$scope.searchForm.errors.returnDate.isError && !$scope.searchForm.errors.adults.isError) {
@@ -413,8 +413,8 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
         }
     };
 
-    // checks for any empty values
-    function checkEmptyValues() {
+    // checks for any errors in the values
+    function checkErrorValues() {
         // get the home location
         var homeAiport = $scope.hub.data.homeLocation.iata ? $scope.hub.data.homeLocation.iata : $scope.hub.data.homeLocation.icao;
         var homeLocation = `${homeAiport} - ${$scope.hub.data.homeLocation.city} (Home)`;

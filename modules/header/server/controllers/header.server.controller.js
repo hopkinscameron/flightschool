@@ -146,9 +146,9 @@ function readFile(path, callback) {
     var contents = {};
 
     // check if file exists
-    fs.exists(path, (exists) => {
+    fs.stat(path, function(err, stats) {
         // if the file exists
-        if(exists) {
+        if (stats.isFile()) {
             // read content
             fs.readFile(path, 'utf8', (err, data) => {
                 // if error occurred

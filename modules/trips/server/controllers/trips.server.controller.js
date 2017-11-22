@@ -29,9 +29,9 @@ exports.read = function (req, res) {
  */
 exports.readDB = function (req, res, next) {
     // check if file exists
-    fs.exists(tripsDetailsPath, (exists) => {
+    fs.stat(tripsDetailsPath, function(err, stats) {
         // if the file exists
-        if(exists) {
+        if (stats.isFile()) {
             // read content
             fs.readFile(tripsDetailsPath, 'utf8', (err, data) => {
                 // if error occurred
@@ -62,6 +62,9 @@ exports.readDB = function (req, res, next) {
         else {
             // reinitialize
             tripsDetails = {};
+
+            // go to next
+            next();
         }
     });
 };

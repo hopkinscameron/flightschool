@@ -284,6 +284,52 @@ accountServiceModule.factory('AccountFactory', ['$http', '$location', '$rootScop
         });
     };
 
+    // gets airline preference page information
+    factory.getAirlinePreferencesPageInformation = function () {
+        // set the endpoint
+        var endpoint = appPath + '/account/airline-preferences';
+
+        // send request
+        return $http.get(endpoint, { 'ignoreLoadingBar': true }).then(function (response) {
+            return response.data.d;
+        })
+        .catch(function (response) {
+            // if the response was sent back with the custom data response
+            if(response.data) {
+                return { 'error': true, 'title': response.data.title, 'status': response.status, 'message': response.data.message };
+            }
+
+            // return default response
+            return { 'error': true, 'title': $rootScope.$root.generalStatusError, 'status': response.status, 'message': response.xhrStatus };
+        });
+    };
+
+    // updates airline preference
+    factory.updateAirlinePreferences = function (data) {
+        // set the endpoint
+        var endpoint = appPath + '/account/airline-preferences';
+
+        // stringify the data
+        var dataStrigified = JSON.stringify({
+            'airlinePreferences': data.preferences,
+            'airlineNonPreferences': data.nonPreferences
+        });
+
+        // send request
+        return $http.post(endpoint, dataStrigified, { 'ignoreLoadingBar': true }).then(function (response) {
+            return response.data.d;
+        })
+        .catch(function (response) {
+            // if the response was sent back with the custom data response
+            if(response.data) {
+                return { 'error': true, 'title': response.data.title, 'status': response.status, 'message': response.data.message };
+            }
+
+            // return default response
+            return { 'error': true, 'title': $rootScope.$root.generalStatusError, 'status': response.status, 'message': response.xhrStatus };
+        });
+    };
+
     // gets membership page information
     factory.getMembershipPageInformation = function () {
         // set the endpoint

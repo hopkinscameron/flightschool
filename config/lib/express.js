@@ -139,6 +139,10 @@ module.exports.initMiddleware = function (app) {
     // use header/body validation (add any additional custom validators)
     app.use(expressValidator({
         customValidators: {
+            // determines object exists
+            exists: (value1) => {
+                return value1 !== undefined;
+            },
             // determines if two values are strictly equal
             isEqual: (value1, value2) => {
                 return value1 === value2;
@@ -171,8 +175,8 @@ module.exports.initMiddleware = function (app) {
             isString: (value) => {
                 return typeof(value) === 'string';
             },
-            // determines if value exists
-            exists: (value, arr) => {
+            // determines if value exists in arry
+            existsInArray: (value, arr) => {
                 return _.findIndex(arr, function(o) { 
                     var iata = o.iata.toLowerCase().includes(value.iata && value.iata.length > 0 ? value.iata.toLowerCase() : '');
                     var icao = o.icao.toLowerCase().includes(value.icao && value.icao.length > 0 ? value.icao.toLowerCase() : '');

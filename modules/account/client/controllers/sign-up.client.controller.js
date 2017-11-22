@@ -114,8 +114,8 @@ accountModule.controller('SignUpController', ['$scope', '$rootScope', '$compile'
 
     // sign up
     $scope.signUp = function () {
-        // check for empty values
-        checkEmptyValues();
+        // check for any errors in the values
+        checkErrorValues();
 
         // check if an error exists
         if(!$scope.signUpForm.errors.firstName.isError && !$scope.signUpForm.errors.lastName.isError && !$scope.signUpForm.errors.email.isError && !$scope.signUpForm.errors.password.isError && !$scope.signUpForm.errors.confirm.isError) {
@@ -321,8 +321,8 @@ accountModule.controller('SignUpController', ['$scope', '$rootScope', '$compile'
         $rootScope.$root.setUpWaypoints(waypointList);
     };
 
-    // checks for any empty values
-    function checkEmptyValues() {
+    // checks for any errors in the values
+    function checkErrorValues() {
         // get strength result
         var strengthResult = owasp.test($scope.signUpForm.inputs.password).errors.length;
 
