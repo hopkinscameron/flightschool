@@ -25,19 +25,17 @@ accountModule.controller('SignUpController', ['$scope', '$rootScope', '$compile'
         'message': ''
     };
 
+    // owasp strength test
+    var owasp = $window.owaspPasswordStrengthTest;
+
     // holds the sign up form data
     $scope.signUpForm = {
         'inputs': {
             'firstName': '   John   ',
             'lastName': '   Doe    ',
             'email': 'john.doe@example.com  ',
-            'password': 'password'            
-        },
-        'views': {
-            'firstName': 'firstName',
-            'lastName': 'lastName',
-            'email': 'email',
-            'password': 'password'
+            'password': 'password',
+            'confirm': 'password'           
         },
         'errors': {
             'generic': {
@@ -58,8 +56,14 @@ accountModule.controller('SignUpController', ['$scope', '$rootScope', '$compile'
             },
             'password': {
                 'isError': false,
-                'message': 'Please a password'
-            }            
+                'message': 'Please enter a password',
+                'optionalMessages': ['Please enter a password', `Please enter a passphrase or password with ${owasp.configs.minLength} or more characters, numbers, lowercase, uppercase, and special characters.`]
+            },
+            'confirm': {
+                'isError': false,
+                'message': 'Please enter your password again',
+                'optionalMessages': ['Please enter your password again', 'Passwords do not match']
+            }
         }
     };
 
@@ -114,7 +118,7 @@ accountModule.controller('SignUpController', ['$scope', '$rootScope', '$compile'
         checkEmptyValues();
 
         // check if an error exists
-        if(!$scope.signUpForm.errors.firstName.isError && !$scope.signUpForm.errors.lastName.isError && !$scope.signUpForm.errors.email.isError && !$scope.signUpForm.errors.password.isError) {
+        if(!$scope.signUpForm.errors.firstName.isError && !$scope.signUpForm.errors.lastName.isError && !$scope.signUpForm.errors.email.isError && !$scope.signUpForm.errors.password.isError && !$scope.signUpForm.errors.confirm.isError) {
             // disable button but showing the form has been submitted
             $scope.formInTransit = true;
 
@@ -123,7 +127,8 @@ accountModule.controller('SignUpController', ['$scope', '$rootScope', '$compile'
                 'firstName': $scope.signUpForm.inputs.firstName,
                 'lastName': $scope.signUpForm.inputs.lastName,
                 'email': $scope.signUpForm.inputs.email,
-                'password': $scope.signUpForm.inputs.password
+                'password': $scope.signUpForm.inputs.password,
+                'confirmedPassword': $scope.signUpForm.inputs.confirm
             };
 
             // login
@@ -135,7 +140,9 @@ accountModule.controller('SignUpController', ['$scope', '$rootScope', '$compile'
                         title: 'Success!',
                         text: 'An email will be sent and you need to verify your account.',
                         type: 'success',
-                        confirmButtonText: 'Sounds Good'
+                        confirmButtonText: 'Sounds Good',
+                        confirmButtonClass: 'btn btn-theme-primary btn-cursor-pointer',
+                        buttonsStyling: false
                     }).then(function () {
                         // redirect to home page
                         $window.location.href = '/';
@@ -159,7 +166,7 @@ accountModule.controller('SignUpController', ['$scope', '$rootScope', '$compile'
                         $scope.formInTransit = false;
 
                         // force apply
-                        $scope.$apply()
+                        $scope.$apply();
                     },
                     // handling the promise rejection
                     function (dismiss) {
@@ -169,7 +176,7 @@ accountModule.controller('SignUpController', ['$scope', '$rootScope', '$compile'
                         $scope.formInTransit = false;
 
                         // force apply
-                        $scope.$apply()
+                        $scope.$apply();
                     });
                 }
             })
@@ -186,7 +193,7 @@ accountModule.controller('SignUpController', ['$scope', '$rootScope', '$compile'
                     $scope.formInTransit = false;
 
                     // force apply
-                    $scope.$apply()
+                    $scope.$apply();
                 },
                 // handling the promise rejection
                 function (dismiss) {
@@ -196,7 +203,7 @@ accountModule.controller('SignUpController', ['$scope', '$rootScope', '$compile'
                     $scope.formInTransit = false;
 
                     // force apply
-                    $scope.$apply()
+                    $scope.$apply();
                 });
             });
         }
@@ -316,10 +323,28 @@ accountModule.controller('SignUpController', ['$scope', '$rootScope', '$compile'
 
     // checks for any empty values
     function checkEmptyValues() {
+        // get strength result
+        var strengthResult = owasp.test($scope.signUpForm.inputs.password).errors.length;
+
         // check for any empty values
         $scope.signUpForm.errors.firstName.isError = !$scope.signUpForm.inputs.firstName || $scope.signUpForm.inputs.firstName.length == 0;
         $scope.signUpForm.errors.lastName.isError = !$scope.signUpForm.inputs.lastName || $scope.signUpForm.inputs.lastName.length == 0;
         $scope.signUpForm.errors.email.isError = !$scope.signUpForm.inputs.email || $scope.signUpForm.inputs.email.length == 0;
-        $scope.signUpForm.errors.password.isError = !$scope.signUpForm.inputs.password || $scope.signUpForm.inputs.password.length == 0;
+        $scope.signUpForm.errors.password.isError = !$scope.signUpForm.inputs.password || $scope.signUpForm.inputs.password.length == 0 || strengthResult;
+        $scope.signUpForm.errors.confirm.isError = !$scope.signUpForm.inputs.confirm || $scope.signUpForm.inputs.confirm.length == 0 || $scope.signUpForm.inputs.password != $scope.signUpForm.inputs.confirm;
+        
+        // set specific text based on empty or equality or strong password
+        if(strengthResult) {
+            $scope.signUpForm.errors.password.message = $scope.signUpForm.errors.password.optionalMessages[1];
+        }
+        if(!$scope.signUpForm.inputs.password || $scope.signUpForm.inputs.password.length == 0) {
+            $scope.signUpForm.errors.password.message = $scope.signUpForm.errors.password.optionalMessages[0];
+        }
+        if($scope.signUpForm.inputs.password != $scope.signUpForm.inputs.confirm) {
+            $scope.signUpForm.errors.confirm.message = $scope.signUpForm.errors.confirm.optionalMessages[1];
+        }
+        if(!$scope.signUpForm.inputs.confirm || $scope.signUpForm.inputs.confirm.length == 0) {
+            $scope.signUpForm.errors.confirm.message = $scope.signUpForm.errors.confirm.optionalMessages[0];
+        }
     };
 }]);

@@ -11,17 +11,15 @@ accountModule.controller('ChangePasswordController', ['$scope', '$rootScope', '$
     // set the path
     Service.afterPath = $location.path();
 
+    // owasp strength test
+    var owasp = $window.owaspPasswordStrengthTest;
+
     // holds the change password form data
     $scope.changePasswordForm = {
         'inputs': {
             'old': '',
             'new': '',
             'confirm': ''
-        },
-        'views': {
-            'old': 'old',
-            'new': 'new',
-            'confirm': 'confirm'
         },
         'errors': {
             'generic': {
@@ -34,11 +32,13 @@ accountModule.controller('ChangePasswordController', ['$scope', '$rootScope', '$
             },
             'new': {
                 'isError': false,
-                'message': 'Please enter a new password'
+                'message': 'Please enter a new password',
+                'optionalMessages': ['Please enter a new password', 'New password cannot be the same as the old', `Please enter a passphrase or password with ${owasp.configs.minLength} or more characters, numbers, lowercase, uppercase, and special characters.`]
             },
             'confirm': {
                 'isError': false,
-                'message': 'Please enter the new password again'
+                'message': 'Please enter the new password again',
+                'optionalMessages': ['Please enter the new password again', 'Passwords do not match']
             }
         }
     };
@@ -56,87 +56,6 @@ accountModule.controller('ChangePasswordController', ['$scope', '$rootScope', '$
     // set the time ago and format
     $scope.lastPasswordChanged.timeAgo = $rootScope.$root.getTimeSince($scope.lastPasswordChanged.date);
     $scope.lastPasswordChanged.format = $rootScope.$root.formatDate($rootScope.$root.locale, $scope.lastPasswordChanged.date);
-
-     // on call event when the focus enters
-    $scope.viewFocusEnter = function (viewId) {
-        // if entering the old password view
-        if (viewId == $scope.changePasswordForm.views.old) {
-            // reset the error
-            $scope.changePasswordForm.errors.old = false;
-        }
-        // if entering the new password view
-        else if (viewId == $scope.changePasswordForm.views.new) {
-            // reset the error
-            $scope.changePasswordForm.errors.new = false;
-        }
-        // if entering the confirm password view
-        else if (viewId == $scope.changePasswordForm.views.confirm) {
-            // reset the error
-            $scope.changePasswordForm.errors.confirm = false;
-        }
-    };
-
-    // on call event when the focus leaves
-    $scope.viewFocusLeave = function (viewId) {
-        // if leaving the old password view
-        if (viewId == $scope.changePasswordForm.views.old) {
-            // if user left field blank
-            if ($scope.changePasswordForm.inputs.old.length == 0) {
-                // set error
-                $scope.changePasswordForm.errors.old = true;
-                $scope.changePasswordForm.errors.generic.isError = true;
-            }
-        }
-        // if leaving the new password view
-        else if (viewId == $scope.changePasswordForm.views.new) {
-            // if user left field blank
-            if ($scope.changePasswordForm.inputs.new.length == 0) {
-                // set error
-                $scope.changePasswordForm.errors.new = true;
-                $scope.changePasswordForm.errors.generic.isError = true;
-            }
-            // if password is the same as current
-            else if($scope.changePasswordForm.inputs.old == $scope.changePasswordForm.inputs.new) {
-                // set error
-                $scope.changePasswordForm.errors.new = true;
-                $scope.changePasswordForm.errors.generic.isError = true;
-            }
-        }
-        // if leaving the confirm password view
-        else if (viewId == $scope.changePasswordForm.views.confirm) {
-            // if user left field blank
-            if ($scope.changePasswordForm.inputs.confirm.length == 0) {
-                // set error
-                $scope.changePasswordForm.errors.confirm = true;
-                $scope.changePasswordForm.errors.generic.isError = true;
-            }
-            // if passwords don't match
-            else if($scope.changePasswordForm.inputs.new != $scope.changePasswordForm.inputs.confirm) {
-                // set error
-                $scope.changePasswordForm.errors.confirm = true;
-                $scope.changePasswordForm.errors.generic.isError = true;
-            }
-        }
-        
-        // check to see if there is an error
-        if ($scope.changePasswordForm.errors.old) {
-            // set error
-            $scope.changePasswordForm.errors.generic.message = 'You must enter your old password';
-        }
-        else if ($scope.changePasswordForm.errors.new) {
-            // set error
-            $scope.changePasswordForm.errors.generic.message = $scope.changePasswordForm.inputs.new.length == 0 ? 'You must enter your new password' : 'Your new password cannot be the same as your old password';
-        }
-        else if ($scope.changePasswordForm.errors.confirm) {
-            // set error
-            $scope.changePasswordForm.errors.generic.message = $scope.changePasswordForm.inputs.confirm.length == 0 ? 'You must enter your new password again' : 'The new password does not match';
-        }
-        else {
-            // remove error
-            $scope.changePasswordForm.errors.generic.message = '';
-            $scope.changePasswordForm.errors.generic.isError = false;
-        }
-    };
 
     // update password
     $scope.updatePassword = function () {
@@ -264,10 +183,30 @@ accountModule.controller('ChangePasswordController', ['$scope', '$rootScope', '$
 
     // checks for any empty values
     function checkEmptyValues() {
+        // get strength result
+        var strengthResult = owasp.test($scope.changePasswordForm.inputs.new).errors.length;
+
         // check for any empty values
         $scope.changePasswordForm.errors.old.isError = !$scope.changePasswordForm.inputs.old || $scope.changePasswordForm.inputs.old.length == 0;
-        $scope.changePasswordForm.errors.new.isError = !$scope.changePasswordForm.inputs.new || $scope.changePasswordForm.inputs.new.length == 0;
-        $scope.changePasswordForm.errors.confirm.isError = !$scope.changePasswordForm.inputs.confirm || $scope.changePasswordForm.inputs.confirm.length == 0;
+        $scope.changePasswordForm.errors.new.isError = !$scope.changePasswordForm.inputs.new || $scope.changePasswordForm.inputs.new.length == 0 || $scope.changePasswordForm.inputs.old == $scope.changePasswordForm.inputs.new || strengthResult;
+        $scope.changePasswordForm.errors.confirm.isError = !$scope.changePasswordForm.inputs.confirm || $scope.changePasswordForm.inputs.confirm.length == 0 || $scope.changePasswordForm.inputs.new != $scope.changePasswordForm.inputs.confirm;
+    
+        // set specific text based on empty or equality or strong password
+        if(strengthResult) {
+            $scope.changePasswordForm.errors.new.message = $scope.changePasswordForm.errors.new.optionalMessages[2];
+        }
+        if($scope.changePasswordForm.inputs.old == $scope.changePasswordForm.inputs.new) {
+            $scope.changePasswordForm.errors.new.message = $scope.changePasswordForm.errors.new.optionalMessages[1];
+        }
+        if(!$scope.changePasswordForm.inputs.new || $scope.changePasswordForm.inputs.new.length == 0) {
+            $scope.changePasswordForm.errors.confirm.message = $scope.changePasswordForm.errors.new.optionalMessages[0];
+        }
+        if($scope.changePasswordForm.inputs.new != $scope.changePasswordForm.inputs.confirm) {
+            $scope.changePasswordForm.errors.confirm.message = $scope.changePasswordForm.errors.confirm.optionalMessages[1];
+        }
+        if(!$scope.changePasswordForm.inputs.confirm || $scope.changePasswordForm.inputs.confirm.length == 0) {
+            $scope.changePasswordForm.errors.confirm.message = $scope.changePasswordForm.errors.confirm.optionalMessages[0];
+        }
     };
 
     // clear the fields

@@ -509,11 +509,11 @@ accountModule.controller('HubController', ['$scope', '$rootScope', '$location', 
         $scope.hub = {};
 
         // get hub page data
-        AccountFactory.getHubPageInformation().then(function (responseCP) {
+        AccountFactory.getHubPageInformation().then(function (responseH) {
             // if returned a valid response
-            if (responseCP && !responseCP.error) {
+            if (responseH && !responseH.error) {
                 // set the data
-                $scope.hub.data = responseCP;
+                $scope.hub.data = responseH;
                 $scope.hub.title = 'Hub';
                 $scope.hub.pageHeader = $scope.hub.title;
                 $scope.hub.pageSubHeader = 'Are your hubs looking okay?';
@@ -526,23 +526,23 @@ accountModule.controller('HubController', ['$scope', '$rootScope', '$location', 
             }
             else {
                 // set error
-                $scope.pageTitle = responseCP.title;
+                $scope.pageTitle = responseH.title;
                 $scope.error.error = true;
-                $scope.error.title = responseCP.title;
-                $scope.error.status = responseCP.status;
-                $scope.error.message = responseCP.message;
+                $scope.error.title = responseH.title;
+                $scope.error.status = responseH.status;
+                $scope.error.message = responseH.message;
 
                 // setup page
                 setUpPage();
             }
         })
-        .catch(function (responseCP) {
+        .catch(function (responseH) {
             // set error
-            $scope.pageTitle = responseCP.title;
+            $scope.pageTitle = responseH.title;
             $scope.error.error = true;
-            $scope.error.title = responseCP.title;
-            $scope.error.status = responseCP.status;
-            $scope.error.message = responseCP.message;
+            $scope.error.title = responseH.title;
+            $scope.error.status = responseH.status;
+            $scope.error.message = responseH.message;
 
             // setup page
             setUpPage();

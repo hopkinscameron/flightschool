@@ -33,7 +33,8 @@ module.exports = {
                 'public/lib/angular-chart/angular-chart.min.js',
                 'public/lib/lodash/lodash.min.js',
                 'public/lib/waypoints/jquery.waypoints.min.js',
-                'public/lib/sweet-alert-2/sweetalert2.min.js'
+                'public/lib/sweet-alert-2/sweetalert2.min.js',
+                'public/lib/owasp-password-strength-test/owasp-password-strength-test.js'
                 // endbower
             ]
         },

@@ -46,6 +46,11 @@ var UserSchema = {
         enum: ['user', 'admin'],
         default: 'user'
     },
+    displayName: {
+        type: String,
+        overwriteable: false,
+        trim: true
+    },
     firstName: {
         type: String,
         trim: true,
@@ -249,7 +254,15 @@ exports.save = function(objToSave, callback) {
                 }
                 else {
                     // merge old data with new data
-                    _.merge(obj, objToSave);
+                    _.mergeWith(obj, objToSave, function (objValue, srcValue) {
+                        // if array, replace array
+                        if (_.isArray(objValue)) {
+                            return srcValue;
+                        }
+                    });
+
+                    // set display name
+                    obj.displayName = `${obj.firstName} ${obj.lastName}`;
 
                     // replace item at index using native splice
                     db.splice(index, 1, obj);
@@ -291,6 +304,9 @@ exports.save = function(objToSave, callback) {
 
                     // set the internal name
                     objToSave.internalName = objToSave.email.toLowerCase();
+
+                    // set display name
+                    objToSave.displayName = `${objToSave.firstName} ${objToSave.lastName}`;
 
                     // push the new object
                     db.push(objToSave);
@@ -355,13 +371,15 @@ exports.update = function(query, updatedObj, callback) {
             }
             else {
                 // merge old data with new data
-                //_.merge(obj, updatedObj);
                 _.mergeWith(obj, updatedObj, function (objValue, srcValue) {
                     // if array, replace array
                     if (_.isArray(objValue)) {
                         return srcValue;
                     }
                 });
+
+                // set display name
+                obj.displayName = `${obj.firstName} ${obj.lastName}`;
 
                 // replace item at index using native splice
                 db.splice(index, 1, obj);

@@ -9,6 +9,10 @@
             "pageLink": ""
         },
         {
+            "title": "Flight Search",
+            "pageLink": "flights"
+        },
+        {
             "title": "Upcoming Trips",
             "pageLink": "upcoming-trips"
         }

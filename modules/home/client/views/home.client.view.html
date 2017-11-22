@@ -1,8 +1,4 @@
-﻿<!-- Begin User logged in -->
-<div ng-include="'/modules/home/client/views/user/home.client.view.html'" ng-if="$root.isLoggedIn">
-</div>
-<!-- End User logged in -->
-<!-- Begin Home Page (User not logged in) -->
+﻿<!-- Begin Home Page -->
 <section ng-controller="HomeController" ng-if="!$root.isLoggedIn">
     <!-- Begin Container -->
     <div class="container">
@@ -23,7 +19,11 @@
             <!-- End Content Header -->
             <!-- Begin Content Body -->
             <div class="card card--border--none card--radius--none card-body box-shadow--sm card-min-height">
-                
+                <!-- Begin Search Flights Button -->
+                <div class="col-md-3 ml-auto text-right">
+                    <a href="/flights" class="btn btn-theme-primary btn-cursor-pointer decoration--never">Search Flights</a>
+                </div>
+                <!-- End Search Flights Button -->
             </div>
             <!-- End Content Body -->
         </div>
@@ -31,4 +31,4 @@
     </div>
     <!-- End Container -->
 </section>
-<!-- End Home Page (User not logged in) -->
+<!-- End Home Page -->

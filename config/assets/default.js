@@ -33,7 +33,8 @@ module.exports = {
                 'public/lib/angular-chart/angular-chart.js',
                 'public/lib/lodash/lodash.js',
                 'public/lib/waypoints/jquery.waypoints.js',
-                'public/lib/sweet-alert-2/sweetalert2.js'
+                'public/lib/sweet-alert-2/sweetalert2.js',
+                'public/lib/owasp-password-strength-test/owasp-password-strength-test.js'
                 // endbower
             ],
             tests: ['public/lib/angular/angular-mocks.js']

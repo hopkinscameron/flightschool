@@ -9,6 +9,8 @@ var // the path
     errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller')),
     // chalk for console logging
     clc = require(path.resolve('./config/lib/clc')),
+    // the application configuration
+    config = require(path.resolve('./config/config')),
     // lodash
     _ = require('lodash'),
     // the file system reader
@@ -114,6 +116,7 @@ exports.updatePassword = function (req, res, next) {
     // validate existence
     req.checkBody('oldPassword', 'Old password is required.').notEmpty();
     req.checkBody('newPassword', 'New password is required.').notEmpty();
+    req.checkBody('newPassword', `Please enter a passphrase or password with ${config.shared.owasp.minLength} or more characters, numbers, lowercase, uppercase, and special characters.`).isStrongPassword();
     req.checkBody('confirmedPassword', 'Confirmed password is required.').notEmpty();
     req.checkBody('confirmedPassword', 'Confirmed password should be equal to new password.').isEqual(req.body.newPassword);
 
@@ -223,7 +226,7 @@ exports.updatePassword = function (req, res, next) {
  */
 exports.readPayment = function (req, res) {
     // create safe profile object
-    var user = User.toObject(req.user, { 'hide': 'firstName lastName sex email phone lastLogin tierId renewalDate subscribed homeLocation hubs maxHubs passwordUpdatedLast notificationNews notificationReminderEmail notificationResearch notificationReminderSMS' });
+    var user = User.toObject(req.user, { 'hide': 'created displayName firstName lastName sex email phone lastLogin tierId renewalDate subscribed homeLocation hubs maxHubs passwordUpdatedLast notificationNews notificationReminderEmail notificationResearch notificationReminderSMS' });
 
     // if card on file
     if(user.paymentInfo) {
@@ -389,7 +392,7 @@ exports.updatePayment = function (req, res) {
  */
 exports.readHubs = function (req, res) {
     // create safe profile object
-    var user = User.toObject(req.user, { 'hide': 'firstName lastName sex email phone lastLogin tierId renewalDate subscribed passwordUpdatedLast notificationNews notificationReminderEmail notificationResearch notificationReminderSMS paymentInfo' });
+    var user = User.toObject(req.user, { 'hide': 'created displayName firstName lastName sex email phone lastLogin tierId renewalDate subscribed passwordUpdatedLast notificationNews notificationReminderEmail notificationResearch notificationReminderSMS paymentInfo' });
 
     // if home location exists
     if(user.homeLocation) {
@@ -746,7 +749,7 @@ exports.deleteHub = function (req, res) {
  */
 exports.readMembership = function (req, res) {
     // create safe profile object
-    var user = User.toObject(req.user, { 'hide': 'firstName lastName sex email phone lastLogin passwordUpdatedLast homeLocation hubs maxHubs notificationNews notificationReminderEmail notificationResearch notificationReminderSMS paymentInfo' });
+    var user = User.toObject(req.user, { 'hide': 'created displayName firstName lastName sex email phone lastLogin passwordUpdatedLast homeLocation hubs maxHubs notificationNews notificationReminderEmail notificationResearch notificationReminderSMS paymentInfo' });
 
     // send data
     res.json({ 'd': user });
@@ -812,7 +815,7 @@ exports.cancelMembership = function (req, res) {
  */
 exports.readNotifications = function (req, res) {
     // create safe profile object
-    var user = User.toObject(req.user, { 'hide': 'firstName lastName sex email phone lastLogin tierId renewalDate subscribed passwordUpdatedLast homeLocation hubs maxHubs paymentInfo' });
+    var user = User.toObject(req.user, { 'hide': 'created displayName firstName lastName sex email phone lastLogin tierId renewalDate subscribed passwordUpdatedLast homeLocation hubs maxHubs paymentInfo' });
 
     // send data
     res.json({ 'd': user });
@@ -907,88 +910,6 @@ exports.readDB = function (req, res, next) {
         }
     });
 };
-
-
-/**
- * User middleware
- */
-/*
-exports.userById = function (req, res, next, id) {
-    // if user is authenticated in the session
-    if (req.isAuthenticated()) {
-        // validate existence
-        req.checkBody('email', 'Email is required.').notEmpty();
-        req.checkBody('email', 'Not a valid email.').isEmail();
-        req.checkBody('oldpassword', 'Old Password is required.').notEmpty();
-        req.checkBody('newpassword', 'New Password is required.').notEmpty();
-        
-        // validate errors
-        req.getValidationResult().then(function(errors) {
-            // if any errors exists
-            if(!errors.isEmpty()) {
-                // holds all the errors in one text
-                var errorText = '';
-
-                // add all the errors
-                for(var x = 0; x < errors.array().length; x++) {
-                    // if not the last error
-                    if(x < errors.array().length - 1) {
-                        errorText += errors.array()[x].msg + '\r\n';
-                    }
-                    else {
-                        errorText += errors.array()[x].msg;
-                    }
-                }
-
-                // send bad request
-                res.status(400).send({ title: errorHandler.getErrorTitle({ code: 400 }), message: errorText });
-            }
-            else {
-                // convert to lowercase
-                id = id ? id.toLowerCase() : id;
-
-                // find user based on id
-                User.findOne({ 'username': id }, function(err, foundUser) {
-                    // if error occurred occurred
-                    if (err) {
-                        // return error
-                        return next(err);
-                    }
-                    // if user was found
-                    else if(foundUser) {
-                        // compare equality
-                        User.comparePassword(req.body.oldpassword, function(err, isMatch) {
-                            // if error occurred occurred
-                            if (err) {
-                                // send internal error
-                                res.status(500).send({ error: true, title: errorHandler.getErrorTitle(err), message: errorHandler.getGenericErrorMessage(err) });
-                                console.log(clc.error(errorHandler.getDetailedErrorMessage(err)));
-                            }
-                            else if(!isMatch) {
-                                // send not found
-                                res.status(404).send({ title: errorHandler.getErrorTitle({ code: 404 }), message: 'Username/Password is incorrect.' });
-                            }
-                            else {
-                                // bind the data to the request
-                                req.foundUser = foundUser;
-                                next();
-                            }
-                        });	
-                    }
-                    else {
-                        // send not found
-                        res.status(404).send({ title: errorHandler.getErrorTitle({ code: 404 }), message: 'Username/Password is incorrect.' });
-                    }
-                });
-            }
-        });
-    }
-    else {
-        // create forbidden error
-        res.status(403).send({ title: errorHandler.getErrorTitle({ code: 403 }), message: errorHandler.getGenericErrorMessage({ code: 403 }) });
-    }
-};
-*/
 
 // creates the safe user object to set in the request
 function createUserReqObject(user) {

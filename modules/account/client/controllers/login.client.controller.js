@@ -12,10 +12,6 @@ accountModule.controller('LoginController', ['$scope', '$rootScope', '$window', 
             'password': 'password',
             'rememberMe': false
         },
-        'views': {
-            'email': 'email',
-            'password': 'password'
-        },
         'errors': {
             'generic': {
                 'message': '',

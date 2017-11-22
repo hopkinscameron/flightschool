@@ -17,18 +17,18 @@ accountModule.controller('PaymentInformationController', ['$scope', '$rootScope'
     // holds the payment information form data
     $scope.paymentInformationForm = {
         'inputs': {
+            /*
+            'name': '',
+            'number': undefined,
+            'expirationMM': undefined,
+            'expirationYY': undefined,
+            'ccv': undefined
+            */
             'name': 'John Doe',
             'number': 4716955713636688,
             'expirationMM': 12,
             'expirationYY': 17,
             'ccv': ''
-        },
-        'views': {
-            'name': 'name',
-            'number': 'number',
-            'expirationMM': 'expirationMM',
-            'expirationYY': 'expirationYY',
-            'ccv': 'ccv'
         },
         'errors': {
             'generic': {
@@ -78,8 +78,8 @@ accountModule.controller('PaymentInformationController', ['$scope', '$rootScope'
             $scope.formInTransit = true;
 
             // get the two digit version of both the month and year
-            var twoDigitMonth = $scope.paymentInformationForm.inputs.expirationMM < 10 ? '0' + $scope.paymentInformationForm.inputs.expirationMM.toString() : $scope.paymentInformationForm.inputs.expirationMM;
-            var twoDigitYear = $scope.paymentInformationForm.inputs.expirationYY < 10 ? '0' + $scope.paymentInformationForm.inputs.expirationYY.toString() : $scope.paymentInformationForm.inputs.expirationYY;
+            var twoDigitMonth = $scope.paymentInformationForm.inputs.expirationMM < 10 ? '0' + $scope.paymentInformationForm.inputs.expirationMM.toString() : $scope.paymentInformationForm.inputs.expirationMM.toString();
+            var twoDigitYear = $scope.paymentInformationForm.inputs.expirationYY < 10 ? '0' + $scope.paymentInformationForm.inputs.expirationYY.toString() : $scope.paymentInformationForm.inputs.expirationYY.toString();
 
             // the data to send
             var changePaymentInformationData = {
@@ -330,7 +330,7 @@ accountModule.controller('PaymentInformationController', ['$scope', '$rootScope'
         }
 
         // year must be greater than minium year or year must be the minimum year and the month has to be greater than the current month of the minimum year
-        return year > $scope.acceptableDateRangeForExpiration.minYear || (month > $scope.acceptableDateRangeForExpiration.minMonth && year >= $scope.acceptableDateRangeForExpiration.minYear);
+        return year > $scope.acceptableDateRangeForExpiration.minYear || (month >= $scope.acceptableDateRangeForExpiration.minMonth && year >= $scope.acceptableDateRangeForExpiration.minYear);
     };
 
     // clear the fields

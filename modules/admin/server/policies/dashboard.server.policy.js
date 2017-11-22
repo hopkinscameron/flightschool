@@ -13,7 +13,7 @@ var // the path
  */
 exports.isAllowed = function (req, res, next) {
     // if user is authenticated in the session, carry on 
-	if (req.isAuthenticated()) {
+	if (req.isAuthenticated() && req.user.role == 'admin') {
         return next();
     }
 	else {

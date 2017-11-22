@@ -12,11 +12,8 @@ var // the path
  * Check if Dashboard policy allows
  */
 exports.isAllowed = function (req, res, next) {
-    // TODO: remove, used for testing
-    var user = true;
-
     // if user is authenticated in the session, carry on 
-	if (req.isAuthenticated() && user) {
+	if (req.isAuthenticated() && req.user.role == 'user') {
         return next();
     }
 	else {

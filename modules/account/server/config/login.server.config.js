@@ -44,7 +44,7 @@ module.exports = function (app, db) {
                 // save the id since it will be lost when going to object
                 // hide the password for security purposes
                 var id = user._id;
-                user = User.toObject(user, { 'hide': 'password lastPasswords internalName created resetPasswordToken resetPasswordExpires' });
+                user = User.toObject(user, { 'hide': 'password lastPasswords internalName resetPasswordToken resetPasswordExpires' });
                 user._id = id;
 
                 // get the payment object

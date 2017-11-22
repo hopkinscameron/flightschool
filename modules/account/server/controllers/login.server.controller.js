@@ -15,12 +15,12 @@ var // the path
     config = require(path.resolve('./config/config')),
     // generator for a strong password
     generatePassword = require('generate-password'),
-    // tester for generating a strong password
+    // tester for ensuring a stronger password
     owasp = require('owasp-password-strength-test'),
     // the User model
     User = require(path.resolve('./modules/account/server/models/model-user'));
 
-// configure
+// configure owasp
 owasp.config(config.shared.owasp);
 
 /**
@@ -48,6 +48,9 @@ exports.signUp = function (req, res, next) {
     req.checkBody('firstName', 'First name is required.').notEmpty();
     req.checkBody('lastName', 'Last name is required.').notEmpty();
     req.checkBody('password', 'Password is required.').notEmpty();
+    req.checkBody('password', `Please enter a passphrase or password with ${config.shared.owasp.minLength} or more characters, numbers, lowercase, uppercase, and special characters.`).isStrongPassword();
+    req.checkBody('confirmedPassword', 'Confirmed password is required.').notEmpty();
+    req.checkBody('confirmedPassword', 'Confirmed password should be equal to new password.').isEqual(req.body.password);
     
     // validate errors
     req.getValidationResult().then(function(errors) {
@@ -128,7 +131,7 @@ exports.login = function (req, res, next) {
  */
 exports.generateRandomPassphrase = function (req, res, next) {
     // if user is authenticated in the session
-    if (req.isAuthenticated()) {
+    if (req.isAuthenticated() && req.user.role == 'admin') {
         var passphrase = generateRandomPassphrase();
 
         // if not passphrase

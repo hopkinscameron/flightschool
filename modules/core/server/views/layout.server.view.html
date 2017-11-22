@@ -116,11 +116,18 @@
         <!-- End No Script For Alerts -->
 
         <!-- Begin Embedding The User Object -->
-        <script id="embeddedUser" type="text/javascript">
+        <script type="text/javascript">
             var user = {{{ user }}};
             var env = "{{ env }}";
         </script>
         <!-- End Embedding The User Object -->
+
+        <!-- Begin Embedding OWASP Config -->
+        <script type="text/javascript">
+            var sharedConfig = {{{ sharedConfig }}};
+            owaspPasswordStrengthTest.config(sharedConfig.owasp);
+        </script>
+        <!-- End Embedding OWASP Config -->
 
         {{#if livereload}}
         <!-- Begin Livereload script rendered -->

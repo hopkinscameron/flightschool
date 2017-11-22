@@ -42,7 +42,12 @@ var // the application configuration
     // lodash
     _ = require('lodash'),
     // lusca for web application security middleware
-    lusca = require('lusca');
+    lusca = require('lusca'),
+    // tester for ensuring a stronger password
+    owasp = require('owasp-password-strength-test');
+
+// configure owasp
+owasp.config(config.shared.owasp);
 
 /**
  * Initialize local variables
@@ -217,14 +222,18 @@ module.exports.initMiddleware = function (app) {
                     }
 
                     // year must be greater than minium year or year must be the minimum year and the month has to be greater than the current month of the minimum year
-                    return year > range.minYear || (month > range.minMonth && year >= range.minYear);
+                    return year > range.minYear || (month >= range.minMonth && year >= range.minYear);
                 }
                 catch (e) {
                     return false;
                 }
                  
                 return true;
-            }
+            },
+            // determines if password is strong enough
+            isStrongPassword: (value) => {
+                return !owasp.test(value).errors.length;
+            },
         }
     }));
 };

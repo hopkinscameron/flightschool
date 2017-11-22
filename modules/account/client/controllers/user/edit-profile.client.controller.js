@@ -16,23 +16,17 @@ accountModule.controller('EditProfileController', ['$scope', '$rootScope', '$loc
 
     // the sex options
     $scope.sexOptions = {
-        'selected': $scope.initialText, //'Male'
+        'selected': $scope.initialText,
         'options': [$scope.initialText, 'Male', 'Female']
     };
 
     // holds the profile form data
     $scope.profileForm = {
         'inputs': {
-            'first': '',//'John',
-            'last': '',//'Does',
-            'phone': '',//'555-555-5555',
-            'email': ''//'example@example.com'
-        },
-        'views': {
-            'first': 'first',
-            'last': 'last',
-            'phone': 'phone',
-            'email': 'email'
+            'first': '',
+            'last': '',
+            'phone': '',
+            'email': ''
         },
         'errors': {
             'generic': {

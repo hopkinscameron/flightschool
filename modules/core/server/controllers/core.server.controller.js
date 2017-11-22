@@ -33,7 +33,11 @@ exports.renderIndex = function (req, res) {
     if (req.user) {
         // create the safe object
         safeUserObject = {
-            username: validator.escape(req.user.email),
+            email: validator.escape(req.user.email),
+            created: req.user.created.toString(),
+            displayName: validator.escape(req.user.displayName),
+            firstName: validator.escape(req.user.firstName),
+            lastName: validator.escape(req.user.lastName),
             role: validator.escape(req.user.role)
         };
     }

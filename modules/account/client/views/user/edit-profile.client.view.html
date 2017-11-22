@@ -25,8 +25,8 @@
                 <!-- End Last Name -->
                 <!-- Begin Sex -->
                 <div class="form-group">
-                    Select your sex
-                    <select id="serviceTypeOptionsSelect" ng-model="sexOptions.selected" class="form-control" ng-class="{'is-invalid': profileForm.errors.sex.isError}" ng-disabled="formInTransit" required>
+                    <label class="col-form-label" for="sexSelect">Select your sex <span style="color: red;">*</span></label>                        
+                    <select id="sexSelect" ng-model="sexOptions.selected" class="form-control" ng-class="{'is-invalid': profileForm.errors.sex.isError}" ng-disabled="formInTransit" required>
                         <option ng-repeat="s in sexOptions.options">{{s}}</option>
                     </select>
                     <small class="invalid-feedback">{{profileForm.errors.sex.message}}</small>

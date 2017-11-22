@@ -72,7 +72,8 @@ accountServiceModule.factory('LoginFactory', ['$http', '$location', '$rootScope'
             'firstName': credentials.firstName,
             'lastName': credentials.lastName,
             'email': credentials.email,
-            'password': credentials.password
+            'password': credentials.password,
+            'confirmedPassword': credentials.confirmedPassword
         });
 
         // send request

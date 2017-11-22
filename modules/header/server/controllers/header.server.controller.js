@@ -31,7 +31,7 @@ exports.read = function (req, res) {
     // if user is authenticated in the session get admin header
     if (req.isAuthenticated()) {
         // if user role
-        if(req.userRole == 'user') {
+        if(req.user.role == 'user') {
             // set authenticated
             headerUserDetails.isLoggedIn = true;
 
@@ -39,7 +39,7 @@ exports.read = function (req, res) {
             res.json({ 'd': headerUserDetails });
         }
         // if admin role
-        else if(req.userRole == 'admin') {
+        else if(req.user.role == 'admin') {
             // set authenticated
             headerAdminDetails.isLoggedIn = true;
 
@@ -63,15 +63,8 @@ exports.read = function (req, res) {
 exports.readDB = function (req, res, next) {
     // if user is authenticated in the session get admin header
     if (req.isAuthenticated()) {
-        // TODO: remove, used for testing
-        var user = true,
-            admin = false;
-
         // if user role
-        if(user) {
-            // TODO: remove, used for testing
-            req.userRole = 'user';
-
+        if(req.user.role == 'user') {
             // read file
             readFile(headerUserDetailsPath, function(err, contents) {
                 // if error occurred
@@ -90,10 +83,7 @@ exports.readDB = function (req, res, next) {
             });
         }
         // if admin role
-        else if(admin) {
-            // TODO: remove, used for testing
-            req.userRole = 'admin';
-
+        else if(req.user.role == 'admin') {
             // read file
             readFile(headerAdminDetailsPath, function(err, contents) {
                 // if error occurred
