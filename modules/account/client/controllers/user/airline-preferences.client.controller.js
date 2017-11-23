@@ -257,7 +257,7 @@ accountModule.controller('AirlinePreferencesController', ['$scope', '$rootScope'
             var pe = {
                 'isError': false,
                 'message': 'You cannot have duplicate airlines',
-                'optionalMessages': ['You cannot have duplicate airlines', 'You cannot have the same preference as a non preference', 'Not a valid airline']
+                'optionalMessages': ['You cannot have duplicate airlines in your preferences', 'You cannot have the same preference as a non preference', 'Not a valid airline']
             };
             $scope.preferencesForm.errors.preferences.push(pe);
 
@@ -272,7 +272,7 @@ accountModule.controller('AirlinePreferencesController', ['$scope', '$rootScope'
             var npe = {
                 'isError': false,
                 'message': 'You cannot have duplicate airlines',
-                'optionalMessages': ['You cannot have duplicate airlines', 'You cannot have the same preference as a non preference', 'Not a valid airline']
+                'optionalMessages': ['You cannot have duplicate airlines in your non preferences', 'You cannot have the same non preference as a preference', 'Not a valid airline']
             };
             $scope.preferencesForm.errors.nonPreferences.push(npe);
 
@@ -295,7 +295,8 @@ accountModule.controller('AirlinePreferencesController', ['$scope', '$rootScope'
             // if not empty
             if(value.value && value.value != '') {
                 // find the index
-                var duplicateIndex = _.findLastIndex($scope.preferencesForm.inputs.preferences, function(o) { return o.value == value.value && o.index != value.index; });
+                var duplicateLocalIndex = _.findLastIndex($scope.preferencesForm.inputs.preferences, function(o) { return o.value == value.value && o.index != value.index; });
+                var duplicateAdjacentIndex = _.findLastIndex($scope.preferencesForm.inputs.nonPreferences, function(o) { return o.value == value.value; });
                 var airlineIndex = _.findIndex($rootScope.$root.airlines, { 'name': value.value });
 
                 // if not a valid airline
@@ -303,13 +304,21 @@ accountModule.controller('AirlinePreferencesController', ['$scope', '$rootScope'
                     $scope.preferencesForm.errors.preferences[x].isError = true;
                     $scope.preferencesForm.errors.preferences[x].message = $scope.preferencesForm.errors.preferences[x].optionalMessages[2];
                 }
-                // if found an index and index is not this current iteration index
-                else if(duplicateIndex != -1 && duplicateIndex != x) {
+                // if found an index in the non preference list
+                else if(duplicateAdjacentIndex != -1) {
                     // set an error for both entries
                     $scope.preferencesForm.errors.preferences[x].isError = true;
-                    $scope.preferencesForm.errors.preferences[duplicateIndex].isError = true;
+                    $scope.preferencesForm.errors.nonPreferences[duplicateAdjacentIndex].isError = true;
+                    $scope.preferencesForm.errors.preferences[x].message = $scope.preferencesForm.errors.preferences[x].optionalMessages[1];
+                    $scope.preferencesForm.errors.nonPreferences[duplicateAdjacentIndex].message = $scope.preferencesForm.errors.nonPreferences[duplicateAdjacentIndex].optionalMessages[1];
+                }
+                // if found an index and index is not this current iteration index
+                else if(duplicateLocalIndex != -1 && duplicateLocalIndex != x) {
+                    // set an error for both entries
+                    $scope.preferencesForm.errors.preferences[x].isError = true;
+                    $scope.preferencesForm.errors.preferences[duplicateLocalIndex].isError = true;
                     $scope.preferencesForm.errors.preferences[x].message = $scope.preferencesForm.errors.preferences[x].optionalMessages[0];
-                    $scope.preferencesForm.errors.preferences[duplicateIndex].message = $scope.preferencesForm.errors.preferences[duplicateIndex].optionalMessages[0];
+                    $scope.preferencesForm.errors.preferences[duplicateLocalIndex].message = $scope.preferencesForm.errors.preferences[duplicateLocalIndex].optionalMessages[0];
                 }
                 else {
                     $scope.preferencesForm.errors.preferences[x].isError = false;
@@ -334,7 +343,8 @@ accountModule.controller('AirlinePreferencesController', ['$scope', '$rootScope'
             // if not empty
             if(value.value && value.value != '') {
                 // find the index
-                var duplicateIndex = _.findLastIndex($scope.preferencesForm.inputs.nonPreferences, function(o) { return o.value == value.value && o.index != value.index; });
+                var duplicateLocalIndex = _.findLastIndex($scope.preferencesForm.inputs.nonPreferences, function(o) { return o.value == value.value && o.index != value.index; });
+                var duplicateAdjacentIndex = _.findLastIndex($scope.preferencesForm.inputs.nonPreferences, function(o) { return o.value == value.value; });
                 var airlineIndex = _.findIndex($rootScope.$root.airlines, { 'name': value.value });
 
                 // if not a valid airline
@@ -342,13 +352,21 @@ accountModule.controller('AirlinePreferencesController', ['$scope', '$rootScope'
                     $scope.preferencesForm.errors.nonPreferences[x].isError = true;
                     $scope.preferencesForm.errors.nonPreferences[x].message = $scope.preferencesForm.errors.nonPreferences[x].optionalMessages[2];
                 }
-                // if found an index and index is not this current iteration index
-                else if(duplicateIndex != -1 && duplicateIndex != x) {
+                // if found an index in the preference list
+                else if(duplicateAdjacentIndex != -1) {
                     // set an error for both entries
                     $scope.preferencesForm.errors.nonPreferences[x].isError = true;
-                    $scope.preferencesForm.errors.nonPreferences[duplicateIndex].isError = true;
+                    $scope.preferencesForm.errors.preferences[duplicateAdjacentIndex].isError = true;
+                    $scope.preferencesForm.errors.nonPreferences[x].message = $scope.preferencesForm.errors.nonPreferences[x].optionalMessages[1];
+                    $scope.preferencesForm.errors.preferences[duplicateAdjacentIndex].message = $scope.preferencesForm.errors.preferences[duplicateAdjacentIndex].optionalMessages[1];
+                }
+                // if found an index and index is not this current iteration index
+                else if(duplicateLocalIndex != -1 && duplicateLocalIndex != x) {
+                    // set an error for both entries
+                    $scope.preferencesForm.errors.nonPreferences[x].isError = true;
+                    $scope.preferencesForm.errors.nonPreferences[duplicateLocalIndex].isError = true;
                     $scope.preferencesForm.errors.nonPreferences[x].message = $scope.preferencesForm.errors.nonPreferences[x].optionalMessages[0];
-                    $scope.preferencesForm.errors.nonPreferences[duplicateIndex].message = $scope.preferencesForm.errors.nonPreferences[duplicateIndex].optionalMessages[0];
+                    $scope.preferencesForm.errors.nonPreferences[duplicateLocalIndex].message = $scope.preferencesForm.errors.nonPreferences[duplicateLocalIndex].optionalMessages[0];
                 }
                 else {
                     $scope.preferencesForm.errors.nonPreferences[x].isError = false;

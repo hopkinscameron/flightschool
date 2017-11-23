@@ -180,54 +180,6 @@ accountServiceModule.factory('AccountFactory', ['$http', '$location', '$rootScop
         });
     };
 
-    // updates home location
-    factory.updateHubHome = function (data) {
-        // set the endpoint
-        var endpoint = appPath + '/account/hub/home';
-
-        // stringify the data
-        var dataStrigified = JSON.stringify({
-            'homeLocation': {
-                'iata': data.homeLocation ? data.homeLocation.iata : '',
-                'icao': data.homeLocation ? data.homeLocation.icao : ''
-            }
-        });
-
-        // send request
-        return $http.post(endpoint, dataStrigified, { 'ignoreLoadingBar': true }).then(function (response) {
-            return response.data.d;
-        })
-        .catch(function (response) {
-            // if the response was sent back with the custom data response
-            if(response.data) {
-                return { 'error': true, 'title': response.data.title, 'status': response.status, 'message': response.data.message };
-            }
-
-            // return default response
-            return { 'error': true, 'title': $rootScope.$root.generalStatusError, 'status': response.status, 'message': response.xhrStatus };
-        });
-    };
-
-    // deletes home location
-    factory.deleteHubHome = function () {
-        // set the endpoint
-        var endpoint = appPath + '/account/hub/home';
-
-        // send request
-        return $http.delete(endpoint, { 'ignoreLoadingBar': true }).then(function (response) {
-            return response.data.d;
-        })
-        .catch(function (response) {
-            // if the response was sent back with the custom data response
-            if(response.data) {
-                return { 'error': true, 'title': response.data.title, 'status': response.status, 'message': response.data.message };
-            }
-
-            // return default response
-            return { 'error': true, 'title': $rootScope.$root.generalStatusError, 'status': response.status, 'message': response.xhrStatus };
-        });
-    };
-
     // adds/updates hub
     factory.upsertHub = function (data) {
         // set the endpoint
@@ -237,7 +189,8 @@ accountServiceModule.factory('AccountFactory', ['$http', '$location', '$rootScop
         var dataStrigified = JSON.stringify({
             'newHub': {
                 'iata': data.newHub ? data.newHub.iata : '',
-                'icao': data.newHub ? data.newHub.icao : ''
+                'icao': data.newHub ? data.newHub.icao : '',
+                'main': data.newHub ? data.newHub.main : undefined
             },
             'oldHub': {
                 'iata': data.oldHub ? data.oldHub.iata : '',

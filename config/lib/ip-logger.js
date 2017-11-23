@@ -205,7 +205,7 @@ function logPageRequest(accessedBy, pageRequested, requestType) {
  */
 exports.log = function (req, res, next) {
     // log the users ip information
-	logUserIPInformation(req);
+	//logUserIPInformation(req);
 	
     // go to next
     next();

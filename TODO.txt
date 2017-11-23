@@ -1,5 +1,7 @@
 ﻿In Progress
-- changes how hubs are added (so when entering the text, auto populate)
+- changes how hubs are added (so when entering the text, auto populate) -> can't quite figure this out yet inside a sweet alert input
+    might have to enter the text a different way (not in sweet alert)
+- fix the definition of main hub (and how it works) on flight page
 
 Next
 - add an "error dashboard" so if there are errors in server, we can view them
@@ -15,6 +17,7 @@ Future
     (if cc number needs to be string, 16 long and valid, then if its not a string, don't even test 16 long or valid)
 
 Done
+- fixed the definition of "main hub"
 
 Testing
 

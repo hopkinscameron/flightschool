@@ -118,10 +118,6 @@ var UserSchema = {
     renewalDate: {
         type: Date
     },
-    homeLocation: {
-        type: Object,
-        default: null
-    },
     hubs: {
         type: Array,
         default: new Array()

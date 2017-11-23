@@ -10,7 +10,7 @@
                 <div class="form-row">
                     <div class="form-group col-md-6" ng-repeat="p in preferencesForm.inputs.preferences track by $index">
                         <label class="col-form-label" for="preference{{$index}}">Preference {{$index + 1}}</label>
-                        <input class="col-md-9 form-control" ng-class="{'is-invalid': p.error.isError}" type="text" name="preference{{$index}}" placeholder="Search for..." id="preference{{$index}}" ng-model="p.value" uib-typeahead="airport.name for airport in $root.airlines | filter : $viewValue | limitTo : 8" ng-disabled="formInTransit" required>
+                        <input class="col-md-9 form-control" ng-class="{'is-invalid': p.error.isError}" type="text" name="preference{{$index}}" placeholder="Search for..." id="preference{{$index}}" ng-model="p.value" uib-typeahead="airline.name for airline in $root.airlines | filter : $viewValue | limitTo : 8" ng-disabled="formInTransit" required>
                         <small class="invalid-feedback">{{p.error.message}}</small>  
                     </div>
                 </div>
@@ -20,7 +20,7 @@
                 <div class="form-row">
                     <div class="form-group col-md-6" ng-repeat="np in preferencesForm.inputs.nonPreferences track by $index">
                         <label class="col-form-label" for="nonPreference{{$index}}">Non Preference {{$index + 1}}</label>                        
-                        <input class="col-md-9 form-control" ng-class="{'is-invalid': np.error.isError}" type="text" name="nonPreference{{$index}}" placeholder="Search for..." id="nonPreference{{$index}}" ng-model="np.value" uib-typeahead="airport.name for airport in $root.airlines | filter : $viewValue | limitTo : 8" ng-disabled="formInTransit" required>
+                        <input class="col-md-9 form-control" ng-class="{'is-invalid': np.error.isError}" type="text" name="nonPreference{{$index}}" placeholder="Search for..." id="nonPreference{{$index}}" ng-model="np.value" uib-typeahead="airline.name for airline in $root.airlines | filter : $viewValue | limitTo : 8" ng-disabled="formInTransit" required>
                         <small class="invalid-feedback">{{np.error.message}}</small>    
                     </div>
                 </div>

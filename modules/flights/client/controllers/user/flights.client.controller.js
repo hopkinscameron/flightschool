@@ -372,10 +372,18 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
                     // set the data
                     $scope.hub.data = responseH;
 
+                    // loop through all hubs and find the main hub
+                    _.forEach($scope.hub.data.hubs, function(value) {
+                        // if main
+                        if(value.main) {
+                            $scope.mainHub = value;
+                        }
+                    });
+
                     // get the airport code
-                    var homeAiport = responseH.homeLocation.iata ? responseH.homeLocation.iata : responseH.homeLocation.icao;
-                    $scope.departOptions.options.push(`${homeAiport} - ${responseH.homeLocation.city} (Home)`);
-                    $scope.arriveOptions.options.push(`${homeAiport} - ${responseH.homeLocation.city} (Home)`);
+                    var mainHubAirport = $scope.mainHub.iata ? $scope.mainHub.iata : $scope.mainHub.icao;
+                    $scope.departOptions.options.push(`${mainHubAirport} - ${$scope.mainHub.city} (Home)`);
+                    $scope.arriveOptions.options.push(`${mainHubAirport} - ${$scope.mainHub.city} (Home)`);
 
                     // add all available hubs and home locations
                     _.forEach(responseH.hubs, function(value) {
@@ -416,18 +424,24 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
     // checks for any errors in the values
     function checkErrorValues() {
         // get the home location
-        var homeAiport = $scope.hub.data.homeLocation.iata ? $scope.hub.data.homeLocation.iata : $scope.hub.data.homeLocation.icao;
-        var homeLocation = `${homeAiport} - ${$scope.hub.data.homeLocation.city} (Home)`;
+        var mainHubAirport = null;
+        var mainHubLocation = null;
+
+        // if main hub exists
+        if($scope.mainHub) {
+            mainHubAirport = $scope.mainHub.iata ? $scope.mainHub.iata : $scope.mainHub.icao;
+            mainHubLocation = `${mainHubAirport} - ${$scope.mainHub.city} (Home)`;
+        }
 
         // check for any empty values
-        $scope.searchForm.errors.depart.isError = !$scope.departOptions.selected || $scope.departOptions.selected.length == 0 || $scope.departOptions.selected == $scope.initialText || $scope.departOptions.selected == $scope.arriveOptions.selected || ($scope.departOptions.selected != homeLocation && $scope.arriveOptions.selected != homeLocation);
-        $scope.searchForm.errors.arrive.isError = !$scope.arriveOptions.selected || $scope.arriveOptions.selected.length == 0 || $scope.arriveOptions.selected == $scope.initialText || $scope.departOptions.selected == $scope.arriveOptions.selected || ($scope.departOptions.selected != homeLocation && $scope.arriveOptions.selected != homeLocation);
+        $scope.searchForm.errors.depart.isError = !$scope.departOptions.selected || $scope.departOptions.selected.length == 0 || $scope.departOptions.selected == $scope.initialText || $scope.departOptions.selected == $scope.arriveOptions.selected || ($scope.departOptions.selected != mainHubLocation && $scope.arriveOptions.selected != mainHubLocation);
+        $scope.searchForm.errors.arrive.isError = !$scope.arriveOptions.selected || $scope.arriveOptions.selected.length == 0 || $scope.arriveOptions.selected == $scope.initialText || $scope.departOptions.selected == $scope.arriveOptions.selected || ($scope.departOptions.selected != mainHubLocation && $scope.arriveOptions.selected != mainHubLocation);
         $scope.searchForm.errors.departDate.isError = !$scope.searchForm.inputs.departDate || $scope.searchForm.inputs.departDate.length == 0;
         $scope.searchForm.errors.returnDate.isError = !$scope.searchForm.inputs.returnDate || $scope.searchForm.inputs.returnDate.length == 0;
         $scope.searchForm.errors.adults.isError = !$scope.searchForm.inputs.adults || $scope.searchForm.inputs.adults < 1;
 
         // set specific text based on empty or equality
-        if($scope.departOptions.selected != homeLocation && $scope.arriveOptions.selected != homeLocation) {
+        if($scope.departOptions.selected != mainHubLocation && $scope.arriveOptions.selected != mainHubLocation) {
             $scope.searchForm.errors.depart.message = $scope.searchForm.errors.depart.optionalMessages[2];
             $scope.searchForm.errors.arrive.message = $scope.searchForm.errors.arrive.optionalMessages[2];
         }

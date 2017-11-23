@@ -55,7 +55,7 @@ exports.read = function (req, res) {
  */
 exports.readProfile = function (req, res) {
     // create safe profile object
-    var user = User.toObject(req.user, { 'hide': 'tierId renewalDate subscribed homeLocation hubs maxHubs airlinePreferences airlineNonPreferences passwordUpdatedLast notificationNews notificationReminderEmail notificationResearch notificationReminderSMS paymentInfo' });
+    var user = User.toObject(req.user, { 'hide': 'tierId renewalDate subscribed hubs maxHubs airlinePreferences airlineNonPreferences passwordUpdatedLast notificationNews notificationReminderEmail notificationResearch notificationReminderSMS paymentInfo' });
 
     // send data
     res.json({ 'd': user });
@@ -227,7 +227,7 @@ exports.updatePassword = function (req, res, next) {
  */
 exports.readPayment = function (req, res) {
     // create safe profile object
-    var user = User.toObject(req.user, { 'hide': 'created displayName firstName lastName sex email phone lastLogin tierId renewalDate subscribed homeLocation hubs maxHubs airlinePreferences airlineNonPreferences passwordUpdatedLast notificationNews notificationReminderEmail notificationResearch notificationReminderSMS' });
+    var user = User.toObject(req.user, { 'hide': 'created displayName firstName lastName sex email phone lastLogin tierId renewalDate subscribed hubs maxHubs airlinePreferences airlineNonPreferences passwordUpdatedLast notificationNews notificationReminderEmail notificationResearch notificationReminderSMS' });
 
     // if card on file
     if(user.paymentInfo) {
@@ -394,25 +394,16 @@ exports.updatePayment = function (req, res) {
 exports.readHubs = function (req, res) {
     // create safe profile object
     var user = User.toObject(req.user, { 'hide': 'created displayName firstName lastName sex email phone lastLogin tierId renewalDate subscribed passwordUpdatedLast airlinePreferences airlineNonPreferences notificationNews notificationReminderEmail notificationResearch notificationReminderSMS paymentInfo' });
-
-    // if home location exists
-    if(user.homeLocation) {
-        // get the airport
-        var index = _.findIndex(airportCodes, user.homeLocation);
-
-        // set airport
-        var airport = index != -1 ? airportCodes[index] : null;
-
-        // recreate the home location object
-        user.homeLocation = _.cloneDeep(airport);
-        delete user.homeLocation.id;
-    }
     
     // current position
     var pos = 0;
 
     // loop through all hubs
     _.forEach(user.hubs, function(value) {
+        // determines if this hub was the main hub
+        var wasMain = value.main;
+        delete value.main;
+
         // get the airport
         var index = _.findIndex(airportCodes, value);
 
@@ -423,139 +414,15 @@ exports.readHubs = function (req, res) {
         user.hubs[pos] = _.cloneDeep(airport);
         delete user.hubs[pos].id;
 
+        // set back main
+        wasMain ? user.hubs[pos].main = true : null;
+        
         // increase to next position
         pos++;
     });
 
     // send data
     res.json({ 'd': user });
-};
-
-/**
- * Updates the hub home location
- */
-exports.updateHubHome = function (req, res) {
-    // validate existence
-    req.checkBody('homeLocation', `You must have a location. Must have key of iata or icao.`).notEmpty();
-    req.checkBody('homeLocation.iata', `${req.body.homeLocation.iata} is not a valid location. Must have key of iata or icao.`).isString();
-    req.checkBody('homeLocation.icao', `${req.body.homeLocation.icao} is not a valid location. Must have key of iata or icao.`).isString();
-    req.checkBody('homeLocation', `There is no airport based on this this location '${req.body.homeLocation.iata}' & '${req.body.homeLocation.icao}'.`).existsInArray(airportCodes);
-
-    // validate errors
-    req.getValidationResult().then(function(errors) {
-        // if any errors exists
-        if(!errors.isEmpty()) {
-            // holds all the errors in one text
-            var errorText = '';
-
-            // add all the errors
-            for(var x = 0; x < errors.array().length; x++) {
-                // if not the last error
-                if(x < errors.array().length - 1) {
-                    errorText += errors.array()[x].msg + '\r\n';
-                }
-                else {
-                    errorText += errors.array()[x].msg;
-                }
-            }
-
-            // send bad request
-            res.status(400).send({ title: errorHandler.getErrorTitle({ code: 400 }), message: errorText });
-        }
-        else {
-            // create the updated values object
-            var updatedValues = {
-                'homeLocation': {
-                    'iata': req.body.homeLocation.iata.toUpperCase(),
-                    'icao': req.body.homeLocation.icao.toUpperCase()
-                } 
-            };
-
-            // get the airport
-            var index = _.findIndex(airportCodes, updatedValues.homeLocation);
-
-            // set airport
-            var airport = index != -1 ? airportCodes[index] : null;
-
-            // redefine the home location to save
-            updatedValues.homeLocation.iata = airport.iata;
-            updatedValues.homeLocation.icao = airport.icao;
-
-            // update the values
-            User.update(req.user, updatedValues, function(err, updatedUser) {
-                // if an error occurred
-                if (err) {
-                    // send internal error
-                    res.status(500).send({ error: true, title: errorHandler.getErrorTitle(err), message: errorHandler.getGenericErrorMessage(err) });
-                    console.log(clc.error(errorHandler.getDetailedErrorMessage(err)));
-                }
-                else if (updatedUser) {
-                    // create the safe user object
-                    var safeUserObj = createUserReqObject(updatedUser);
-
-                    // set the updated object
-                    req.user = safeUserObj;
-
-                    // recreate the home location object
-                    var homeLocation = _.cloneDeep(airport);
-                    delete homeLocation.id;
-
-                    // send data
-                    res.json({ 'd': homeLocation });
-                }
-                else {
-                    // send internal error
-                    res.status(500).send({ error: true, title: errorHandler.getErrorTitle({ code: 500 }), message: errorHandler.getGenericErrorMessage({ code: 500 }) });
-                    console.log(clc.error(`In ${path.basename(__filename)} \'updateHubHome\': ` + errorHandler.getGenericErrorMessage({ code: 500 }) + ' Couldn\'t update User.'));
-                }
-            });
-        }
-    });
-};
-
-/**
- * Deletes the hub home location
- */
-exports.deleteHubHome = function (req, res) {
-    // get the home location
-    var deletedHome = req.user.homeLocation;
-
-    // if there is a home location
-    if(deletedHome) {
-        // create the updated values object
-        var updatedValues = {
-            'homeLocation': null
-        };
-
-        // update the values
-        User.update(req.user, updatedValues, function(err, updatedUser) {
-            // if an error occurred
-            if (err) {
-                // send internal error
-                res.status(500).send({ error: true, title: errorHandler.getErrorTitle(err), message: errorHandler.getGenericErrorMessage(err) });
-                console.log(clc.error(errorHandler.getDetailedErrorMessage(err)));
-            }
-            else if (updatedUser) {
-                // create the safe user object
-                var safeUserObj = createUserReqObject(updatedUser);
-
-                // set the updated object
-                req.user = safeUserObj;
-
-                // send data
-                res.json({ 'd': { 'hub': deletedHome, title: errorHandler.getErrorTitle({ code: 200 }), message: 'Home Hub successfully deleted.' } });
-            }
-            else {
-                // send internal error
-                res.status(500).send({ error: true, title: errorHandler.getErrorTitle({ code: 500 }), message: errorHandler.getGenericErrorMessage({ code: 500 }) });
-                console.log(clc.error(`In ${path.basename(__filename)} \'deleteHubHome\': ` + errorHandler.getGenericErrorMessage({ code: 500 }) + ' Couldn\'t update User.'));
-            }
-        });
-    }
-    else {
-        // send bad request
-        res.json({ 'd': { error: true, title: errorHandler.getErrorTitle({ code: 400 }), message: 'Home location does not currently exist. Cannot delete.' } });
-    }
 };
 
 /**
@@ -624,7 +491,7 @@ exports.upsertHub = function (req, res) {
             }
 
             // if there already a hub
-            if(newIndex != -1) {
+            if(newIndex != -1 && oldIndex == -1) {
                 // send bad request
                 res.status(400).send({ title: errorHandler.getErrorTitle({ code: 400 }), message: 'Cannot have duplicate hubs.' });
             }
@@ -634,6 +501,7 @@ exports.upsertHub = function (req, res) {
 
                 // set airport
                 var airport = index != -1 ? airportCodes[index] : null;
+                airport = _.cloneDeep(airport);
 
                 // clone hubs and add
                 var hubs = _.cloneDeep(req.user.hubs);
@@ -649,6 +517,18 @@ exports.upsertHub = function (req, res) {
                 else {  
                     // add
                     hubs.push({ 'iata': airport.iata, 'icao': airport.icao });
+                }
+
+                // if setting as main hub
+                if(req.body.newHub.main) {
+                    // remove old main hub
+                    _.forEach(hubs, function(value) {
+                        delete value.main;
+                    });
+
+                    // set new main hub
+                    oldIndex != -1 ? hubs[oldIndex].main = true : hubs[hubs.length - 1].main = true;
+                    airport.main = true;
                 }
 
                 // create the updated values object
@@ -750,7 +630,7 @@ exports.deleteHub = function (req, res) {
  */
 exports.readAirlinePreferences = function (req, res) {
     // create safe profile object
-    var user = User.toObject(req.user, { 'hide': 'created displayName firstName lastName sex email phone lastLogin tierId renewalDate subscribed passwordUpdatedLast homeLocation hubs maxHubs  notificationNews notificationReminderEmail notificationResearch notificationReminderSMS paymentInfo' });
+    var user = User.toObject(req.user, { 'hide': 'created displayName firstName lastName sex email phone lastLogin tierId renewalDate subscribed passwordUpdatedLast hubs maxHubs  notificationNews notificationReminderEmail notificationResearch notificationReminderSMS paymentInfo' });
     user.maxPreferences = 5;
     user.maxNonPreferences = 5;
 
@@ -857,7 +737,7 @@ exports.updateAirlinePreferences = function (req, res) {
  */
 exports.readMembership = function (req, res) {
     // create safe profile object
-    var user = User.toObject(req.user, { 'hide': 'created displayName firstName lastName sex email phone lastLogin passwordUpdatedLast homeLocation hubs maxHubs airlinePreferences airlineNonPreferences notificationNews notificationReminderEmail notificationResearch notificationReminderSMS paymentInfo' });
+    var user = User.toObject(req.user, { 'hide': 'created displayName firstName lastName sex email phone lastLogin passwordUpdatedLast hubs maxHubs airlinePreferences airlineNonPreferences notificationNews notificationReminderEmail notificationResearch notificationReminderSMS paymentInfo' });
 
     // send data
     res.json({ 'd': user });
@@ -923,7 +803,7 @@ exports.cancelMembership = function (req, res) {
  */
 exports.readNotifications = function (req, res) {
     // create safe profile object
-    var user = User.toObject(req.user, { 'hide': 'created displayName firstName lastName sex email phone lastLogin tierId renewalDate subscribed passwordUpdatedLast homeLocation hubs maxHubs airlinePreferences airlineNonPreferences paymentInfo' });
+    var user = User.toObject(req.user, { 'hide': 'created displayName firstName lastName sex email phone lastLogin tierId renewalDate subscribed passwordUpdatedLast hubs maxHubs airlinePreferences airlineNonPreferences paymentInfo' });
 
     // send data
     res.json({ 'd': user });
