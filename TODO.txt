@@ -1,7 +1,6 @@
 ﻿In Progress
 - changes how hubs are added (so when entering the text, auto populate) -> can't quite figure this out yet inside a sweet alert input
     might have to enter the text a different way (not in sweet alert)
-- fix the definition of main hub (and how it works) on flight page
 
 Next
 - add an "error dashboard" so if there are errors in server, we can view them
@@ -9,7 +8,7 @@ Next
 - use 'https://api.ipify.org?format=json' if can't use other tool to get ip address
 - when a user purchases a membership, then set maxHubs
 - instead of sending a huge amount of data over server (for hubs) just send iata and icao adn then on front end do a lookup
-
+- remove credit card stuff and use Stripe.com instead
 
 Future
 - after sign up, send an email to verify
@@ -17,7 +16,6 @@ Future
     (if cc number needs to be string, 16 long and valid, then if its not a string, don't even test 16 long or valid)
 
 Done
-- fixed the definition of "main hub"
 
 Testing
 

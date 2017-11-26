@@ -32,21 +32,16 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
     // the initial text of a dropdown
     $scope.initialText = 'Select One';
 
-    // the departing options
-    $scope.departOptions = {
-        'selected': $scope.initialText,
-        'options': [$scope.initialText]
-    };
-
-    // the arrival options
-    $scope.arriveOptions = {
-        'selected': $scope.initialText,
+    // the hub options
+    $scope.hubOptions = {
         'options': [$scope.initialText]
     };
 
     // holds the sign up form data
     $scope.searchForm = {
         'inputs': {
+            'depart': $scope.initialText,
+            'arrive': '',
             'departDate': today,
             'returnDate': tomorrow,
             'adults': 1
@@ -59,12 +54,12 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
             'depart': {
                 'isError': false,
                 'message': 'Please select a departing location',
-                'optionalMessages': ['Please select a departing location', 'Cannot depart and arrive at same location', 'Can only travel from Home to Hub or Hub to Home, Hub to Hub is not allowed']
+                'optionalMessages': ['Please select a departing location', 'Cannot depart and arrive at same location', 'Must have a Hub as a departing or arriving location', 'Not a valid airport location']
             },
             'arrive': {
                 'isError': false,
                 'message': 'Please select a arrival location',
-                'optionalMessages': ['Please select a arrival location', 'Cannot depart and arrive at same location', 'Can only travel from Home to Hub or Hub to Home, Hub to Hub is not allowed']
+                'optionalMessages': ['Please select an arrival location', 'Cannot depart and arrive at same location', 'Must have a Hub as a departing or arriving location', 'Not a valid airport location']
             },
             'departDate': {
                 'isError': false,
@@ -83,6 +78,17 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
     
     // determines if form is in transit
     $scope.formInTransit = false;
+
+    // determines which direction user is going for their hub
+    $scope.hubDirection = 'depart';
+
+    // the direction text
+    $scope.directionText  = {
+        'current': 'Switch to hub arrival <i class="fa fa-arrow-right" aria-hidden="true"></i>',
+        'changeTo': 'arrive',
+        'textOptions': ['<i class="fa fa-arrow-left" aria-hidden="true"></i> Switch to hub departure', 'Switch to hub arrival <i class="fa fa-arrow-right" aria-hidden="true"></i>'],
+        'changeOptions': ['depart', 'arrive']
+    };
 
     // determines if the page is fully loaded
     $scope.pageFullyLoaded = false;
@@ -126,6 +132,36 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
         }
     });
 
+    // switch between depart and arrive for hubs
+    $scope.switchTo = function (departOrArrive) {
+        // set null
+        $scope.hubDirection = null;
+
+        // if switching to arrive
+        if(departOrArrive == 'arrive') {
+            // swap to depart
+            $scope.directionText.current = $scope.directionText.textOptions[0];
+            $scope.directionText.changeTo = $scope.directionText.changeOptions[0];
+        }
+        else {
+            // swap to arrive
+            $scope.directionText.current = $scope.directionText.textOptions[1];
+            $scope.directionText.changeTo = $scope.directionText.changeOptions[1];
+        }
+        
+        // swap values
+        $timeout(function() {
+             // if arrive
+            departOrArrive == 'arrive' ? $scope.hubDirection = departOrArrive : $scope.hubDirection = 'depart';
+
+            // swap values
+            var prevArr = $scope.searchForm.inputs.arrive;
+            var prevDep = $scope.searchForm.inputs.depart;
+            $scope.searchForm.inputs.arrive = prevDep;
+            $scope.searchForm.inputs.depart = prevArr;
+        }, 750);
+    };
+
     // searches for flights
     $scope.searchFlights = function () {
         // check for any errors in the values
@@ -136,26 +172,97 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
             // disable button but showing the form has been submitted
             $scope.formInTransit = true;
 
-            // the data to send
-            var signUpData = {
-                'depart': $scope.departOptions.selected,
-                'arrive': $scope.arriveOptions.selected,
-                'departDate': $scope.searchForm.inputs.departDate,
-                'returnDate': $scope.searchForm.inputs.returnDate,
-                'adults': $scope.searchForm.inputs.adults
-            };
+            // get the depart
+            var depart = null;
+            var arrive = null;
 
-            // search flights
-            FlightsFactory.getFlights(signUpData).then(function (responseF) {
-                // if returned a valid response
-                if (responseF && !responseF.error) {
-                    // set the data
-                    $scope.flights.flightList = responseF;
+            // if direction is arrive
+            if($scope.hubDirection == 'arrive') {
+                // get the index of ' (Main)'
+                var mainIndex = $scope.searchForm.inputs.arrive.indexOf(' (Main)');
 
-                    // show the form is no longer in transit
-                    $scope.formInTransit = false;
+                // if user selected main hub
+                if(mainIndex != -1) {
+                    arrive = $scope.searchForm.inputs.arrive.substring(0, mainIndex);
                 }
                 else {
+                    arrive = $scope.searchForm.inputs.arrive;
+                }
+
+                // set depart
+                depart = $scope.searchForm.inputs.depart;
+            }
+            else {
+                // get the index of ' (Main)'
+                var mainIndex = $scope.searchForm.inputs.depart.indexOf(' (Main)');
+                
+                // if user selected main hub
+                if(mainIndex != -1) {
+                    depart = $scope.searchForm.inputs.depart.substring(0, mainIndex);
+                }
+                else {
+                    depart = $scope.searchForm.inputs.depart;
+                }
+
+                // set arrive
+                arrive = $scope.searchForm.inputs.arrive;
+            }
+
+            // get the departing/arriving location
+            var foundDepart = _.find($rootScope.$root.airportCodes, { 'name': depart });
+            var foundArrive = _.find($rootScope.$root.airportCodes, { 'name': arrive });
+
+            // if both are found
+            if(foundDepart && foundArrive) {
+                // the data to send
+                var searchData = {
+                    'depart': { 'iata': foundDepart.iata, 'icao': foundDepart.icao },
+                    'arrive': { 'iata': foundArrive.iata, 'icao': foundArrive.icao },
+                    'departDate': $scope.searchForm.inputs.departDate,
+                    'returnDate': $scope.searchForm.inputs.returnDate,
+                    'adults': $scope.searchForm.inputs.adults
+                };
+
+                // search flights
+                FlightsFactory.getFlights(searchData).then(function (responseF) {
+                    // if returned a valid response
+                    if (responseF && !responseF.error) {
+                        // set the data
+                        $scope.flights.flightList = responseF;
+
+                        // show the form is no longer in transit
+                        $scope.formInTransit = false;
+                    }
+                    else {
+                        // show error
+                        swal({
+                            title: 'Error!',
+                            text: 'Sorry! There was an error: ' + responseF.message,
+                            type: 'error',
+                            confirmButtonClass: 'btn btn-theme-primary btn-cursor-pointer',
+                            buttonsStyling: false
+                        }).then(function () {
+                            // show error
+                            $scope.searchForm.errors.generic.message = responseF.message;
+                            $scope.searchForm.errors.generic.isError = true;
+                            $scope.formInTransit = false;
+
+                            // force apply
+                            $scope.$apply();
+                        },
+                        // handling the promise rejection
+                        function (dismiss) {
+                            // show error
+                            $scope.searchForm.errors.generic.message = responseF.message;
+                            $scope.searchForm.errors.generic.isError = true;
+                            $scope.formInTransit = false;
+
+                            // force apply
+                            $scope.$apply();         
+                        });
+                    }
+                })
+                .catch(function (responseF) {
                     // show error
                     swal({
                         title: 'Error!',
@@ -180,21 +287,21 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
                         $scope.formInTransit = false;
 
                         // force apply
-                        $scope.$apply();         
+                        $scope.$apply();           
                     });
-                }
-            })
-            .catch(function (responseF) {
+                });
+            }
+            else {
                 // show error
                 swal({
                     title: 'Error!',
-                    text: 'Sorry! There was an error: ' + responseF.message,
+                    text: 'Sorry! There was an error: Please try again later.',
                     type: 'error',
                     confirmButtonClass: 'btn btn-theme-primary btn-cursor-pointer',
                     buttonsStyling: false
                 }).then(function () {
                     // show error
-                    $scope.searchForm.errors.generic.message = responseF.message;
+                    $scope.searchForm.errors.generic.message = $rootScope.$root.generalStatusError;
                     $scope.searchForm.errors.generic.isError = true;
                     $scope.formInTransit = false;
 
@@ -204,14 +311,14 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
                 // handling the promise rejection
                 function (dismiss) {
                     // show error
-                    $scope.searchForm.errors.generic.message = responseF.message;
+                    $scope.searchForm.errors.generic.message = $rootScope.$root.generalStatusError;
                     $scope.searchForm.errors.generic.isError = true;
                     $scope.formInTransit = false;
 
                     // force apply
                     $scope.$apply();           
                 });
-            });
+            }
         }
     };
 
@@ -372,26 +479,41 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
                     // set the data
                     $scope.hub.data = responseH;
 
-                    // loop through all hubs and find the main hub
-                    _.forEach($scope.hub.data.hubs, function(value) {
-                        // if main
-                        if(value.main) {
-                            $scope.mainHub = value;
-                        }
-                    });
-
-                    // get the airport code
-                    var mainHubAirport = $scope.mainHub.iata ? $scope.mainHub.iata : $scope.mainHub.icao;
-                    $scope.departOptions.options.push(`${mainHubAirport} - ${$scope.mainHub.city} (Home)`);
-                    $scope.arriveOptions.options.push(`${mainHubAirport} - ${$scope.mainHub.city} (Home)`);
-
                     // add all available hubs and home locations
                     _.forEach(responseH.hubs, function(value) {
                         // get the airport code
                         var hubAirport = value.iata ? value.iata : value.icao;
-                        $scope.departOptions.options.push(`${hubAirport} - ${value.city} (Hub)`);
-                        $scope.arriveOptions.options.push(`${hubAirport} - ${value.city} (Hub)`);
+
+                        // if main
+                        if(value.main) {
+                            // set main
+                            $scope.hubOptions.options.push(`${value.name} (Main)`);
+                        }
+                        else {
+                            // set hub
+                            $scope.hubOptions.options.push(value.name);
+                        }
                     });
+
+                    // if the user doesn't have hubs
+                    if(responseH.hubs.length == 0) {
+                        // show error
+                        swal({
+                            title: 'No hubs!',
+                            text: 'Sorry! It looks like you don\'t have any hubs. Lets add some!',
+                            type: 'info',
+                            confirmButtonClass: 'btn btn-theme-primary btn-cursor-pointer',
+                            buttonsStyling: false
+                        }).then(function () {
+                            // go to account page
+                            $window.href = '/account/hubs';
+                        },
+                        // handling the promise rejection
+                        function (dismiss) {
+                            // go to account page
+                            $window.href = '/account/hubs';
+                        });
+                    }
                 }
                 else {
                     // show error
@@ -423,36 +545,40 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
 
     // checks for any errors in the values
     function checkErrorValues() {
-        // get the home location
-        var mainHubAirport = null;
-        var mainHubLocation = null;
-
-        // if main hub exists
-        if($scope.mainHub) {
-            mainHubAirport = $scope.mainHub.iata ? $scope.mainHub.iata : $scope.mainHub.icao;
-            mainHubLocation = `${mainHubAirport} - ${$scope.mainHub.city} (Home)`;
-        }
-
         // check for any empty values
-        $scope.searchForm.errors.depart.isError = !$scope.departOptions.selected || $scope.departOptions.selected.length == 0 || $scope.departOptions.selected == $scope.initialText || $scope.departOptions.selected == $scope.arriveOptions.selected || ($scope.departOptions.selected != mainHubLocation && $scope.arriveOptions.selected != mainHubLocation);
-        $scope.searchForm.errors.arrive.isError = !$scope.arriveOptions.selected || $scope.arriveOptions.selected.length == 0 || $scope.arriveOptions.selected == $scope.initialText || $scope.departOptions.selected == $scope.arriveOptions.selected || ($scope.departOptions.selected != mainHubLocation && $scope.arriveOptions.selected != mainHubLocation);
+        $scope.searchForm.errors.depart.isError = !$scope.searchForm.inputs.depart || $scope.searchForm.inputs.depart.length == 0 || ($scope.hubDirection == 'depart' && $scope.searchForm.inputs.depart == $scope.initialText)
+                                                    || ($scope.hubDirection == 'depart' && _.indexOf($scope.hubOptions.options, $scope.searchForm.inputs.depart) == -1)
+                                                    || ($scope.hubDirection == 'arrive' && _.findIndex($rootScope.$root.airportCodes, { 'name': $scope.searchForm.inputs.depart }) == -1);
+        $scope.searchForm.errors.arrive.isError = !$scope.searchForm.inputs.arrive || $scope.searchForm.inputs.arrive.length == 0 || ($scope.hubDirection == 'arrive' && $scope.searchForm.inputs.arrive == $scope.initialText)
+                                                    || ($scope.hubDirection == 'arrive' && _.indexOf($scope.hubOptions.options, $scope.searchForm.inputs.arrive) == -1)
+                                                    || ($scope.hubDirection == 'depart' && _.findIndex($rootScope.$root.airportCodes, { 'name': $scope.searchForm.inputs.arrive }) == -1);
         $scope.searchForm.errors.departDate.isError = !$scope.searchForm.inputs.departDate || $scope.searchForm.inputs.departDate.length == 0;
         $scope.searchForm.errors.returnDate.isError = !$scope.searchForm.inputs.returnDate || $scope.searchForm.inputs.returnDate.length == 0;
         $scope.searchForm.errors.adults.isError = !$scope.searchForm.inputs.adults || $scope.searchForm.inputs.adults < 1;
 
         // set specific text based on empty or equality
-        if($scope.departOptions.selected != mainHubLocation && $scope.arriveOptions.selected != mainHubLocation) {
+        if($scope.hubDirection == 'arrive' && _.findIndex($rootScope.$root.airportCodes, { 'name': $scope.searchForm.inputs.depart }) == -1) {
+            $scope.searchForm.errors.depart.message = $scope.searchForm.errors.depart.optionalMessages[3];
+        }
+        else if($scope.hubDirection == 'depart' && _.findIndex($rootScope.$root.airportCodes, { 'name': $scope.searchForm.inputs.arrive }) == -1) {
+            $scope.searchForm.errors.arrive.message = $scope.searchForm.errors.arrive.optionalMessages[3];
+        }
+
+        if($scope.hubDirection == 'depart' && $scope.searchForm.inputs.depart != $scope.initialText && _.indexOf($scope.hubOptions.options, $scope.searchForm.inputs.depart) == -1) {
             $scope.searchForm.errors.depart.message = $scope.searchForm.errors.depart.optionalMessages[2];
+        }
+        else if($scope.hubDirection == 'arrive' && $scope.searchForm.inputs.arrive != $scope.initialText && _.indexOf($scope.hubOptions.options, $scope.searchForm.inputs.arrive) == -1) {
             $scope.searchForm.errors.arrive.message = $scope.searchForm.errors.arrive.optionalMessages[2];
         }
-        if($scope.departOptions.selected == $scope.arriveOptions.selected) {
+
+        if($scope.searchForm.inputs.depart == $scope.searchForm.inputs.arrive) {
             $scope.searchForm.errors.depart.message = $scope.searchForm.errors.depart.optionalMessages[1];
             $scope.searchForm.errors.arrive.message = $scope.searchForm.errors.arrive.optionalMessages[1];
         }
-        if(!$scope.departOptions.selected || $scope.departOptions.selected.length == 0 || $scope.departOptions.selected == $scope.initialText) {
+        if(!$scope.searchForm.inputs.depart || $scope.searchForm.inputs.depart.length == 0 || ($scope.hubDirection == 'depart' && $scope.searchForm.inputs.depart == $scope.initialText)) {
             $scope.searchForm.errors.depart.message = $scope.searchForm.errors.depart.optionalMessages[0];
         }
-        if(!$scope.arriveOptions.selected || $scope.arriveOptions.selected.length == 0 || $scope.arriveOptions.selected == $scope.initialText) {
+        if(!$scope.searchForm.inputs.arrive || $scope.searchForm.inputs.arrive.length == 0 || ($scope.hubDirection == 'arrive' && $scope.searchForm.inputs.arrive == $scope.initialText)) {
             $scope.searchForm.errors.arrive.message = $scope.searchForm.errors.arrive.optionalMessages[0];
         }
     };
