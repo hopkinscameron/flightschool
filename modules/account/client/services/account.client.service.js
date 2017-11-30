@@ -310,7 +310,10 @@ accountServiceModule.factory('AccountFactory', ['$http', '$location', '$rootScop
 
         // stringify the data
         var dataStrigified = JSON.stringify({
-            
+            'number': data.number,
+            'expiration': data.expiration,
+            'ccv': data.ccv,
+            'tierId': data.tierId,
         });
 
         // send request

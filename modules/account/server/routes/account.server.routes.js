@@ -10,9 +10,7 @@ var // the path
     // the account policy
 	accountPolicy = require('../policies/account.server.policy'),
     // the account controller to handle routes
-    accountController = require('../controllers/account.server.controller'),
-    // the login controller to handle routes
-    loginController = require('../controllers/login.server.controller');
+    accountController = require('../controllers/account.server.controller');
 
 module.exports = function (app) {
     // =========================================================================

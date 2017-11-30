@@ -278,6 +278,11 @@ headerModule.controller('HeaderController', ['$scope', '$rootScope', '$location'
         });
     };
 
+    // format float to number of decimals
+    $rootScope.$root.formatFloat = function(value, numDecimals) {
+        return value.toFixed(numDecimals);
+    };
+
     // initialize variables
     function initializeVariables () {
         // set jQuery
@@ -308,18 +313,6 @@ headerModule.controller('HeaderController', ['$scope', '$rootScope', '$location'
         $rootScope.$root.locale = 'locale';
         $rootScope.$root.iso = 'iso';
         $rootScope.$root.shortNumeric = 'shortNumeric';
-
-        // parses date/time
-        $rootScope.$root.parseDateTime = function (dateTime) {
-            try {
-                // get the locale string format
-                var formatted = new Date(dateTime).toLocaleString().replace(/:\d{2}\s/,' ');
-                return formatted;
-            }
-            catch (e) {
-                return '';
-            }
-        };
 
         // holds the header backend data
         $scope.header = {};

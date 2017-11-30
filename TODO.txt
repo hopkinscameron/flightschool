@@ -9,6 +9,7 @@ Next
 - when a user purchases a membership, then set maxHubs
 - instead of sending a huge amount of data over server (for hubs) just send iata and icao adn then on front end do a lookup
 - remove credit card stuff and use Stripe.com instead
+- when a membership is expiring, set as a banner above the header
 
 Future
 - after sign up, send an email to verify
@@ -16,6 +17,7 @@ Future
     (if cc number needs to be string, 16 long and valid, then if its not a string, don't even test 16 long or valid)
 
 Done
+
 
 Testing
 

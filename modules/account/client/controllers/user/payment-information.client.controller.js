@@ -28,7 +28,7 @@ accountModule.controller('PaymentInformationController', ['$scope', '$rootScope'
             'number': 4716955713636688,
             'expirationMM': 12,
             'expirationYY': 17,
-            'ccv': ''
+            'ccv': undefined //123
         },
         'errors': {
             'generic': {
@@ -184,7 +184,7 @@ accountModule.controller('PaymentInformationController', ['$scope', '$rootScope'
         $scope.paymentInformationForm.inputs.number = parseInt($scope.paymentInformation.data.number);
         $scope.paymentInformationForm.inputs.expirationMM = parseInt($scope.paymentInformation.data.expiration.substring(0, 2));
         $scope.paymentInformationForm.inputs.expirationYY = parseInt($scope.paymentInformation.data.expiration.substring(2));
-        $scope.paymentInformationForm.inputs.ccv = '';
+        $scope.paymentInformationForm.inputs.ccv = parseInt($scope.paymentInformation.data.ccv);
     };
 
     // cancel's editing

@@ -10,8 +10,6 @@
  */
 var // generate UUID's
     uuidv1 = require('uuid/v1'),
-    // short id generator
-    shortid = require('shortid'),
     // lodash
     _ = require('lodash'),
     // the path
@@ -176,7 +174,7 @@ exports.save = function(objToSave, callback) {
         var index = -1;
 
         // find the object matching the object index
-        index = _.findIndex(db, { 'internalName': objToSave.internalName });
+        index = _.findIndex(db, { '_id': objToSave._id });
         obj = index != -1 ? db[index] : null;
 
         // if object was found
@@ -218,9 +216,6 @@ exports.save = function(objToSave, callback) {
 
             // set created date
             objToSave.created = new Date();
-
-            // generate a short id if the current one doesn't exist
-            objToSave.internalName = shortid.generate();
 
             // push the new object
             db.push(objToSave);

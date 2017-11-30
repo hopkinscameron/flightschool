@@ -33,8 +33,6 @@ var // the path
     accountDetailsPath = path.join(__dirname, '../data/account.json'),
     // the file details for this view
     accountDetails = {},
-    // the Payment Transaction model
-    PaymentTransaction = require(path.resolve('./modules/account/server/models/model-payment-transaction')),
     // the Payment Type model
     PaymentType = require(path.resolve('./modules/account/server/models/model-payment-type')),
     // the Tier model
@@ -55,7 +53,7 @@ exports.read = function (req, res) {
  */
 exports.readProfile = function (req, res) {
     // create safe profile object
-    var user = User.toObject(req.user, { 'hide': 'tierId renewalDate subscribed hubs maxHubs airlinePreferences airlineNonPreferences passwordUpdatedLast notificationNews notificationReminderEmail notificationResearch notificationReminderSMS paymentInfo' });
+    var user = User.toObject(req.user, { 'hide': 'tierId nextBillingCycle subscribed hubs maxHubs airlinePreferences airlineNonPreferences passwordUpdatedLast notificationNews notificationReminderEmail notificationResearch notificationReminderSMS paymentInfo' });
 
     // send data
     res.json({ 'd': user });
@@ -92,7 +90,9 @@ exports.updateProfile = function (req, res) {
                 var safeUserObj = createUserReqObject(updatedUser);
 
                 // set the updated object
+                var p = req.user.paymentInfo;
                 req.user = safeUserObj;
+                req.user.paymentInfo = p;
 
                 // read the profile
                 module.exports.readProfile(req, res);
@@ -196,7 +196,9 @@ exports.updatePassword = function (req, res, next) {
                                             var safeUserObj = createUserReqObject(updatedUser);
 
                                             // set the updated object
+                                            var p = req.user.paymentInfo;
                                             req.user = safeUserObj;
+                                            req.user.paymentInfo = p;
 
                                             // return password changed
                                             res.json({ 'd': { title: errorHandler.getErrorTitle({ code: 200 }), message: errorHandler.getGenericErrorMessage({ code: 200 }) + ' Successful password change.' } });
@@ -227,7 +229,7 @@ exports.updatePassword = function (req, res, next) {
  */
 exports.readPayment = function (req, res) {
     // create safe profile object
-    var user = User.toObject(req.user, { 'hide': 'created displayName firstName lastName sex email phone lastLogin tierId renewalDate subscribed hubs maxHubs airlinePreferences airlineNonPreferences passwordUpdatedLast notificationNews notificationReminderEmail notificationResearch notificationReminderSMS' });
+    var user = User.toObject(req.user, { 'hide': 'created displayName firstName lastName sex email phone lastLogin tierId nextBillingCycle subscribed hubs maxHubs airlinePreferences airlineNonPreferences passwordUpdatedLast notificationNews notificationReminderEmail notificationResearch notificationReminderSMS' });
 
     // if card on file
     if(user.paymentInfo) {
@@ -393,7 +395,7 @@ exports.updatePayment = function (req, res) {
  */
 exports.readHubs = function (req, res) {
     // create safe profile object
-    var user = User.toObject(req.user, { 'hide': 'created displayName firstName lastName sex email phone lastLogin tierId renewalDate subscribed passwordUpdatedLast airlinePreferences airlineNonPreferences notificationNews notificationReminderEmail notificationResearch notificationReminderSMS paymentInfo' });
+    var user = User.toObject(req.user, { 'hide': 'created displayName firstName lastName sex email phone lastLogin tierId nextBillingCycle subscribed passwordUpdatedLast airlinePreferences airlineNonPreferences notificationNews notificationReminderEmail notificationResearch notificationReminderSMS paymentInfo' });
     
     // current position
     var pos = 0;
@@ -555,7 +557,9 @@ exports.upsertHub = function (req, res) {
                             var safeUserObj = createUserReqObject(updatedUser);
 
                             // set the updated object
+                            var p = req.user.paymentInfo;
                             req.user = safeUserObj;
+                            req.user.paymentInfo = p;
 
                             // recreate the hub location object
                             var hub = _.cloneDeep(airport);
@@ -607,7 +611,9 @@ exports.deleteHub = function (req, res) {
                 var safeUserObj = createUserReqObject(updatedUser);
 
                 // set the updated object
+                var p = req.user.paymentInfo;
                 req.user = safeUserObj;
+                req.user.paymentInfo = p;
 
                 // send data
                 res.json({ 'd': { 'hub': deletedHub, title: errorHandler.getErrorTitle({ code: 200 }), message: 'Hub successfully deleted.' } });
@@ -630,7 +636,7 @@ exports.deleteHub = function (req, res) {
  */
 exports.readAirlinePreferences = function (req, res) {
     // create safe profile object
-    var user = User.toObject(req.user, { 'hide': 'created displayName firstName lastName sex email phone lastLogin tierId renewalDate subscribed passwordUpdatedLast hubs maxHubs  notificationNews notificationReminderEmail notificationResearch notificationReminderSMS paymentInfo' });
+    var user = User.toObject(req.user, { 'hide': 'created displayName firstName lastName sex email phone lastLogin tierId nextBillingCycle subscribed passwordUpdatedLast hubs maxHubs  notificationNews notificationReminderEmail notificationResearch notificationReminderSMS paymentInfo' });
     user.maxPreferences = 5;
     user.maxNonPreferences = 5;
 
@@ -717,7 +723,9 @@ exports.updateAirlinePreferences = function (req, res) {
                     var safeUserObj = createUserReqObject(updatedUser);
 
                     // set the updated object
+                    var p = req.user.paymentInfo;
                     req.user = safeUserObj;
+                    req.user.paymentInfo = p;
 
                     // read the airline preferences
                     module.exports.readAirlinePreferences(req, res);
@@ -737,7 +745,7 @@ exports.updateAirlinePreferences = function (req, res) {
  */
 exports.readMembership = function (req, res) {
     // create safe profile object
-    var user = User.toObject(req.user, { 'hide': 'created displayName firstName lastName sex email phone lastLogin passwordUpdatedLast hubs maxHubs airlinePreferences airlineNonPreferences notificationNews notificationReminderEmail notificationResearch notificationReminderSMS paymentInfo' });
+    var user = User.toObject(req.user, { 'hide': 'created displayName firstName lastName sex email phone lastLogin passwordUpdatedLast hubs maxHubs airlinePreferences airlineNonPreferences notificationNews notificationReminderEmail notificationResearch notificationReminderSMS' });
 
     // send data
     res.json({ 'd': user });
@@ -747,8 +755,116 @@ exports.readMembership = function (req, res) {
  * Changes the membership details
  */
 exports.changeMembership = function (req, res) {
-    // send data
-    res.json({ 'd': accountDetails });
+    // get next valid date
+    var nextValidMonthYear = new Date();
+    nextValidMonthYear.setMonth(nextValidMonthYear.getMonth() + 1);
+    var minMonth = nextValidMonthYear.getMonth();
+    minMonth++;
+    minMonth = minMonth < 10 ? `0${minMonth.toString()}` : minMonth.toString();
+
+    // get the next 5 years based on the next valid date
+    var fiveComing = new Date(nextValidMonthYear);
+    fiveComing.setFullYear(fiveComing.getFullYear() + 5);
+    var acceptableDateRangeForExpiration = { 
+        'minMonth': parseInt(minMonth), 
+        'maxMonth': 12, 
+        'minYear': parseInt(nextValidMonthYear.getFullYear().toString().substring(2)), 
+        'maxYear': parseInt(fiveComing.getFullYear().toString().substring(2))
+    };
+
+    // validate existence
+    req.checkBody('number', 'You must have a credit card number.').notEmpty();
+    req.checkBody('number', 'Credit card number must be in string format of 16 digits.').isString();
+    req.checkBody('number', 'Invalid Credit card number.').isValidCC(validCCTypes);
+    req.checkBody('expiration', 'You must have the expirtation date.').notEmpty();
+    req.checkBody('expiration', 'Expirtation date needs to be in the string format of MMYY.').isString();
+    req.checkBody('expiration', 'Expirtation date is not 4 digits in the format of MMYY.').isOfLength(4);
+    req.checkBody('expiration', `Expirtation date is not a valid date (must be the minumum date ${acceptableDateRangeForExpiration.minMonth}/${acceptableDateRangeForExpiration.minYear} and maximum date ${acceptableDateRangeForExpiration.maxMonth}/${acceptableDateRangeForExpiration.maxYear} ).`).isValidExpMonthYear(acceptableDateRangeForExpiration);
+    req.checkBody('ccv', 'You must have the CCV number.').notEmpty();
+    req.checkBody('ccv', 'CCV number must be in string format of 3 digits.').isString();
+    req.checkBody('ccv', 'CCV number is not 3 digits.').isOfLength(3);
+
+    // validate errors
+    req.getValidationResult().then(function(errors) {
+        // if any errors exists
+        if(!errors.isEmpty()) {
+            // holds all the errors in one text
+            var errorText = '';
+
+            // add all the errors
+            for(var x = 0; x < errors.array().length; x++) {
+                // if not the last error
+                if(x < errors.array().length - 1) {
+                    errorText += errors.array()[x].msg + '\r\n';
+                }
+                else {
+                    errorText += errors.array()[x].msg;
+                }
+            }
+
+            // send bad request
+            res.status(400).send({ title: errorHandler.getErrorTitle({ code: 400 }), message: errorText });
+        }
+        else {
+            // TODO: if user has membership and is currently subscribed, charge them only the difference, else create new
+
+            // verify tier id is valid
+            Tier.findById(req.body.tierId, function(err, foundTier) {
+                // if an error occurred
+                if (err) {
+                    // send internal error
+                    res.status(500).send({ error: true, title: errorHandler.getErrorTitle(err), message: errorHandler.getGenericErrorMessage(err) });
+                    console.log(clc.error(errorHandler.getDetailedErrorMessage(err)));
+                }
+                else if (foundTier) {
+                    // billing cycle start/end
+                    var billingCycleStart = new Date();
+                    var billingCycleEnd = new Date();
+                    billingCycleEnd.setMonth(billingCycleEnd.getMonth() + 1);
+                    billingCycleEnd.setDate(billingCycleEnd.getDate() - 1);
+
+                    // create the updated values object
+                    var updatedValues = {
+                        '_id': req.user._id,
+                        'tierId': req.body.tierId,
+                        'subscribed': true,
+                        'nextBillingCycle': { 'start': billingCycleStart, 'end': billingCycleEnd }
+                    };
+
+                    // update the values
+                    User.update(req.user, updatedValues, function(err, updatedUser) {
+                        // if an error occurred
+                        if (err) {
+                            // send internal error
+                            res.status(500).send({ error: true, title: errorHandler.getErrorTitle(err), message: errorHandler.getGenericErrorMessage(err) });
+                            console.log(clc.error(errorHandler.getDetailedErrorMessage(err)));
+                        }
+                        else if (updatedUser) {
+                            // create the safe user object
+                            var safeUserObj = createUserReqObject(updatedUser);
+
+                            // set the updated object
+                            var p = req.user.paymentInfo;
+                            req.user = safeUserObj;
+                            req.user.paymentInfo = p;
+
+                            // read the membership
+                            module.exports.readMembership(req, res);
+                        }
+                        else {
+                            // send internal error
+                            res.status(500).send({ error: true, title: errorHandler.getErrorTitle({ code: 500 }), message: errorHandler.getGenericErrorMessage({ code: 500 }) });
+                            console.log(clc.error(`In ${path.basename(__filename)} \'changeMembership\': ` + errorHandler.getGenericErrorMessage({ code: 500 }) + ' Couldn\'t update User.'));
+                        }
+                    });
+                }
+                else {
+                    // send bad request
+                    res.status(400).send({ title: errorHandler.getErrorTitle({ code: 400 }), message: 'Not a valid membership level' });
+                }
+            });
+        }
+    });
 };
 
 /**
@@ -762,9 +878,8 @@ exports.cancelMembership = function (req, res) {
     if(currentMembership) {
         // create the updated values object
         var updatedValues = {
-            'tierId': null,
             'subscribed': false,
-            'renewalDate': null
+            'nextBillingCycle': null
         };
 
         // update the values
@@ -780,10 +895,12 @@ exports.cancelMembership = function (req, res) {
                 var safeUserObj = createUserReqObject(updatedUser);
 
                 // set the updated object
+                var p = req.user.paymentInfo;
                 req.user = safeUserObj;
+                req.user.paymentInfo = p;
 
-                // send data
-                res.json({ 'd': { 'hub': currentMembership, title: errorHandler.getErrorTitle({ code: 200 }), message: 'Membership cancelled.' } });
+                // read the membership
+                module.exports.readMembership(req, res);
             }
             else {
                 // send internal error
@@ -794,7 +911,7 @@ exports.cancelMembership = function (req, res) {
     }
     else {
         // send bad request
-        res.json({ 'd': { error: true, title: errorHandler.getErrorTitle({ code: 400 }), message: 'There is no current membership to be cancelled.' } });
+        res.json({ 'd': { error: true, title: errorHandler.getErrorTitle({ code: 400 }), message: 'There is no current membership to be canceled.' } });
     }
 };
 
@@ -803,7 +920,7 @@ exports.cancelMembership = function (req, res) {
  */
 exports.readNotifications = function (req, res) {
     // create safe profile object
-    var user = User.toObject(req.user, { 'hide': 'created displayName firstName lastName sex email phone lastLogin tierId renewalDate subscribed passwordUpdatedLast hubs maxHubs airlinePreferences airlineNonPreferences paymentInfo' });
+    var user = User.toObject(req.user, { 'hide': 'created displayName firstName lastName sex email phone lastLogin tierId nextBillingCycle subscribed passwordUpdatedLast hubs maxHubs airlinePreferences airlineNonPreferences paymentInfo' });
 
     // send data
     res.json({ 'd': user });
@@ -839,7 +956,9 @@ exports.updateNotifications = function (req, res) {
                 var safeUserObj = createUserReqObject(updatedUser);
 
                 // set the updated object
+                var p = req.user.paymentInfo;
                 req.user = safeUserObj;
+                req.user.paymentInfo = p;
 
                 // read the notifications
                 module.exports.readNotifications(req, res);
@@ -1104,7 +1223,7 @@ function createPaymentTypeReqObject(pt) {
     // save the id since it will be lost when going to object
     // hide the information for security purposes
     var id = safeObj._id;
-    safeObj = PaymentType.toObject(safeObj, { 'hide': 'created internalName ccv userId' });
+    safeObj = PaymentType.toObject(safeObj, { 'hide': 'created internalName userId' });
     safeObj._id = id;
 
     // return the safe obj

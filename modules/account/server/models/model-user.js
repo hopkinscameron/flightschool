@@ -115,8 +115,8 @@ var UserSchema = {
         type: String,
         default: null
     },
-    renewalDate: {
-        type: Date
+    nextBillingCycle: {
+        type: Object
     },
     hubs: {
         type: Array,

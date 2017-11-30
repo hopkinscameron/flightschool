@@ -433,6 +433,8 @@ accountModule.controller('HubController', ['$scope', '$rootScope', '$location', 
             reverseButtons: true,
             buttonsStyling: false,
             showLoaderOnConfirm: true,
+            allowEscapeKey: false,
+            allowOutsideClick: false,
             preConfirm: function () {
                 return new Promise(function (resolve, reject) {
                     // add hub
@@ -449,8 +451,7 @@ accountModule.controller('HubController', ['$scope', '$rootScope', '$location', 
                         reject(responseDH.message);
                     });
                 });
-            },
-            allowOutsideClick: false
+            }
         }).then(function () {
             swal({
                 type: 'success',

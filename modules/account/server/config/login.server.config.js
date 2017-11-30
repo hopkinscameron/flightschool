@@ -61,7 +61,7 @@ module.exports = function (app, db) {
 
                         // hide the information for security purposes
                         var id = safePaymentObj._id;
-                        safePaymentObj = PaymentType.toObject(safePaymentObj, { 'hide': 'created internalName ccv userId' });
+                        safePaymentObj = PaymentType.toObject(safePaymentObj, { 'hide': 'created internalName userId' });
                         safePaymentObj._id = id;    
 
                         // set the payment object
