@@ -106,6 +106,15 @@ accountModule.controller('AccountController', ['$scope', '$rootScope', '$compile
         }
     });
 
+    // listen for the event in the relevant $scope
+    $scope.$on('navigateToTab', function (event, data) {
+        // if there is data
+        if(data && data.path) {
+            // navigate to tab
+            $scope.navigateToTab(data.path);
+        }
+    });
+
     // navigate to tab
     $scope.navigateToTab = function (path) {
         // change the location without reloading the entire page

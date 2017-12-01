@@ -53,7 +53,7 @@ exports.read = function (req, res) {
  */
 exports.readProfile = function (req, res) {
     // create safe profile object
-    var user = User.toObject(req.user, { 'hide': 'tierId nextBillingCycle subscribed hubs maxHubs airlinePreferences airlineNonPreferences passwordUpdatedLast notificationNews notificationReminderEmail notificationResearch notificationReminderSMS paymentInfo' });
+    var user = User.toObject(req.user, { 'hide': 'tierId billingCycle nextBillingDate subscribed hubs maxHubs airlinePreferences airlineNonPreferences passwordUpdatedLast notificationNews notificationReminderEmail notificationResearch notificationReminderSMS paymentInfo' });
 
     // send data
     res.json({ 'd': user });
@@ -229,7 +229,7 @@ exports.updatePassword = function (req, res, next) {
  */
 exports.readPayment = function (req, res) {
     // create safe profile object
-    var user = User.toObject(req.user, { 'hide': 'created displayName firstName lastName sex email phone lastLogin tierId nextBillingCycle subscribed hubs maxHubs airlinePreferences airlineNonPreferences passwordUpdatedLast notificationNews notificationReminderEmail notificationResearch notificationReminderSMS' });
+    var user = User.toObject(req.user, { 'hide': 'created displayName firstName lastName sex email phone lastLogin tierId billingCycle nextBillingDate subscribed hubs maxHubs airlinePreferences airlineNonPreferences passwordUpdatedLast notificationNews notificationReminderEmail notificationResearch notificationReminderSMS' });
 
     // if card on file
     if(user.paymentInfo) {
@@ -395,7 +395,7 @@ exports.updatePayment = function (req, res) {
  */
 exports.readHubs = function (req, res) {
     // create safe profile object
-    var user = User.toObject(req.user, { 'hide': 'created displayName firstName lastName sex email phone lastLogin tierId nextBillingCycle subscribed passwordUpdatedLast airlinePreferences airlineNonPreferences notificationNews notificationReminderEmail notificationResearch notificationReminderSMS paymentInfo' });
+    var user = User.toObject(req.user, { 'hide': 'created displayName firstName lastName sex email phone lastLogin billingCycle nextBillingDate passwordUpdatedLast airlinePreferences airlineNonPreferences notificationNews notificationReminderEmail notificationResearch notificationReminderSMS paymentInfo' });
     
     // current position
     var pos = 0;
@@ -538,7 +538,7 @@ exports.upsertHub = function (req, res) {
                     'hubs': hubs
                 };
 
-                // check the lenth to see if user tried to go over the limit
+                // check the length to see if user tried to go over the limit
                 if(hubs.length > req.user.maxHubs) {
                     // send bad request
                     res.status(400).send({ title: errorHandler.getErrorTitle({ code: 400 }), message: `Cannot add more than ${req.user.maxHubs} hubs.` });
@@ -636,7 +636,7 @@ exports.deleteHub = function (req, res) {
  */
 exports.readAirlinePreferences = function (req, res) {
     // create safe profile object
-    var user = User.toObject(req.user, { 'hide': 'created displayName firstName lastName sex email phone lastLogin tierId nextBillingCycle subscribed passwordUpdatedLast hubs maxHubs  notificationNews notificationReminderEmail notificationResearch notificationReminderSMS paymentInfo' });
+    var user = User.toObject(req.user, { 'hide': 'created displayName firstName lastName sex email phone lastLogin tierId billingCycle nextBillingDate subscribed passwordUpdatedLast hubs maxHubs  notificationNews notificationReminderEmail notificationResearch notificationReminderSMS paymentInfo' });
     user.maxPreferences = 5;
     user.maxNonPreferences = 5;
 
@@ -820,16 +820,32 @@ exports.changeMembership = function (req, res) {
                     // billing cycle start/end
                     var billingCycleStart = new Date();
                     var billingCycleEnd = new Date();
+                    var nextBillingDate = new Date();
                     billingCycleEnd.setMonth(billingCycleEnd.getMonth() + 1);
                     billingCycleEnd.setDate(billingCycleEnd.getDate() - 1);
-
+                    nextBillingDate.setMonth(nextBillingDate.getMonth() + 1);
+                    
                     // create the updated values object
                     var updatedValues = {
                         '_id': req.user._id,
                         'tierId': req.body.tierId,
                         'subscribed': true,
-                        'nextBillingCycle': { 'start': billingCycleStart, 'end': billingCycleEnd }
+                        'billingCycle': { 'start': billingCycleStart, 'end': billingCycleEnd },
+                        'nextBillingDate': nextBillingDate,
+                        'maxHubs': foundTier.maxHubs
                     };
+
+                    // check the length to see if new membership has correct hub length (-1 means unlimited)
+                    if(req.user.hubs.length > foundTier.maxHubs && foundTier.maxHubs != -1) {
+                        // holds the number of hubs to drop
+                        var numToDrop = req.user.hubs.length - foundTier.maxHubs;
+
+                        // copy arry
+                        updatedValues.hubs = _.cloneDeep(req.user.hubs);
+
+                        // cut down the hubs to appropriate length
+                        updatedValues.hubs = _.dropRight(updatedValues.hubs, numToDrop);
+                    }
 
                     // update the values
                     User.update(req.user, updatedValues, function(err, updatedUser) {
@@ -879,7 +895,8 @@ exports.cancelMembership = function (req, res) {
         // create the updated values object
         var updatedValues = {
             'subscribed': false,
-            'nextBillingCycle': null
+            'billingCycle': null,
+            'nextBillingDate': null
         };
 
         // update the values
@@ -920,7 +937,7 @@ exports.cancelMembership = function (req, res) {
  */
 exports.readNotifications = function (req, res) {
     // create safe profile object
-    var user = User.toObject(req.user, { 'hide': 'created displayName firstName lastName sex email phone lastLogin tierId nextBillingCycle subscribed passwordUpdatedLast hubs maxHubs airlinePreferences airlineNonPreferences paymentInfo' });
+    var user = User.toObject(req.user, { 'hide': 'created displayName firstName lastName sex email phone lastLogin tierId billingCycle nextBillingDate subscribed passwordUpdatedLast hubs maxHubs airlinePreferences airlineNonPreferences paymentInfo' });
 
     // send data
     res.json({ 'd': user });

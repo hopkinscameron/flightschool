@@ -70,12 +70,6 @@
 .text-color {
     color: $text-color !important;
 
-    &--white {
-        color: $light-light !important;
-    }
-    &--black {
-        color: $dark-dark !important;
-    }
     &--theme-secondary {
         color: $brand-theme-secondary !important;
     }

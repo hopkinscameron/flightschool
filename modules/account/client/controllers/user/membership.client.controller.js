@@ -19,6 +19,9 @@ accountModule.controller('MembershipController', ['$scope', '$rootScope', '$loca
         'options': []
     };
 
+    // determines if membership options should show
+    $scope.showMembershipOptions = false;
+
     // create membership
     $scope.createMembership = function(membership) {
         // the purchase information
@@ -98,7 +101,7 @@ accountModule.controller('MembershipController', ['$scope', '$rootScope', '$loca
                     // update membership
                     $scope.membership.data.tierId = savedMembership.tierId;
                     $scope.membership.data.subscribed = savedMembership.subscribed;
-                    $scope.membership.data.nextBillingCycle = savedMembership.nextBillingCycle;
+                    $scope.membership.data.billingCycle = savedMembership.billingCycle;
 
                     // go through each membership and find the corresponding value
                     _.forEach($scope.membershipOptions.options, function(value) {
@@ -120,7 +123,7 @@ accountModule.controller('MembershipController', ['$scope', '$rootScope', '$loca
                     // update membership
                     $scope.membership.data.tierId = savedMembership.tierId;
                     $scope.membership.data.subscribed = savedMembership.subscribed;
-                    $scope.membership.data.nextBillingCycle = savedMembership.nextBillingCycle;
+                    $scope.membership.data.billingCycle = savedMembership.billingCycle;
 
                     // go through each membership and find the corresponding value
                     _.forEach($scope.membershipOptions.options, function(value) {
@@ -202,7 +205,7 @@ accountModule.controller('MembershipController', ['$scope', '$rootScope', '$loca
                     // update membership
                     $scope.membership.data.tierId = savedMembership.tierId;
                     $scope.membership.data.subscribed = savedMembership.subscribed;
-                    $scope.membership.data.nextBillingCycle = savedMembership.nextBillingCycle;
+                    $scope.membership.data.billingCycle = savedMembership.billingCycle;
 
                     // go through each membership and find the corresponding value
                     _.forEach($scope.membershipOptions.options, function(value) {
@@ -224,7 +227,7 @@ accountModule.controller('MembershipController', ['$scope', '$rootScope', '$loca
                     // update membership
                     $scope.membership.data.tierId = savedMembership.tierId;
                     $scope.membership.data.subscribed = savedMembership.subscribed;
-                    $scope.membership.data.nextBillingCycle = savedMembership.nextBillingCycle;
+                    $scope.membership.data.billingCycle = savedMembership.billingCycle;
 
                     // go through each membership and find the corresponding value
                     _.forEach($scope.membershipOptions.options, function(value) {
@@ -250,7 +253,7 @@ accountModule.controller('MembershipController', ['$scope', '$rootScope', '$loca
     // cancel membership
     $scope.cancelMembership = function() {
         // get the end of membership
-        var formatted = $rootScope.$root.formatDate($rootScope.$root.dateLong, $scope.membership.data.nextBillingCycle.end);
+        var formatted = $rootScope.$root.formatDate($rootScope.$root.dateLong, $scope.membership.data.billingCycle.end);
 
         // the canceled membership
         var canceledMembership = undefined;
@@ -300,7 +303,7 @@ accountModule.controller('MembershipController', ['$scope', '$rootScope', '$loca
                 // update membership
                 $scope.membership.data.tierId = canceledMembership.tierId;
                 $scope.membership.data.subscribed = canceledMembership.subscribed;
-                $scope.membership.data.nextBillingCycle = canceledMembership.nextBillingCycle;
+                $scope.membership.data.billingCycle = canceledMembership.billingCycle;
 
                 // check membership expiration
                 checkMembershipExpiration();
@@ -313,7 +316,7 @@ accountModule.controller('MembershipController', ['$scope', '$rootScope', '$loca
                 // update membership
                 $scope.membership.data.tierId = canceledMembership.tierId;
                 $scope.membership.data.subscribed = canceledMembership.subscribed;
-                $scope.membership.data.nextBillingCycle = canceledMembership.nextBillingCycle;
+                $scope.membership.data.billingCycle = canceledMembership.billingCycle;
 
                 // check membership expiration
                 checkMembershipExpiration();
@@ -324,6 +327,11 @@ accountModule.controller('MembershipController', ['$scope', '$rootScope', '$loca
         },
         // handling the promise rejection
         function (dismiss) {});
+    };
+
+    // show membership options
+    $scope.showMembership = function () {
+        $scope.showMembershipOptions = !$scope.showMembershipOptions;
     };
 
     // get page data
@@ -347,11 +355,11 @@ accountModule.controller('MembershipController', ['$scope', '$rootScope', '$loca
                 });
 
                 // get membership page data
-                AccountFactory.getMembershipPageInformation().then(function (responseS) {
+                AccountFactory.getMembershipPageInformation().then(function (responseM) {
                     // if returned a valid response
-                    if (responseS && !responseS.error) {
+                    if (responseM && !responseM.error) {
                         // set the data
-                        $scope.membership.data = responseS;
+                        $scope.membership.data = responseM;
                         $scope.membership.title = 'Membership';
                         $scope.membership.pageHeader = $scope.membership.title;
 
@@ -407,23 +415,23 @@ accountModule.controller('MembershipController', ['$scope', '$rootScope', '$loca
                     }
                     else {
                         // set error
-                        $scope.pageTitle = responseS.title;
+                        $scope.pageTitle = responseM.title;
                         $scope.error.error = true;
-                        $scope.error.title = responseS.title;
-                        $scope.error.status = responseS.status;
-                        $scope.error.message = responseS.message;
+                        $scope.error.title = responseM.title;
+                        $scope.error.status = responseM.status;
+                        $scope.error.message = responseM.message;
 
                         // setup page
                         setUpPage();
                     }
                 })
-                .catch(function (responseS) {
+                .catch(function (responseM) {
                     // set error
-                    $scope.pageTitle = responseS.title;
+                    $scope.pageTitle = responseM.title;
                     $scope.error.error = true;
-                    $scope.error.title = responseS.title;
-                    $scope.error.status = responseS.status;
-                    $scope.error.message = responseS.message;
+                    $scope.error.title = responseM.title;
+                    $scope.error.status = responseM.status;
+                    $scope.error.message = responseM.message;
 
                     // setup page
                     setUpPage();
@@ -491,7 +499,7 @@ accountModule.controller('MembershipController', ['$scope', '$rootScope', '$loca
     // checks membership expiration
     function checkMembershipExpiration() {
         // if there is not a next billing date but the user was previously subscribed
-        if($scope.membership.data.tier && !$scope.membership.data.nextBillingCycle) {
+        if($scope.membership.data.tier && !$scope.membership.data.billingCycle) {
             // if today's date is before the end of the last payment cycle
             if($scope.membership.data.payments && new Date() < $scope.membership.data.payments[0].end) {
                 $scope.membershipExpiration = new Date($scope.membership.data.payments[0].end);

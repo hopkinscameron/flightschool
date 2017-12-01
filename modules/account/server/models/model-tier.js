@@ -48,6 +48,14 @@ var TierSchema = {
     description: {
         type: String,
         required: true
+    },
+    maxHubs: {
+        type: Number,
+        required: true
+    },
+    unlimited: {
+        type: Boolean,
+        required: true
     }
 };
 

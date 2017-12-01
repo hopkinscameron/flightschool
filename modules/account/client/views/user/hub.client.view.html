@@ -43,7 +43,7 @@
                 <!-- End Add -->
             </div>
             <div class="row" ng-if="hub.data.hubs.length > 0">
-                <div class="col-md-6 mt-2"  ng-class="{'mt-3': $index == 0 || $index == 1 || $index == 2 }" ng-repeat="tmpHub in hub.data.hubs track by $index">
+                <div class="col-md-6 mt-2"  ng-class="{'mt-3': $index == 0 || $index == 1 }" ng-repeat="tmpHub in hub.data.hubs track by $index">
                     <div class="card card-body card--light-light">
                         <span class="d-block text-right" style="margin-top: -15px; margin-right: -5px;"><i class="fa fa-times text-danger btn-cursor-pointer" aria-hidden="true" ng-click="deleteHub($index)"></i></span>
                         <p class="mb-0 font-weight-bold">{{tmpHub.name}}</p>
@@ -55,11 +55,16 @@
             </div>
             <!-- End Hubs -->
             <!-- Begin No Hubs -->
-            <div class="mt-3" ng-if="!hub.data.hubs || hub.data.hubs.length == 0">
+            <div class="mt-3" ng-if="(!hub.data.hubs || hub.data.hubs.length == 0) && hub.data.tierId && hub.data.subscribed">
                 <p>Looks like you don't have any hubs. Would you like to add one? Based on your membership, you're alloted up to <span class="font-weight-bold">{{hub.data.maxHubs}}</span>.</p>
                 <button class="btn btn-theme-primary btn-cursor-pointer" ng-click="addHub()">Add Hub</button>
             </div>
             <!-- End No Hubs -->
+            <!-- Begin No Subscription -->
+            <div class="mt-3" ng-if="!hub.data.subscribed">
+                <p>Looks like you don't have an active membership. Let's go to the <a class="decoration--underline btn-cursor-pointer" ng-click="navigateToMembershipPage('account/membership')">membership page</a> and see what options there are.</p>
+            </div>
+            <!-- End No Subscription -->
         </div>
         <!-- End Hub List -->
     </div>

@@ -115,8 +115,11 @@ var UserSchema = {
         type: String,
         default: null
     },
-    nextBillingCycle: {
+    billingCycle: {
         type: Object
+    },
+    nextBillingDate : {
+        type: Date
     },
     hubs: {
         type: Array,
@@ -196,10 +199,6 @@ exports.findById = function(id, callback) {
  * Find One
  */
 exports.findOne = function(query, callback) {
-    // if querying on email, change to lowercase and delete email query
-    query.internalName = query.email ? query.email.toLowerCase() : null;
-    delete query['email'];
-
     // find one
     helpers.findOne(db, query, function(err, obj) {
         // if a callback
@@ -239,7 +238,7 @@ exports.save = function(objToSave, callback) {
         helpers.trimValuesForProperties(trimmableSchemaProperties, objToSave);
 
         // find the object matching the object index
-        var index = _.findIndex(db, { 'email': objToSave.email });
+        var index = _.findIndex(db, { 'internalName': objToSave.email ? objToSave.email.toLowerCase() : objToSave.email });
         obj = index != -1 ? db[index] : null;
 
         // if object was found
@@ -363,6 +362,12 @@ exports.update = function(query, updatedObj, callback) {
         // add the last passwords to this object if changing the password
         updatedObj.password ? updatedObj.lastPasswords = obj.lastPasswords : updatedObj;
         
+        // if email was changed
+        if(updatedObj.email) {
+            // update the internal name
+            obj.internalName = updatedObj.email.toLowerCase();
+        }
+
         // encrypt password
         encryptPassword(updatedObj, function(err) {
             // if error occurred

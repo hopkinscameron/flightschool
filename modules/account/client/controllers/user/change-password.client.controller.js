@@ -12,7 +12,7 @@ accountModule.controller('ChangePasswordController', ['$scope', '$rootScope', '$
     Service.afterPath = $location.path();
 
     // owasp strength test
-    var owasp = $window.owaspPasswordStrengthTest;
+    var owasp = window.owaspPasswordStrengthTest;
 
     // holds the change password form data
     $scope.changePasswordForm = {

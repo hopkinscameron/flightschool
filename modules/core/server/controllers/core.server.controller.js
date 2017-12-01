@@ -38,7 +38,8 @@ exports.renderIndex = function (req, res) {
             displayName: validator.escape(req.user.displayName),
             firstName: validator.escape(req.user.firstName),
             lastName: validator.escape(req.user.lastName),
-            role: validator.escape(req.user.role)
+            role: validator.escape(req.user.role),
+            lastLogin: req.user.lastLogin.toString()
         };
     }
 

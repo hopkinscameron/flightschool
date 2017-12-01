@@ -4,7 +4,7 @@
 var headerModule = angular.module('header');
 
 // create the controller
-headerModule.controller('HeaderController', ['$scope', '$rootScope', '$location', '$window', 'Service', 'HeaderFactory', function ($scope, $rootScope, $location, $window, Service, HeaderFactory) {
+headerModule.controller('HeaderController', ['$scope', '$rootScope', '$location', '$window', 'Service', 'AccountFactory', 'HeaderFactory', function ($scope, $rootScope, $location, $window, Service, AccountFactory, HeaderFactory) {
     // initialize variables
     initializeVariables();
 
@@ -283,6 +283,23 @@ headerModule.controller('HeaderController', ['$scope', '$rootScope', '$location'
         return value.toFixed(numDecimals);
     };
 
+    // closes notification banner
+    $rootScope.$root.closeBanner = function() {
+        // if not already collapsing
+        if(!angular.element('#notificationBanner').hasClass('collapsing')) {
+            // hide
+            $('#notificationBanner').collapse('hide');
+        }
+
+        // on collapsed
+        $('#notificationBanner').on('hidden.bs.collapse', function () {
+            // reset
+            $rootScope.$root.showNotificationBanner = false;
+            $rootScope.$root.notificationText = null;
+            $rootScope.$root.notificationType = $rootScope.$root.notificationTypeInfo;
+        });
+    };
+
     // initialize variables
     function initializeVariables () {
         // set jQuery
@@ -314,6 +331,12 @@ headerModule.controller('HeaderController', ['$scope', '$rootScope', '$location'
         $rootScope.$root.iso = 'iso';
         $rootScope.$root.shortNumeric = 'shortNumeric';
 
+        // the notification types
+        $rootScope.$root.notificationTypeSuccess = 'success';
+        $rootScope.$root.notificationTypeWarning = 'warning';
+        $rootScope.$root.notificationTypeDanger = 'danger';
+        $rootScope.$root.notificationTypeInfo = 'info';
+
         // holds the header backend data
         $scope.header = {};
 
@@ -339,6 +362,40 @@ headerModule.controller('HeaderController', ['$scope', '$rootScope', '$location'
         $rootScope.$root.discoverRegex = /^6(?:011|5[0-9]{2})[0-9]{12}$/;
     };
 
+    // gets the membership information
+    function retrieveMembership() {
+        // get membership page data
+        AccountFactory.getMembershipPageInformation().then(function (responseM) {
+            // if returned a valid response
+            if (responseM && !responseM.error) {
+                // if there is not a next billing date but the user was previously subscribed
+                if(responseM.tierId && !responseM.billingCycle) {
+                    // FIXME: used for testing
+                    responseM.payments = [
+                        { 'start': new Date('November 30 2017'), 'end': new Date('December 29 2017'), 'price': 40.00, 'tax': 2.40, 'tier': 'Bronze Wanderer', 'cardType': 'VISA', 'cardDigits': '1234' },
+                        { 'start': new Date('November 13 2017'), 'end': new Date('December 12 2017'), 'price': 40.00, 'tax': 2.40, 'tier': 'Bronze Wanderer', 'cardType': 'VISA', 'cardDigits': '1234' },
+                        { 'start': new Date('October 13 2017'), 'end': new Date('November 12 2017'), 'price': 40.00, 'tax': 2.40, 'tier': 'Bronze Wanderer', 'cardType': 'VISA', 'cardDigits': '1234' }
+                    ];
+
+                    // if today's date is before the end of the last payment cycle
+                    if(responseM.payments && new Date() < responseM.payments[0].end) {
+                        // set a banner
+                        $rootScope.$root.showNotificationBanner = true;
+                        $rootScope.$root.notificationText = `Hey ${window.user.firstName}, it looks like your membership is expiring on ${$rootScope.$root.formatDate($rootScope.$root.shortNumeric, new Date(responseM.payments[0].end))}`;
+                        $rootScope.$root.notificationType = $rootScope.$root.notificationTypeDanger;
+
+                        // if not already collapsing
+                        if(!angular.element('#notificationBanner').hasClass('collapsing')) {
+                            // hide
+                            $('#notificationBanner').collapse('show');
+                        }
+                    }
+                }
+            }
+        })
+        .catch(function (responseM) {});
+    };
+
     // gets the header information
     function getHeaderInformation() {
         // get the header information
@@ -347,12 +404,18 @@ headerModule.controller('HeaderController', ['$scope', '$rootScope', '$location'
             $scope.header = responseHeader;
             $rootScope.$root.isLoggedIn = responseHeader.isLoggedIn;
 
+            // if logged in
+            if($rootScope.$root.isLoggedIn) {
+                // get membership information
+                retrieveMembership();
+            }
+
             // header refreshed
             $rootScope.$broadcast('headerRefreshed', {});
         })
         .catch(function (responseHeader) {
             // header refreshed with error
-            $rootScope.$broadcast('headerRefreshed', {'error': true, 'message': responseHeader.message});
+            $rootScope.$broadcast('headerRefreshed', { 'error': true, 'message': responseHeader.message });
         });
     };
 

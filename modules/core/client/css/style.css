@@ -822,12 +822,18 @@ nav {
 a {
   color: #2C3035;
   text-decoration: underline; }
+  a.decoration--underline {
+    text-decoration: underline !important; }
+    a.decoration--underline:hover, a.decoration--underline:active, a.decoration--underline:focus {
+      color: #0076FF !important;
+      text-decoration: none !important; }
   a.decoration--never {
     text-decoration: none !important; }
     a.decoration--never.decorate--highlight:hover {
       text-decoration: underline !important; }
   a:hover, a:active, a:focus {
-    color: #0076FF; }
+    color: #0076FF;
+    text-decoration: none !important; }
   a.highlight--never:hover, a.highlight--never:active, a.highlight--never:focus {
     color: #2C3035 !important; }
   a.highlight--danger:hover, a.highlight--danger:active, a.highlight--danger:focus {
@@ -923,10 +929,6 @@ hr.blog-post-bar {
 
 .text-color {
   color: #2C3035 !important; }
-  .text-color--white {
-    color: #F5F7F9 !important; }
-  .text-color--black {
-    color: #000 !important; }
   .text-color--theme-secondary {
     color: #FFFFFF !important; }
 
