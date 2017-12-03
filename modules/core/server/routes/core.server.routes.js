@@ -21,10 +21,6 @@ module.exports = function (app) {
     // Return a 404 for all undefined api, module or lib routes
     app.route('/:url(api|modules|lib)/*').get(coreController.renderNotFound);
 
-    // define application route
-    app.route('/*').get(coreController.renderIndex);
-    //app.route('/*').get(coreController.testBasicHelloWorld);
-
     // GET gets core information
 	// format /api/core
     app.route('/api/core').post([ipLogger.log, coreController.readDB], coreController.getCoreData);
@@ -32,4 +28,9 @@ module.exports = function (app) {
     // POST shortens the url
     // format /api/shortenUrl
     app.route('/api/shortenUrl').post([corePolicy.isAllowed, ipLogger.log], coreController.shortenUrl);
+
+    // define application route
+    //app.route('/*').get(coreController.renderIndex);
+    app.route('/*').all(coreController.renderIndex);
+    //app.use(coreController.renderIndex);
 };

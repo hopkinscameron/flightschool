@@ -8,6 +8,8 @@ Next (Immediate)
 - do some verification on server to make sure the first and last name contains only letters
 - when payment doesn't go through or card is about to expire, show notification
 - rewrite hub client controller so that there isn't duplicate code... also, add in preconfirms to prevent dialog drop closing while something is in progress
+- add route.all(articlesPolicy.isAllowed) when all routes need authorization
+- add acl for user specific authorization
 
 Later (After next is completed)
 - add an "error dashboard" so if there are errors in server, we can view them
