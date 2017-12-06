@@ -190,7 +190,7 @@ accountServiceModule.factory('AccountFactory', ['$http', '$location', '$rootScop
             'newHub': {
                 'iata': data.newHub ? data.newHub.iata : '',
                 'icao': data.newHub ? data.newHub.icao : '',
-                'main': data.newHub ? data.newHub.main : undefined
+                'main': data.newHub && data.newHub.main ? data.newHub.main : undefined
             },
             'oldHub': {
                 'iata': data.oldHub ? data.oldHub.iata : '',

@@ -39,7 +39,12 @@ exports.renderIndex = function (req, res) {
             firstName: validator.escape(req.user.firstName),
             lastName: validator.escape(req.user.lastName),
             role: validator.escape(req.user.role),
-            lastLogin: req.user.lastLogin.toString()
+            lastLogin: req.user.lastLogin.toString(),
+            membership: {
+                tierId: validator.escape(req.user.tierId),
+                subscribed: req.user.subscribed,
+                billingCycle: req.user.billingCycle
+            }
         };
     }
 

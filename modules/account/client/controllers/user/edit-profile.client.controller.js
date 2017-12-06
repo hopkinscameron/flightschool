@@ -93,13 +93,24 @@ accountModule.controller('EditProfileController', ['$scope', '$rootScope', '$loc
                         // show the form is no longer in transit
                         $scope.formInTransit = false;
 
+                        // remove any error
+                        $scope.profileForm.errors.generic.message = '';
+                        $scope.profileForm.errors.generic.isError = false;
+
                         // force apply
                         $scope.$apply();
                     },
                     // handling the promise rejection
                     function (dismiss) {
-                        // clear the form for security
-                        resetForm();                   
+                        // show the form is no longer in transit
+                        $scope.formInTransit = false;
+
+                        // remove any error
+                        $scope.profileForm.errors.generic.message = '';
+                        $scope.profileForm.errors.generic.isError = false;
+
+                        // force apply
+                        $scope.$apply();                 
                     });
                 }
                 else {

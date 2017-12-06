@@ -364,6 +364,34 @@ headerModule.controller('HeaderController', ['$scope', '$rootScope', '$location'
 
     // gets the membership information
     function retrieveMembership() {
+        // get the membership
+        var membership = window.user.membership;
+
+        // if there is not a next billing date but the user was previously subscribed
+        if(membership && membership.tierId && !membership.billingCycle) {
+            // FIXME: used for testing
+            membership.payments = [
+                { 'start': new Date('November 30 2017'), 'end': new Date('December 29 2017'), 'price': 40.00, 'tax': 2.40, 'tier': 'Bronze Wanderer', 'cardType': 'VISA', 'cardDigits': '1234' },
+                { 'start': new Date('November 13 2017'), 'end': new Date('December 12 2017'), 'price': 40.00, 'tax': 2.40, 'tier': 'Bronze Wanderer', 'cardType': 'VISA', 'cardDigits': '1234' },
+                { 'start': new Date('October 13 2017'), 'end': new Date('November 12 2017'), 'price': 40.00, 'tax': 2.40, 'tier': 'Bronze Wanderer', 'cardType': 'VISA', 'cardDigits': '1234' }
+            ];
+
+            // if today's date is before the end of the last payment cycle
+            if(membership.payments && new Date() < membership.payments[0].end) {
+                // set a banner
+                $rootScope.$root.showNotificationBanner = true;
+                $rootScope.$root.notificationText = `Hey ${window.user.firstName}, it looks like your membership is expiring on ${$rootScope.$root.formatDate($rootScope.$root.shortNumeric, new Date(responseM.payments[0].end))}`;
+                $rootScope.$root.notificationType = $rootScope.$root.notificationTypeDanger;
+
+                // if not already collapsing
+                if(!angular.element('#notificationBanner').hasClass('collapsing')) {
+                    // hide
+                    $('#notificationBanner').collapse('show');
+                }
+            }
+        }
+
+        /*
         // get membership page data
         AccountFactory.getMembershipPageInformation().then(function (responseM) {
             // if returned a valid response
@@ -394,6 +422,7 @@ headerModule.controller('HeaderController', ['$scope', '$rootScope', '$location'
             }
         })
         .catch(function (responseM) {});
+        */
     };
 
     // gets the header information

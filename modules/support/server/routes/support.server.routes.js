@@ -15,9 +15,11 @@ var // the path
 module.exports = function (app) {
     // GET gets contact page information
 	// format /api/support/contact
-    app.route('/api/support/contact').get([ipLogger.log, contactController.readDB], contactController.read);
+    app.route('/api/support/contact').all([ipLogger.log, contactController.readDB])
+    .get(contactController.read);
 
     // GET gets faq page information
 	// format /api/support/faq
-    app.route('/api/support/faq').get([ipLogger.log, faqController.readDB], faqController.read);
+    app.route('/api/support/faq').all([ipLogger.log, faqController.readDB])
+    .get(faqController.read);
 };

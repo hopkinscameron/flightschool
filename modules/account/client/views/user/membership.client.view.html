@@ -68,10 +68,10 @@
                 <!-- Begin Renew/Puchase New Buttons -->
                 <div class="row">
                     <div class="col-md-6">
-                        <button class="btn btn-theme-primary btn-cursor-pointer" ng-click="createMembership(membership.data.tier)" ng-if="!showMembershipOptions">Renew Now</button>
+                        <button class="btn btn-theme-primary btn-cursor-pointer" ng-click="createMembership(membership.data.tier)">Renew Now</button>
                     </div>
                     <div class="col-md-6 text-right">
-                        <button class="btn btn-theme-primary btn-cursor-pointer" ng-click="showMembership()">{{showMembershipOptions ? 'Cancel' : 'Puchase New'}}</button>
+                        <button class="btn btn-theme-primary btn-cursor-pointer" ng-click="showMembershipOptions()">Puchase New</button>
                     </div>
                 </div>
                 <!-- End Renew/Puchase New Buttons -->
@@ -87,7 +87,7 @@
                 </div>
                 <!-- End Previous Membership -->
                 <!-- Begin Payment History -->
-                <div class="mt-3 pt-3 card--border--none card--border--top card--border--color-light" ng-class="{'mt-4': $index == 0}" ng-repeat="payment in membership.data.payments" ng-if="!showMembershipOptions">
+                <div class="mt-3 pt-3 card--border--none card--border--top card--border--color-light" ng-class="{'mt-4': $index == 0}" ng-repeat="payment in membership.data.payments">
                     <!-- Begin Date Renewed && Price -->
                     <div class="row">
                         <div class="col-md-6">
@@ -126,9 +126,9 @@
             </div>
             <!-- End Not Active Membership -->
             <!-- Begin No Membership -->
-            <div ng-if="(!membership.data.subscribed && !membership.data.tier) || showMembershipOptions">
+            <div ng-if="!membership.data.subscribed && !membership.data.tier">
                 <h6 ng-if="!membership.data.subscribed && !membership.data.tier">You've never had a membership before!? Whaaaaattt? Well take a look at some options below.</h6>
-                <h6 class="font-weight-bold mt-3" ng-if="showMembershipOptions">Take a look at some options below.</h6>
+                <h6 class="font-weight-bold mt-3">Take a look at some options below.</h6>
                 <div class="list-group mt-2">
                     <div class="list-group-item list-group-item-action" ng-repeat="m in membershipOptions.options">
                         <div class="row btn-cursor-pointer" ng-click="m.showDetails = !m.showDetails">
@@ -139,7 +139,7 @@
                             <ul>
                                 <li>{{m.description}}</li>
                                 <li>Monthly Cost: ${{m.price}}</li>
-                                <li>Flight discount: {{m.discount}}%</li>
+                                <li>Flight Discount: {{m.discount}}%</li>
                             </ul>
                             <button class="btn btn-theme-primary btn-cursor-pointer" ng-click="createMembership(m)">Subscribe</button>
                         </div>

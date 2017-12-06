@@ -17,13 +17,16 @@ var // the path
 module.exports = function (app) {
     // GET gets about page information
 	// format /api/about
-    app.route('/api/about').get([ipLogger.log, aboutController.readDB], aboutController.read);
+    app.route('/api/about').all([ipLogger.log, aboutController.readDB])
+    .get(aboutController.read);
 
     // GET gets privacy page information
 	// format /api/about/privacy
-    app.route('/api/about/privacy').get([ipLogger.log, privacyController.readDB], privacyController.read);
+    app.route('/api/about/privacy').all([ipLogger.log, privacyController.readDB])
+    .get(privacyController.read);
 
     // GET gets terms and conditions page information
 	// format /api/about/terms-and-conditions
-    app.route('/api/about/terms-and-conditions').get([ipLogger.log, termsController.readDB], termsController.read);
+    app.route('/api/about/terms-and-conditions').all([ipLogger.log, termsController.readDB])
+    .get(termsController.read);
 };

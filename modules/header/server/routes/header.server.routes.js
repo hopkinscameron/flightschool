@@ -9,5 +9,6 @@ var // the header controller to handle routes
 module.exports = function (app) {
     // GET get header information
 	// format /api/header
-    app.route('/api/header').get(headerController.readDB, headerController.read);
+    app.route('/api/header').all(headerController.readDB)
+    .get(headerController.read);
 };

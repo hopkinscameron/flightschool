@@ -13,5 +13,6 @@ var // the path
 module.exports = function (app) {
     // GET gets home page information
 	// format /api/home
-    app.route('/api/home').get([ipLogger.log, homeController.readDB], homeController.read);
+    app.route('/api/home').all([ipLogger.log, homeController.readDB])
+    .get(homeController.read);
 };

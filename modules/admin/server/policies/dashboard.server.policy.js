@@ -9,6 +9,13 @@ var // the path
     errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller'));
 
 /**
+ * Invoke Permissions
+ */
+exports.invokeRolesPolicies = function () {
+   
+};
+
+/**
  * Check if Dashboard policy allows
  */
 exports.isAllowed = function (req, res, next) {

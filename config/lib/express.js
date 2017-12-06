@@ -49,6 +49,9 @@ var // the application configuration
 // configure owasp
 owasp.config(config.shared.owasp);
 
+// the alpha characters regex
+var alphaCharactersRegex = /^[a-zA-Z]*$/;
+
 /**
  * Initialize local variables
  */
@@ -238,6 +241,10 @@ module.exports.initMiddleware = function (app) {
             isStrongPassword: (value) => {
                 return !owasp.test(value).errors.length;
             },
+            // determines if only contains letters
+            onlyContainsAlphaCharacters: (value) => {
+                return alphaCharactersRegex.test(value);
+            }
         }
     }));
 };
@@ -397,7 +404,7 @@ module.exports.init = function () {
     this.initModulesConfiguration(app);
 
     // initialize modules server authorization policies
-    //this.initModulesServerPolicies(app);
+    this.initModulesServerPolicies(app);
 
     // initialize modules server routes
     this.initModulesServerRoutes(app);

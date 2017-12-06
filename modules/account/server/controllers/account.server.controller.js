@@ -77,30 +77,64 @@ exports.updateProfile = function (req, res) {
 
     // if there is something to update
     if(Object.keys(updatedValues).length > 0) {
-        // update the values
-        User.update(req.user, updatedValues, function(err, updatedUser) {
-            // if an error occurred
-            if (err) {
-                // send internal error
-                res.status(500).send({ error: true, title: errorHandler.getErrorTitle(err), message: errorHandler.getGenericErrorMessage(err) });
-                console.log(clc.error(errorHandler.getDetailedErrorMessage(err)));
-            }
-            else if (updatedUser) {
-                // create the safe user object
-                var safeUserObj = createUserReqObject(updatedUser);
+        // if first name
+        if(updatedValues.firstName) {
+            req.checkBody('firstName', 'First name must contain only letters.').onlyContainsAlphaCharacters();
+        }
 
-                // set the updated object
-                var p = req.user.paymentInfo;
-                req.user = safeUserObj;
-                req.user.paymentInfo = p;
+        // if last name
+        if(updatedValues.lastName) {
+            req.checkBody('lastName', 'Last name must contain only letters.').onlyContainsAlphaCharacters();
+        }
 
-                // read the profile
-                module.exports.readProfile(req, res);
-            }
+        // validate errors
+        req.getValidationResult().then(function(errors) {
+            // if any errors exists
+            if(!errors.isEmpty()) {
+                // holds all the errors in one text
+                var errorText = '';
+
+                // add all the errors
+                for(var x = 0; x < errors.array().length; x++) {
+                    // if not the last error
+                    if(x < errors.array().length - 1) {
+                        errorText += errors.array()[x].msg + '\r\n';
+                    }
+                    else {
+                        errorText += errors.array()[x].msg;
+                    }
+                }
+
+                // send bad request
+                res.status(400).send({ title: errorHandler.getErrorTitle({ code: 400 }), message: errorText });
+            } 
             else {
-                // send internal error
-                res.status(500).send({ error: true, title: errorHandler.getErrorTitle({ code: 500 }), message: errorHandler.getGenericErrorMessage({ code: 500 }) });
-                console.log(clc.error(`In ${path.basename(__filename)} \'updateProfile\': ` + errorHandler.getGenericErrorMessage({ code: 500 }) + ' Couldn\'t update User.'));
+                // update the values
+                User.update(req.user, updatedValues, function(err, updatedUser) {
+                    // if an error occurred
+                    if (err) {
+                        // send internal error
+                        res.status(500).send({ error: true, title: errorHandler.getErrorTitle(err), message: errorHandler.getGenericErrorMessage(err) });
+                        console.log(clc.error(errorHandler.getDetailedErrorMessage(err)));
+                    }
+                    else if (updatedUser) {
+                        // create the safe user object
+                        var safeUserObj = createUserReqObject(updatedUser);
+
+                        // set the updated object
+                        var p = req.user.paymentInfo;
+                        req.user = safeUserObj;
+                        req.user.paymentInfo = p;
+
+                        // read the profile
+                        module.exports.readProfile(req, res);
+                    }
+                    else {
+                        // send internal error
+                        res.status(500).send({ error: true, title: errorHandler.getErrorTitle({ code: 500 }), message: errorHandler.getGenericErrorMessage({ code: 500 }) });
+                        console.log(clc.error(`In ${path.basename(__filename)} \'updateProfile\': ` + errorHandler.getGenericErrorMessage({ code: 500 }) + ' Couldn\'t update User.'));
+                    }
+                });
             }
         });
     }

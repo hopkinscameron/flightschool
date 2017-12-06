@@ -19,7 +19,7 @@
     "start": "node server.js"
   },
   "dependencies": {
-    "acl": "^0.4.10",
+    "acl": "^0.4.11",
     "airport-codes": "^1.0.2",
     "async": "^2.5.0",
     "bcryptjs": "^2.4.3",

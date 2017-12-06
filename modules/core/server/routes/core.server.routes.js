@@ -19,18 +19,21 @@ module.exports = function (app) {
     */
     
     // Return a 404 for all undefined api, module or lib routes
-    app.route('/:url(api|modules|lib)/*').get(coreController.renderNotFound);
+    app.route('/:url(api|modules|lib)/*')
+    .get(coreController.renderNotFound);
 
     // GET gets core information
 	// format /api/core
-    app.route('/api/core').post([ipLogger.log, coreController.readDB], coreController.getCoreData);
+    app.route('/api/core').all([ipLogger.log, coreController.readDB])
+    .post(coreController.getCoreData);
 
     // POST shortens the url
     // format /api/shortenUrl
-    app.route('/api/shortenUrl').post([corePolicy.isAllowed, ipLogger.log], coreController.shortenUrl);
+    app.route('/api/shortenUrl').all([ipLogger.log, corePolicy.isAllowed])
+    .post(coreController.shortenUrl);
 
     // define application route
     //app.route('/*').get(coreController.renderIndex);
-    app.route('/*').all(coreController.renderIndex);
+    app.route('/*').all([ipLogger.log, coreController.renderIndex]);
     //app.use(coreController.renderIndex);
 };

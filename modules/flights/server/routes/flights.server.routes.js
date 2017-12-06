@@ -16,6 +16,7 @@ module.exports = function (app) {
     // GET gets flight page information
     // POST searches flights
 	// format /api/flights
-    app.route('/api/flights').get([ipLogger.log, flightsController.readDB], flightsController.read);
-    app.route('/api/flights').post([flightsPolicy.isAllowed, ipLogger.log, flightsController.readDB], flightsController.searchFlights);
+    app.route('/api/flights').all([ipLogger.log, flightsController.readDB])
+    .get(flightsController.read)
+    .post(flightsPolicy.isAllowed, flightsController.searchFlights);
 };

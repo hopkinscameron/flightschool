@@ -19,9 +19,6 @@ accountModule.controller('MembershipController', ['$scope', '$rootScope', '$loca
         'options': []
     };
 
-    // determines if membership options should show
-    $scope.showMembershipOptions = false;
-
     // create membership
     $scope.createMembership = function(membership) {
         // the purchase information
@@ -258,7 +255,7 @@ accountModule.controller('MembershipController', ['$scope', '$rootScope', '$loca
         // the canceled membership
         var canceledMembership = undefined;
 
-        // get the selected airport
+        // ask user if they want to cancel their membership
         swal({
             type: 'question',
             title: 'Are you sure you want to cancel your membership?',
@@ -330,8 +327,47 @@ accountModule.controller('MembershipController', ['$scope', '$rootScope', '$loca
     };
 
     // show membership options
-    $scope.showMembership = function () {
-        $scope.showMembershipOptions = !$scope.showMembershipOptions;
+    $scope.showMembershipOptions = function () {
+        var items = '<div class="list-group">';
+        var index = 0;
+
+        // go through each option and add
+        _.forEach($scope.membershipOptions.options, function(value) {
+            var buttonId = 'membershipOptionButton' + index;
+            items += '<div class="list-group-item list-group-item-action">';
+            items += '<h6 class="text-left font-weight-bold">' + value.displayName + '</h6>';
+            items += '<ul class="text-left"><li>' + value.description + '</li>'
+                    + '<li>Monthly Cost: $' + value.price + '</li>'
+                    + '<li>Flight Discount: ' + value.discount + '%</li>'
+                    + '</ul>';
+            items += '<button id="' + buttonId + '" class="btn btn-theme-primary btn-cursor-pointer">Subscribe</button>';
+            items += '</div>';
+            index++;
+        });
+
+        items += '</div>';
+
+        // get the selected airport
+        swal({
+            title: 'Wanderer Levels',
+            html: items,
+            confirmButtonText: 'Okay',
+            confirmButtonClass: 'btn btn-theme-primary btn-cursor-pointer',
+            reverseButtons: true,
+            buttonsStyling: false
+        }).then(function () {},
+        // handling the promise rejection
+        function (dismiss) {});
+
+        // go through each option and set button click
+        for(var x = 0; x < $scope.membershipOptions.options.length; x++) {
+            var buttonId = 'membershipOptionButton' + x;
+            $(`#${buttonId}`).click(function() {
+                swal.close();
+                var buttonIndex = this.id.substring(this.id.length - 1);
+                $scope.createMembership($scope.membershipOptions.options[buttonIndex]);
+            });
+        };
     };
 
     // get page data
