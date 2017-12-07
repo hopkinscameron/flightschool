@@ -3,12 +3,12 @@
     might have to enter the text a different way (not in sweet alert)
 
 Next (Immediate)
+- implement flight search
 - find a way to force an update on the embeded user obj when profile is changed
 
 Later (After next is completed)
 - add an "error dashboard" so if there are errors in server, we can view them
 - if I have the html editor up on page load, and I exit out, I can't get the other content to show
-- instead of sending a huge amount of data over server (for hubs) just send iata and icao adn then on front end do a lookup
 - remove credit card stuff and use Stripe.com instead
 - when payment doesn't go through or card is about to expire, show notification
 

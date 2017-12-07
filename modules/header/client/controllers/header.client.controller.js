@@ -4,7 +4,7 @@
 var headerModule = angular.module('header');
 
 // create the controller
-headerModule.controller('HeaderController', ['$scope', '$rootScope', '$location', '$window', 'Service', 'AccountFactory', 'HeaderFactory', function ($scope, $rootScope, $location, $window, Service, AccountFactory, HeaderFactory) {
+headerModule.controller('HeaderController', ['$scope', '$rootScope', '$location', '$window', 'Service', 'AccountFactory', 'FlightsFactory', 'HeaderFactory', function ($scope, $rootScope, $location, $window, Service, AccountFactory, FlightsFactory, HeaderFactory) {
     // initialize variables
     initializeVariables();
 
@@ -21,6 +21,7 @@ headerModule.controller('HeaderController', ['$scope', '$rootScope', '$location'
         $('.navbar-collapse').collapse('hide');
     });
 
+    /*
     // get the airport codes
     $.getJSON('/lib/airport-codes/airports.json', function(json) {
         $rootScope.$root.airportCodes = json;
@@ -28,6 +29,20 @@ headerModule.controller('HeaderController', ['$scope', '$rootScope', '$location'
 
     // get the airlines
     $.getJSON('/lib/airlines/airlines.json', function(json) {
+        $rootScope.$root.airlines = json;
+    });
+    */
+    
+    // get flight information
+    getFlightInformation();
+
+    // get the airport codes
+    $.getJSON('/lib/airport-codes/airports.json', function(json) {
+        $rootScope.$root.airportCodes = json;
+    });
+
+    // get the airlines
+    $.ajax('https://api.skypicker.com/airlines', function(json) {
         $rootScope.$root.airlines = json;
     });
 
@@ -451,7 +466,22 @@ headerModule.controller('HeaderController', ['$scope', '$rootScope', '$location'
     // gets the nth index of substring
     function nthIndexOf(string, subString, index) {
         return string.split(subString, index).join(subString).length;
-    }
+    };
+
+    // gets flight information such as airlines and airports
+    function getFlightInformation() {
+        // get airlines
+        FlightsFactory.getAirlines().then(function (responseA) {
+            $rootScope.$root.airlines = responseA;
+        })
+        .catch(function (responseA) {});
+
+        // get airports
+        FlightsFactory.getAirports().then(function (responseA) {
+            $rootScope.$root.airportCodes = responseA;
+        })
+        .catch(function (responseA) {});
+    };
 
     // on window resize
     angular.element($window).resize(function() {

@@ -25,9 +25,13 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
     // get todays date
     var today = new Date();
     
-    // get tomorrows date
-    var tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
+    // get three days from now date
+    var threeDays = new Date(today);
+    threeDays.setDate(threeDays.getDate() + 3);
+
+    // holds the minimum depart/return date
+    $scope.departDateMin = new Date();
+    $scope.returnDateMin = new Date();
 
     // the initial text of a dropdown
     $scope.initialText = 'Select One';
@@ -43,8 +47,9 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
             'depart': $scope.initialText,
             'arrive': '',
             'departDate': today,
-            'returnDate': tomorrow,
-            'adults': 1
+            'returnDate': threeDays,
+            'adults': 1,
+            'roundTripOrOneWay': 'roundTrip'
         },
         'errors': {
             'generic': {
@@ -83,10 +88,10 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
     $scope.hubDirection = 'depart';
 
     // the direction text
-    $scope.directionText  = {
+    $scope.directionText = {
         'current': 'Switch to hub arrival <i class="fa fa-arrow-right" aria-hidden="true"></i>',
         'changeTo': 'arrive',
-        'textOptions': ['<i class="fa fa-arrow-left" aria-hidden="true"></i> Switch to hub departure', 'Switch to hub arrival <i class="fa fa-arrow-right" aria-hidden="true"></i>'],
+        'textOptions': ['\<i class="fa fa-arrow-left" aria-hidden="true"></i> Switch to hub departure', 'Switch to hub arrival <i class="fa fa-arrow-right" aria-hidden="true"></i>'],
         'changeOptions': ['depart', 'arrive']
     };
 
@@ -132,6 +137,21 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
         }
     });
 
+    // changes round trip option
+    $scope.changeRoundTripOption = function() {
+        // if round trip, set the day to three days after the current date given
+        if($scope.searchForm.inputs.roundTripOrOneWay == 'roundTrip') {
+            // get three days from depart date
+            var threeDays = new Date($scope.searchForm.inputs.departDate);
+            threeDays.setDate(threeDays.getDate() + 3);
+            $scope.searchForm.inputs.returnDate = threeDays;
+        }
+        // if one way, remove date
+        else if($scope.searchForm.inputs.roundTripOrOneWay == 'oneWay') {
+            $scope.searchForm.inputs.returnDate = null;
+        }
+    };
+
     // switch between depart and arrive for hubs
     $scope.switchTo = function (departOrArrive) {
         // set null
@@ -160,6 +180,18 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
             $scope.searchForm.inputs.arrive = prevDep;
             $scope.searchForm.inputs.depart = prevArr;
         }, 750);
+    };
+
+    // on change of depart date
+    $scope.changeDepartDate = function() {
+        // if the return date is before the departure date
+        if($scope.searchForm.inputs.returnDate < $scope.searchForm.inputs.departDate) {
+            // get three days from depart date
+            var threeDays = new Date($scope.searchForm.inputs.departDate);
+            threeDays.setDate(threeDays.getDate() + 3);
+            $scope.searchForm.inputs.returnDate = threeDays;
+            $scope.returnDateMin = new Date($scope.searchForm.inputs.departDate);
+        }
     };
 
     // searches for flights
@@ -472,6 +504,9 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
             // initialize
             $scope.hub = {};
             
+            // set loading hubs
+            $scope.loadingHubs = true;
+
             // get hub page data
             AccountFactory.getHubPageInformation().then(function (responseH) {
                 // if returned a valid response
@@ -514,6 +549,9 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
                             $window.href = '/account/hubs';
                         });
                     }
+
+                    // set no longer loading hubs
+                    $scope.loadingHubs = false;
                 }
                 else {
                     // show error

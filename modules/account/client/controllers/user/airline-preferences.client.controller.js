@@ -73,11 +73,11 @@ accountModule.controller('AirlinePreferencesController', ['$scope', '$rootScope'
             // go through preferences/non preferences and add
             _.forEach($scope.preferencesForm.inputs.preferences, function(value) {
                 // if value exists, add
-                value.airline ? preferencesData.preferences.push(value.airline) : null;
+                value.airline && value.airline.id ? preferencesData.preferences.push(value.airline.id) : null;
             });
             _.forEach($scope.preferencesForm.inputs.nonPreferences, function(value) {
                 // if value exists, add
-                value.airline ? preferencesData.nonPreferences.push(value.airline) : null;
+                value.airline && value.airline.id ? preferencesData.nonPreferences.push(value.airline.id) : null;
             });
     
             // update preferences

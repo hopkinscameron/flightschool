@@ -19,81 +19,113 @@
             <!-- End Content Header -->
             <!-- Begin Content Body -->
             <div class="card card--border--none card--radius--none card-body box-shadow--sm card-min-height">
-                <!-- Begin Switch Of Departure/Arrival -->
-                <div class="col-md-12">
-                    <h6 class="btn-cursor-pointer" ng-click="switchTo(directionText.changeTo)"><span ng-bind-html="directionText.current | trustHTML"></span></h6>       
+                <!-- Begin Loading Hubs -->
+                <div ng-if="loadingHubs">
+                    <p>Loading your hubs. <i class="fa fa-spinner fa-2x fa-spin"></i></p>
                 </div>
-                <!-- End Switch Of Departure/Arrival -->
-                <!-- Begin Flight Search -->
-                <div id="flights-search-form" class="col-md-12">
-                    <div ng-if="searchForm.errors.generic.isError">
-                        <span style="color: red;">{{searchForm.errors.generic.message}}</span>
-                    </div>
-                    <form class="form-group typeahead-custom" ng-submit="searchFlights()" novalidate>
-                        <div class="form-row">
-                            <!-- Begin Depart -->
-                            <div class="form-group col">
-                                <label class="col-form-label" for="departSelect">Depart</label>
-                                <!-- Begin Hub Departure -->
-                                <select id="departSelect" ng-model="searchForm.inputs.depart" class="form-control form-control-lg" ng-class="{'is-invalid': searchForm.errors.depart.isError}" ng-disabled="formInTransit" ng-if="hubDirection == 'depart'" required>
-                                    <option ng-repeat="h in hubOptions.options">{{h}}</option>
-                                </select>
-                                <!-- End Hub Departure -->
-                                <!-- Begin Anywhere Departure -->
-                                <input class="form-control form-control-lg" ng-class="{'is-invalid': searchForm.errors.depart.isError}" type="text" name="departSelect" placeholder="Search for..." id="departSelect" ng-model="searchForm.inputs.depart" uib-typeahead="airport.name for airport in $root.airportCodes | filter : $viewValue | limitTo : 8" ng-disabled="formInTransit" ng-if="hubDirection == 'arrive'" required>                                
-                                <!-- End Anywhere Departure -->
-                                <small class="invalid-feedback">{{searchForm.errors.depart.message}}</small>
-                            </div>
-                            <!-- End Depart -->
-                            <!-- Begin Arrive -->
-                            <div class="form-group col">
-                                <label class="col-form-label" for="arriveSelect">Arrive</label>
-                                <!-- Begin Hub Arrival -->
-                                <select id="arriveSelect" ng-model="searchForm.inputs.arrive" class="form-control form-control-lg" ng-class="{'is-invalid': searchForm.errors.arrive.isError}" ng-disabled="formInTransit" ng-if="hubDirection == 'arrive'" required>
-                                    <option ng-repeat="h in hubOptions.options">{{h}}</option>
-                                </select>
-                                <!-- End Hub Arrival -->
-                                <!-- Begin Anywhere Arrival -->
-                                <input class="form-control form-control-lg" ng-class="{'is-invalid': searchForm.errors.arrive.isError}" type="text" name="arriveSelect" placeholder="Search for..." id="arriveSelect" ng-model="searchForm.inputs.arrive" uib-typeahead="airport.name for airport in $root.airportCodes | filter : $viewValue | limitTo : 8" ng-disabled="formInTransit" ng-if="hubDirection == 'depart'" required>                                
-                                <!-- End Anywhere Arrival -->
-                                <small class="invalid-feedback">{{searchForm.errors.arrive.message}}</small>
-                            </div>
-                            <!-- End Arrive -->
-                            <!-- Begin Depart Date -->
-                            <div class="form-group col-md-3">
-                                <label class="col-form-label" for="departDate">Depart Date</label>
-                                <input class="form-control form-control-lg form-control-danger" ng-class="{'is-invalid': searchForm.errors.departDate.isError}" type="date" name="departDate" placeholder="Depart Date" id="departDate" ng-model="searchForm.inputs.departDate" ng-disabled="formInTransit" required>
-                                <small class="invalid-feedback">{{searchForm.errors.departDate.message}}</small>
-                            </div>
-                            <!-- End Depart Date -->
-                            <!-- Begin Return Date -->
-                            <div class="form-group col-md-3">
-                                <label class="col-form-label" for="returnDate">Return Date</label>
-                                <input class="form-control form-control-lg form-control-danger" ng-class="{'is-invalid': searchForm.errors.returnDate.isError}" type="date" name="returnDate" placeholder="Return Date" id="returnDate" ng-model="searchForm.inputs.returnDate" ng-disabled="formInTransit" required>
-                                <small class="invalid-feedback">{{searchForm.errors.returnDate.message}}</small>
-                            </div>
-                            <!-- End Return Date -->
-                            <!-- Begin Adults -->
-                            <div class="form-group col-md-1">
-                                <label class="col-form-label" for="adults">Adults</label>
-                                <input class="form-control form-control-lg form-control-danger" ng-class="{'is-invalid': searchForm.errors.adults.isError}" type="number" name="adults" id="adults" min="1" max="8" ng-model="searchForm.inputs.adults" ng-disabled="formInTransit" required>
-                                <small class="invalid-feedback">{{searchForm.errors.adults.message}}</small>
-                            </div>
-                            <!-- End Adults -->
-                        </div>
-                        <!-- Begin Search Button -->
+                <!-- End Loading Hubs -->
+                <!-- Begin Not Having Hubs -->
+                <div ng-if="hubOptions.options.length == 0 && !loadingHubs">
+                    <p>Looks like you don't have any hubs. Hubs are required to search for flights. <a href="/account/hubs" class="decoration--underline btn-cursor-pointer">Let's go get you a hub</a></p>
+                </div>
+                <!-- End Not Having Hubs -->
+                <!-- Begin Having Hubs -->
+                <div ng-if="hubOptions.options.length > 0 && !loadingHubs">
+                    <div class="col-md-12">
                         <div class="row">
-                            <div class="col text-right">
-                                <button type="submit" class="btn btn-theme-primary btn-cursor-pointer" ng-class="{'w-100': $root.isDeviceWidthSmallerThan(426)}" ng-disabled="formInTransit">{{formInTransit ? 'Searching' : 'Search'}}</button>
+                            <!-- Begin One Way vs. Round Trip -->
+                            <div class="col-md-6">
+                                <div class="form-check form-check-inline">
+                                    <label class="form-check-label">
+                                        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="radioRoundTrip" value="roundTrip" ng-model="searchForm.inputs.roundTripOrOneWay" ng-change="changeRoundTripOption()"> Round Trip
+                                    </label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <label class="form-check-label">
+                                        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="radioOneWay" value="oneWay" ng-model="searchForm.inputs.roundTripOrOneWay" ng-change="changeRoundTripOption()"> One Way
+                                    </label>
+                                </div>
                             </div>
+                            <!-- End One Way vs. Round Trip -->
+                            <!-- Begin Switch Of Departure/Arrival -->
+                            <div class="col-md-6 text-right">
+                                <h6 class="btn-cursor-pointer" ng-click="switchTo(directionText.changeTo)"><span ng-bind-html="directionText.current | trustHTML"></span></h6>       
+                            </div>
+                            <!-- End Switch Of Departure/Arrival -->
                         </div>
-                        <!-- End Search Button -->
-                    </form>
-                </div>                
-                <!-- End Flight Search -->
-                <!-- Begin Flights -->
+                    </div>
+                    <!-- Begin Flight Search -->
+                    <div id="flights-search-form" class="col-md-12">
+                        <div ng-if="searchForm.errors.generic.isError">
+                            <span style="color: red;">{{searchForm.errors.generic.message}}</span>
+                        </div>
+                        <form class="form-group typeahead-custom" ng-submit="searchFlights()" novalidate>
+                            <div class="form-row">
+                                <!-- Begin Depart -->
+                                <div class="form-group col">
+                                    <label class="col-form-label" for="departSelect">Depart</label>
+                                    <!-- Begin Hub Departure -->
+                                    <select id="departSelect" ng-model="searchForm.inputs.depart" class="form-control form-control-lg" ng-class="{'is-invalid': searchForm.errors.depart.isError}" ng-disabled="formInTransit" ng-if="hubDirection == 'depart'" required>
+                                        <option ng-repeat="h in hubOptions.options">{{h}}</option>
+                                    </select>
+                                    <!-- End Hub Departure -->
+                                    <!-- Begin Anywhere Departure -->
+                                    <input class="form-control form-control-lg" ng-class="{'is-invalid': searchForm.errors.depart.isError}" type="text" name="departSelect" placeholder="Search for..." id="departSelect" ng-model="searchForm.inputs.depart" uib-typeahead="airport.name for airport in $root.airportCodes | filter : $viewValue | limitTo : 8" ng-disabled="formInTransit" ng-if="hubDirection == 'arrive'" required>                                
+                                    <!-- End Anywhere Departure -->
+                                    <small class="invalid-feedback">{{searchForm.errors.depart.message}}</small>
+                                </div>
+                                <!-- End Depart -->
+                                <!-- Begin Arrive -->
+                                <div class="form-group col">
+                                    <label class="col-form-label" for="arriveSelect">Arrive</label>
+                                    <!-- Begin Hub Arrival -->
+                                    <select id="arriveSelect" ng-model="searchForm.inputs.arrive" class="form-control form-control-lg" ng-class="{'is-invalid': searchForm.errors.arrive.isError}" ng-disabled="formInTransit" ng-if="hubDirection == 'arrive'" required>
+                                        <option ng-repeat="h in hubOptions.options">{{h}}</option>
+                                    </select>
+                                    <!-- End Hub Arrival -->
+                                    <!-- Begin Anywhere Arrival -->
+                                    <input class="form-control form-control-lg" ng-class="{'is-invalid': searchForm.errors.arrive.isError}" type="text" name="arriveSelect" placeholder="Search for..." id="arriveSelect" ng-model="searchForm.inputs.arrive" uib-typeahead="airport.name for airport in $root.airportCodes | filter : $viewValue | limitTo : 8" ng-disabled="formInTransit" ng-if="hubDirection == 'depart'" required>                                
+                                    <!-- End Anywhere Arrival -->
+                                    <small class="invalid-feedback">{{searchForm.errors.arrive.message}}</small>
+                                </div>
+                                <!-- End Arrive -->
+                                <!-- Begin Depart Date -->
+                                <div class="form-group col-md-3">
+                                    <label class="col-form-label" for="departDate">Depart Date</label>
+                                    <input class="form-control form-control-lg form-control-danger" ng-class="{'is-invalid': searchForm.errors.departDate.isError}" type="date" name="departDate" placeholder="Depart Date" id="departDate" min="{{departDateMin | date:'yyyy-MM-dd'}}" ng-model="searchForm.inputs.departDate" ng-change="changeDepartDate()" ng-disabled="formInTransit" required>
+                                    <small class="invalid-feedback">{{searchForm.errors.departDate.message}}</small>
+                                </div>
+                                <!-- End Depart Date -->
+                                <!-- Begin Return Date -->
+                                <div class="form-group col-md-3">
+                                    <label class="col-form-label" for="returnDate">Return Date</label>
+                                    <input class="form-control form-control-lg form-control-danger" ng-class="{'is-invalid': searchForm.errors.returnDate.isError}" type="date" name="returnDate" placeholder="Return Date" id="returnDate" min="{{returnDateMin | date:'yyyy-MM-dd'}}" ng-model="searchForm.inputs.returnDate" ng-disabled="formInTransit || searchForm.inputs.roundTripOrOneWay == 'oneWay'" required>
+                                    <small class="invalid-feedback">{{searchForm.errors.returnDate.message}}</small>
+                                </div>
+                                <!-- End Return Date -->
+                                <!-- Begin Adults -->
+                                <div class="form-group col-md-1">
+                                    <label class="col-form-label" for="adults">Adults</label>
+                                    <input class="form-control form-control-lg form-control-danger" ng-class="{'is-invalid': searchForm.errors.adults.isError}" type="number" name="adults" id="adults" min="1" max="8" ng-model="searchForm.inputs.adults" ng-disabled="formInTransit" required>
+                                    <small class="invalid-feedback">{{searchForm.errors.adults.message}}</small>
+                                </div>
+                                <!-- End Adults -->
+                            </div>
+                            <!-- Begin Search Button -->
+                            <div class="row">
+                                <div class="col text-right">
+                                    <button type="submit" class="btn btn-theme-primary btn-cursor-pointer" ng-class="{'w-100': $root.isDeviceWidthSmallerThan(426)}" ng-disabled="formInTransit">{{formInTransit ? 'Searching' : 'Search'}}</button>
+                                </div>
+                            </div>
+                            <!-- End Search Button -->
+                        </form>
+                    </div>                
+                    <!-- End Flight Search -->
+                    <!-- Begin Flights -->
 
-                <!-- End Flights -->
+                    <!-- End Flights -->
+                </div>
+                <!-- End Having Hubs -->
             </div>
             <!-- End Content Body -->
         </div>

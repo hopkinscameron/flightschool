@@ -4,6 +4,11 @@
     <div class="card-body">
         <!-- Begin Hub List -->
         <div class="col-md-10 mx-auto">
+            <!-- Begin No Subscription -->
+            <div class="mt-3" ng-if="!hub.data.subscribed">
+                <p>Looks like you don't have an active membership. Let's go to the <a class="decoration--underline btn-cursor-pointer" ng-click="navigateToMembershipPage('account/membership')">membership page</a> and see what options there are.</p>
+            </div>
+            <!-- End No Subscription -->
             <!-- Begin Main Hub -->
             <div ng-if="mainHub">
                 <!-- Begin Title -->
@@ -60,11 +65,6 @@
                 <button class="btn btn-theme-primary btn-cursor-pointer" ng-click="addHub()">Add Hub</button>
             </div>
             <!-- End No Hubs -->
-            <!-- Begin No Subscription -->
-            <div class="mt-3" ng-if="!hub.data.subscribed">
-                <p>Looks like you don't have an active membership. Let's go to the <a class="decoration--underline btn-cursor-pointer" ng-click="navigateToMembershipPage('account/membership')">membership page</a> and see what options there are.</p>
-            </div>
-            <!-- End No Subscription -->
         </div>
         <!-- End Hub List -->
     </div>

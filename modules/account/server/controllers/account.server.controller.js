@@ -15,6 +15,8 @@ var // the path
     _ = require('lodash'),
     // the file system reader
     fs = require('fs'),
+    // the ability to create requests/promises
+    requestPromise = require('request-promise'),
     // the helper functions
     helpers = require(path.resolve('./config/lib/global-model-helpers')),
     // the path to credit card types
@@ -674,6 +676,38 @@ exports.readAirlinePreferences = function (req, res) {
     user.maxPreferences = 5;
     user.maxNonPreferences = 5;
 
+    // current position
+    var pos = 0;
+
+    // go through all values and check if airline exists
+    _.forEach(user.airlinePreferences, function(value) {
+        // find index
+        var index = _.findIndex(airlines, { 'id': value });
+
+        // set airline
+        var airline = index != -1 ? airlines[index] : null;
+        user.airlinePreferences[pos] = _.cloneDeep(airline);
+
+        // increase to next position
+        pos++;
+    });
+
+    // reset
+    pos = 0;
+
+    // go through all values and check if airline exists
+    _.forEach(user.airlineNonPreferences, function(value) {
+        // find index
+        var index = _.findIndex(airlines, { 'id': value });
+
+        // set airline
+        var airline = index != -1 ? airlines[index] : null;
+        user.airlinePreferences[pos] = _.cloneDeep(airline);
+
+        // increase to next position
+        pos++;
+    });
+
     // send data
     res.json({ 'd': user });
 };
@@ -721,7 +755,7 @@ exports.updateAirlinePreferences = function (req, res) {
             // go through all values and check if airport exists
             _.forEach(updatedValues.airlinePreferences, function(value) {
                 // find index
-                var index = _.findIndex(airlines, value);
+                var index = _.findIndex(airlines, { 'id': value });
 
                 // if index found
                 if(index != -1) {
@@ -732,7 +766,7 @@ exports.updateAirlinePreferences = function (req, res) {
             // go through all values and check if airport exists
             _.forEach(updatedValues.airlineNonPreferences, function(value) {
                 // find index
-                var index = _.findIndex(airlines, value);
+                var index = _.findIndex(airlines, { 'id': value });
 
                 // if index found
                 if(index != -1) {
@@ -1089,56 +1123,84 @@ exports.readDB = function (req, res, next) {
         }
     });
 
-    // check if file exists
-    fs.stat(airlinesDetailsPath, function(err, stats) {
-        // if the file exists
-        if (stats.isFile()) {
-            // read content
-            fs.readFile(airlinesDetailsPath, 'utf8', (err, data) => {
-                // if error occurred
-                if (err) {
-                    // send internal error
-                    res.status(500).send({ error: true, title: errorHandler.getErrorTitle(err), message: errorHandler.getGenericErrorMessage(err) });
-                    console.log(clc.error(errorHandler.getDetailedErrorMessage(err)));
-                }
-                else {
-                    try {
-                        // read content
-                        airlines = JSON.parse(data);
+    // create request
+    var options = {
+        method: 'GET',
+        uri: 'https://api.skypicker.com/airlines?',
+        headers: {
+            'Content-Type': 'application/json; odata=verbose',
+            'Accept': 'application/json; odata=verbose'
+        },
+        json: true
+    };
 
-                        // increase the count
-                        completed++;
-                        
-                        // if reached the needed count
-                        if(needCompleted == completed) {
-                            // go to next
-                            next();
-                        }
-                    }
-                    catch (e) {
-                        // set error
-                        err = e;
+    // submit request to get airlines
+    requestPromise(options).then(function (responseA) {
+        // read content
+        airlines = responseA;
 
+        // increase the count
+        completed++;
+        
+        // if reached the needed count
+        if(needCompleted == completed) {
+            // go to next
+            next();
+        }
+    }).catch(function (responseA) {
+        // attempt to get local airline config
+        
+        // check if file exists
+        fs.stat(airlinesDetailsPath, function(err, stats) {
+            // if the file exists
+            if (stats.isFile()) {
+                // read content
+                fs.readFile(airlinesDetailsPath, 'utf8', (err, data) => {
+                    // if error occurred
+                    if (err) {
                         // send internal error
                         res.status(500).send({ error: true, title: errorHandler.getErrorTitle(err), message: errorHandler.getGenericErrorMessage(err) });
                         console.log(clc.error(errorHandler.getDetailedErrorMessage(err)));
                     }
-                }
-            });
-        }
-        else {
-            // reinitialize
-            airlines = [];
+                    else {
+                        try {
+                            // read content
+                            airlines = JSON.parse(data);
 
-            // increase the count
-            completed++;
-            
-            // if reached the needed count
-            if(needCompleted == completed) {
-                // go to next
-                next();
+                            // increase the count
+                            completed++;
+                            
+                            // if reached the needed count
+                            if(needCompleted == completed) {
+                                // go to next
+                                next();
+                            }
+                        }
+                        catch (e) {
+                            // set error
+                            err = e;
+
+                            // send internal error
+                            res.status(500).send({ error: true, title: errorHandler.getErrorTitle(err), message: errorHandler.getGenericErrorMessage(err) });
+                            console.log(clc.error(errorHandler.getDetailedErrorMessage(err)));
+                        }
+                    }
+                });
             }
-        }
+            else {
+                // reinitialize
+                airlines = [];
+
+                // increase the count
+                completed++;
+                
+                // if reached the needed count
+                if(needCompleted == completed) {
+                    // go to next
+                    next();
+                }
+            }
+        });
     });
 
     // check if file exists

@@ -153,8 +153,8 @@ exports.shortenUrl = function (req, res) {
                 res.json({ 'd': returnReq });
             }).catch(function (responseSU) {
                 // send internal error
-                res.status(500).send({ error: true, title: errorHandler.getErrorTitle(err), message: errorHandler.getGenericErrorMessage(err)  });
-                console.log(clc.error(errorHandler.getDetailedErrorMessage(err)));
+                res.status(500).send({ error: true, title: responseSU.error.code, message: responseSU.error.message  });
+                console.log(clc.error(responseSU.error.message));
             });
         }
     });
