@@ -45,11 +45,12 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
     $scope.searchForm = {
         'inputs': {
             'depart': $scope.initialText,
-            'arrive': '',
-            'departDate': today,
+            'arrive': 'Detroit Metro Wayne Co',
+            'departDate': new Date('12/11/17'),
             'returnDate': threeDays,
             'adults': 1,
-            'roundTripOrOneWay': 'roundTrip'
+            'roundTripOrOneWay': 'oneway',
+            'nonStop': true
         },
         'errors': {
             'generic': {
@@ -140,14 +141,14 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
     // changes round trip option
     $scope.changeRoundTripOption = function() {
         // if round trip, set the day to three days after the current date given
-        if($scope.searchForm.inputs.roundTripOrOneWay == 'roundTrip') {
+        if($scope.searchForm.inputs.roundTripOrOneWay == 'round') {
             // get three days from depart date
             var threeDays = new Date($scope.searchForm.inputs.departDate);
             threeDays.setDate(threeDays.getDate() + 3);
             $scope.searchForm.inputs.returnDate = threeDays;
         }
         // if one way, remove date
-        else if($scope.searchForm.inputs.roundTripOrOneWay == 'oneWay') {
+        else if($scope.searchForm.inputs.roundTripOrOneWay == 'oneway') {
             $scope.searchForm.inputs.returnDate = null;
         }
     };
@@ -185,7 +186,7 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
     // on change of depart date
     $scope.changeDepartDate = function() {
         // if the return date is before the departure date
-        if($scope.searchForm.inputs.returnDate < $scope.searchForm.inputs.departDate) {
+        if($scope.searchForm.inputs.returnDate < $scope.searchForm.inputs.departDate && $scope.searchForm.inputs.roundTripOrOneWay == 'round') {
             // get three days from depart date
             var threeDays = new Date($scope.searchForm.inputs.departDate);
             threeDays.setDate(threeDays.getDate() + 3);
@@ -252,7 +253,11 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
                     'arrive': { 'iata': foundArrive.iata, 'icao': foundArrive.icao },
                     'departDate': $scope.searchForm.inputs.departDate,
                     'returnDate': $scope.searchForm.inputs.returnDate,
-                    'adults': $scope.searchForm.inputs.adults
+                    'adults': $scope.searchForm.inputs.adults,
+                    'typeFlight': $scope.searchForm.inputs.roundTripOrOneWay == 'round' ? 'round' : 'oneway',
+                    'preferredAirlines': ['DL'],
+                    'nonPreferredAirlines': [],
+                    'nonStop': $scope.searchForm.inputs.nonStop ? 1 : 0
                 };
 
                 // search flights
@@ -260,7 +265,8 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
                     // if returned a valid response
                     if (responseF && !responseF.error) {
                         // set the data
-                        $scope.flights.flightList = responseF;
+                        $scope.flights.flightListData = responseF;
+                        $scope.flights.flightListTo = responseF.data;
 
                         // show the form is no longer in transit
                         $scope.formInTransit = false;
@@ -352,6 +358,59 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
                 });
             }
         }
+    };
+
+    // get the airline name
+    $scope.getAirlineName = function (airlineCode) {
+        // get the airline
+        var airline = _.find($rootScope.$root.airlines, { 'id': airlineCode});
+        return airline ? airline.name : airlineCode;
+    };
+
+    // get the flight departure time
+    $scope.getFlightDepartureTime = function (routes) {
+        // get the first time stamp
+        var time = routes[0].dTimeUTC;
+        return $rootScope.$root.formatTime($rootScope.$root.timeShort, time);
+    };
+
+    // get the flight arrival time
+    $scope.getFlightArrivalTime = function (routes) {
+        // get the first time stamp
+        var time = routes[routes.length - 1].aTimeUTC;
+        return $rootScope.$root.formatTime($rootScope.$root.timeShort, time);
+    };
+
+    // get flight numbers
+    $scope.getRouteFlightNumbers = function (routes) {
+        // holds the flight numbers
+        var flightNos = '';
+
+        var pos = 0;
+        // go through each route
+        _.forEach(routes, function(value) {
+            // tack on the fight number
+            pos == 0 ? flightNos += value.flight_no : flightNos += ',' + value.flight_no;
+            pos++;
+        });
+
+        return flightNos;
+    };
+
+    // get flight path
+    $scope.getFlightPath = function (routes) {
+        // holds the flight numbers
+        var flightPath = '';
+
+        var pos = 0;
+        // go through each route
+        _.forEach(routes, function(value) {
+            // tack on the fight number
+            pos == 0 ? flightPath += value.flyFrom + ' to ' + value.flyTo: flightPath += ',' + value.flyFrom + ' to ' + value.flyTo;
+            pos++;
+        });
+
+        return flightPath;
     };
 
     // initialize page
@@ -523,6 +582,7 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
                         if(value.main) {
                             // set main
                             $scope.hubOptions.options.push(`${value.name} (Main)`);
+                            $scope.searchForm.inputs.depart = `${value.name} (Main)`;
                         }
                         else {
                             // set hub
@@ -591,7 +651,7 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
                                                     || ($scope.hubDirection == 'arrive' && _.indexOf($scope.hubOptions.options, $scope.searchForm.inputs.arrive) == -1)
                                                     || ($scope.hubDirection == 'depart' && _.findIndex($rootScope.$root.airportCodes, { 'name': $scope.searchForm.inputs.arrive }) == -1);
         $scope.searchForm.errors.departDate.isError = !$scope.searchForm.inputs.departDate || $scope.searchForm.inputs.departDate.length == 0;
-        $scope.searchForm.errors.returnDate.isError = !$scope.searchForm.inputs.returnDate || $scope.searchForm.inputs.returnDate.length == 0;
+        $scope.searchForm.errors.returnDate.isError = (!$scope.searchForm.inputs.returnDate || $scope.searchForm.inputs.returnDate.length == 0) && $scope.searchForm.inputs.roundTripOrOneWay == 'round';
         $scope.searchForm.errors.adults.isError = !$scope.searchForm.inputs.adults || $scope.searchForm.inputs.adults < 1;
 
         // set specific text based on empty or equality

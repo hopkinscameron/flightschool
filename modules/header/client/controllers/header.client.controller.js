@@ -80,9 +80,31 @@ headerModule.controller('HeaderController', ['$scope', '$rootScope', '$location'
             else if(type == $rootScope.$root.shortNumeric) {
                 return date.toLocaleString('en-us', { day: 'numeric', month: 'numeric', year: 'numeric' });
             }
+            else if(type == $rootScope.$root.dateSkyPicker) {
+                var skyPickerApiDate = date.toLocaleString('en-us', { day: 'numeric', month: 'numeric', year: 'numeric' });
+                var dateSplit = skyPickerApiDate.split('/');
+                skyPickerApiDate = `${dateSplit[1]}/${dateSplit[0]}/${dateSplit[2]}`;
+                return skyPickerApiDate;
+            }
         }
         catch (e) {
             return dateToFormat;
+        }
+    };
+
+    // format time
+    $rootScope.$root.formatTime = function(type, timeToFormat) {
+        try {
+            var date = new Date(timeToFormat);
+
+            // switch based on time type
+            if(type == $rootScope.$root.timeShort) {
+                return date.toLocaleTimeString();
+            }
+            
+        }
+        catch (e) {
+            return timeToFormat;
         }
     };
 
@@ -342,9 +364,11 @@ headerModule.controller('HeaderController', ['$scope', '$rootScope', '$location'
         $rootScope.$root.dateShort = 'short';
         $rootScope.$root.dateLong = 'long';
         $rootScope.$root.dateOnly = 'dateOnly';
-        $rootScope.$root.locale = 'locale';
-        $rootScope.$root.iso = 'iso';
+        $rootScope.$root.dateLocale = 'dateLocale';
+        $rootScope.$root.dateIso = 'dateIso';
         $rootScope.$root.shortNumeric = 'shortNumeric';
+        $rootScope.$root.dateSkyPicker = 'dateSkyPicker';
+        $rootScope.$root.timeShort = 'timeShort';
 
         // the notification types
         $rootScope.$root.notificationTypeSuccess = 'success';

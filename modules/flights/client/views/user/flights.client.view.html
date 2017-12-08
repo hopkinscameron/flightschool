@@ -37,12 +37,12 @@
                             <div class="col-md-6">
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label">
-                                        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="radioRoundTrip" value="roundTrip" ng-model="searchForm.inputs.roundTripOrOneWay" ng-change="changeRoundTripOption()"> Round Trip
+                                        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="radioRoundTrip" value="round" ng-model="searchForm.inputs.roundTripOrOneWay" ng-change="changeRoundTripOption()"> Round Trip
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label">
-                                        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="radioOneWay" value="oneWay" ng-model="searchForm.inputs.roundTripOrOneWay" ng-change="changeRoundTripOption()"> One Way
+                                        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="radioOneWay" value="oneway" ng-model="searchForm.inputs.roundTripOrOneWay" ng-change="changeRoundTripOption()"> One Way
                                     </label>
                                 </div>
                             </div>
@@ -59,7 +59,7 @@
                         <div ng-if="searchForm.errors.generic.isError">
                             <span style="color: red;">{{searchForm.errors.generic.message}}</span>
                         </div>
-                        <form class="form-group typeahead-custom" ng-submit="searchFlights()" novalidate>
+                        <form class="form-group typeahead-custom" ng-submit="searchFlights()" autocomplete="off" novalidate>
                             <div class="form-row">
                                 <!-- Begin Depart -->
                                 <div class="form-group col">
@@ -99,7 +99,7 @@
                                 <!-- Begin Return Date -->
                                 <div class="form-group col-md-3">
                                     <label class="col-form-label" for="returnDate">Return Date</label>
-                                    <input class="form-control form-control-lg form-control-danger" ng-class="{'is-invalid': searchForm.errors.returnDate.isError}" type="date" name="returnDate" placeholder="Return Date" id="returnDate" min="{{returnDateMin | date:'yyyy-MM-dd'}}" ng-model="searchForm.inputs.returnDate" ng-disabled="formInTransit || searchForm.inputs.roundTripOrOneWay == 'oneWay'" required>
+                                    <input class="form-control form-control-lg form-control-danger" ng-class="{'is-invalid': searchForm.errors.returnDate.isError}" type="date" name="returnDate" placeholder="Return Date" id="returnDate" min="{{returnDateMin | date:'yyyy-MM-dd'}}" ng-model="searchForm.inputs.returnDate" ng-disabled="formInTransit || searchForm.inputs.roundTripOrOneWay == 'oneway'" required>
                                     <small class="invalid-feedback">{{searchForm.errors.returnDate.message}}</small>
                                 </div>
                                 <!-- End Return Date -->
@@ -121,9 +121,39 @@
                         </form>
                     </div>                
                     <!-- End Flight Search -->
-                    <!-- Begin Flights -->
-
-                    <!-- End Flights -->
+                    <!-- Begin Flights To -->
+                    <div ng-if="flights.flightListTo">
+                        <!-- Begin Flight List -->
+                        <table class="table" ng-if="flights.flightListTo.length > 0">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Airline</th>
+                                    <th scope="col">Departure Time</th>
+                                    <th scope="col">Arrival Time</th>
+                                    <th scope="col">Flight #</th>
+                                    <th scope="col">Route</th>
+                                    <th scope="col">Travel Time</th>
+                                    <th scope="col">Your Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="flight in flights.flightListTo">
+                                    <th scope="row">{{getAirlineName(flight.airlines[0])}}</th>
+                                    <td>{{getFlightDepartureTime(flight.route)}}</td>
+                                    <td>{{getFlightDepartureTime(flight.route)}}</td>
+                                    <td>{{getRouteFlightNumbers(flight.route)}}</td>
+                                    <td>{{getFlightPath(flight.route)}}</td>
+                                    <td>{{flight.fly_duration}}</td>
+                                    <td>${{$root.formatFloat(flight.price, 2)}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <!-- End Flight List -->
+                        <!-- Begin No Flights Found -->
+                        <p ng-if="flights.flightListTo.length == 0">Sorry, there were no flights found</p>
+                        <!-- End No Flights Found -->
+                    </div>
+                    <!-- End Flights To -->
                 </div>
                 <!-- End Having Hubs -->
             </div>

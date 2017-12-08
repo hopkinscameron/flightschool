@@ -38,21 +38,54 @@ flightsServiceModule.factory('FlightsFactory', ['$http', '$location', '$rootScop
 
     // gets flights
     factory.getFlights = function (data) {
-        // set the endpoint
-        var endpoint = appPath + '/flights';
+        // holds the from/to locations
+        var from = '';
+        var to = '';
 
-        // stringify the data
-        var dataStrigified = JSON.stringify({
-            'depart': data.depart,
-            'arrive': data.arrive,
-            'departDate': data.departDate,
-            'returnDate': data.returnDate,
-            'adults': data.adults
+        // if depart
+        if(data.depart) {
+            from = data.depart.iata ? data.depart.iata : data.depart.icao;
+        }
+
+        // if arrive
+        if(data.arrive) {
+            to = data.arrive.iata ? data.arrive.iata : data.arrive.icao;
+        }
+
+        // holds the from/to date
+        var fromDate = $rootScope.$root.formatDate($rootScope.$root.dateSkyPicker, data.departDate);
+        var toDate = $rootScope.$root.formatDate($rootScope.$root.dateSkyPicker, data.departDate);
+
+        // holds the preferred/non preferred airlines
+        var preferredAirlines = '';
+        var nonPreferredAirlines = '';
+
+        // go through all preferred/non preferred airlines
+        var pos = 0;
+        _.forEach(data.preferredAirlines, function(value) {
+            pos == 0 ? preferredAirlines += value : preferredAirlines += ',' + value;
+            pos++;
+        });
+        pos = 0;
+        _.forEach(data.nonPreferredAirlines, function(value) {
+            pos == 0 ? nonPreferredAirlines += value : nonPreferredAirlines += ',' + value;
+            pos++;
         });
 
+        // set the endpoint
+        var endpoint = `https://api.skypicker.com/flights?flyFrom=${from}&to=${to}&dateFrom=${fromDate}&dateTo=${toDate}&typeFlight=${data.typeFlight}&adults=${data.adults}&directFlights=${data.nonStop}&partner=picky&partner_market=us&curr=USD&selectedAirlines=${preferredAirlines}&limit=10`;
+
+        // the configuration for the http call
+        var config = {
+            'ignoreLoadingBar': true,
+            'headers' : {
+                'Access-Control-Max-Age': undefined
+            }
+        };
+
         // send request
-        return $http.post(endpoint, dataStrigified, { 'ignoreLoadingBar': true }).then(function (response) {
-            return response.data.d;
+        return $http.get(endpoint, config).then(function (response) {
+            return response.data;
         })
         .catch(function (response) {
             // if the response was sent back with the custom data response

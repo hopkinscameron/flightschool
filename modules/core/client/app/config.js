@@ -6,7 +6,7 @@ var applicationModuleName = 'wanderlust';
 
 // the application name
 // FIXME: had this as "const" is there a way to keep this during minification
-var applicationName = 'Wander Lust';
+var applicationName = 'Bootstrap';
 
 // the application base
 // FIXME: had this as "const" is there a way to keep this during minification
