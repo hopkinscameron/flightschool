@@ -124,30 +124,70 @@
                     <!-- Begin Flights To -->
                     <div ng-if="flights.flightListTo">
                         <!-- Begin Flight List -->
-                        <table class="table" ng-if="flights.flightListTo.length > 0">
-                            <thead>
-                                <tr>
-                                    <th scope="col">Airline</th>
-                                    <th scope="col">Departure Time</th>
-                                    <th scope="col">Arrival Time</th>
-                                    <th scope="col">Flight #</th>
-                                    <th scope="col">Route</th>
-                                    <th scope="col">Travel Time</th>
-                                    <th scope="col">Your Price</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr ng-repeat="flight in flights.flightListTo">
-                                    <th scope="row">{{getAirlineName(flight.airlines[0])}}</th>
-                                    <td>{{getFlightDepartureTime(flight.route)}}</td>
-                                    <td>{{getFlightDepartureTime(flight.route)}}</td>
-                                    <td>{{getRouteFlightNumbers(flight.route)}}</td>
-                                    <td>{{getFlightPath(flight.route)}}</td>
-                                    <td>{{flight.fly_duration}}</td>
-                                    <td>${{$root.formatFloat(flight.price, 2)}}</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <div class="row" ng-if="flights.flightListTo.length > 0">
+                            <!-- Begin Filters -->
+                            <div class="col-md-2">
+                                <div class="card-body bg-light">
+                                    <h6 class="text-center">Filter Results</h6>
+                                    <!-- Begin Airline Filters -->
+                                    <p class="text-center mb-0">Airline Filters</p>
+                                    <div class="card--border--none card--border--top card--border--color-light">
+                                        <div class="form-check" ng-repeat="airline in flights.flightListData.all_airlines">
+                                            <label class="form-check-label">
+                                                <input class="form-check-input" type="checkbox" ng-value="{{airline}}" ng-model="airlineFilterModels[$index]" ng-change="updateFilter(flightFilters.airlines)">
+                                                {{getAirlineName(airline)}}
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <!-- End Airline Filters -->
+                                    <!-- Begin Flight Air Time -->
+                                    <p class="text-center mb-0">Flight Length</p>
+                                    <div class="card--border--none card--border--top card--border--color-light">
+                                        <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
+                                    </div>
+                                    <!-- End Flight Air Time -->
+                                    <!-- Begin Flight Departure Time -->
+                                    <!-- End Flight Departure Time -->
+                                    <!-- Begin Flight Arrival Time -->
+                                    <!-- End Flight Arrival Time -->
+                                    <!-- Begin Price -->
+                                    <!-- End Price -->
+                                    <!-- Begin # of Stops -->
+                                    <!-- End # of Stops -->
+                                </div>
+                            </div>
+                            <!-- Eng Filters -->
+                            <!-- Begin Flights -->
+                            <div class="col-md-10">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Airline</th>
+                                            <th>Departure Time</th>
+                                            <th>Arrival Time</th>
+                                            <th>Flight #</th>
+                                            <th>Route</th>
+                                            <th>Travel Time</th>
+                                            <th>Origional Price</th>
+                                            <th>Your Price</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="flight in filteredFlights">
+                                            <th scope="row">{{getAirlineName(flight.airlines[0])}}</th>
+                                            <td>{{getFlightDepartureTime(flight.route)}}</td>
+                                            <td>{{getFlightArrivalTime(flight.route)}}</td>
+                                            <td>{{getRouteFlightNumbers(flight.route)}}</td>
+                                            <td>{{getFlightPath(flight.route)}}</td>
+                                            <td>{{flight.fly_duration}}</td>
+                                            <td>${{$root.formatFloat(flight.price, 2)}}</td>
+                                            <td>${{getUserFlightPrice(flight.price)}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- End Flights -->
+                        </div>
                         <!-- End Flight List -->
                         <!-- Begin No Flights Found -->
                         <p ng-if="flights.flightListTo.length == 0">Sorry, there were no flights found</p>

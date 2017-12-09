@@ -4,7 +4,7 @@
 var flightsModule = angular.module('flights');
 
 // create the controller
-flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile', '$location', '$window', '$timeout', 'Service', 'AccountFactory', 'FlightsFactory', function ($scope, $rootScope, $compile, $location, $window, $timeout, Service, AccountFactory, FlightsFactory) {
+flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile', '$location', '$window', '$timeout', 'Service', 'TierFactory', 'AccountFactory', 'FlightsFactory', function ($scope, $rootScope, $compile, $location, $window, $timeout, Service, TierFactory, AccountFactory, FlightsFactory) {
     // determines if a page has already sent a request for load
     var pageRequested = false;
 
@@ -21,6 +21,9 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
         'status': 404,
         'message': ''
     };
+
+    // user membership
+    var userMembership = undefined;
 
     // get todays date
     var today = new Date();
@@ -50,7 +53,7 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
             'returnDate': threeDays,
             'adults': 1,
             'roundTripOrOneWay': 'oneway',
-            'nonStop': true
+            'nonStop': false
         },
         'errors': {
             'generic': {
@@ -80,6 +83,15 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
                 'message': 'Please provide a at least 1 adult'
             }         
         }
+    };
+
+    // flight filters
+    $scope.flightFilters = {
+        'airlines': 'airlines',
+        'dTime': 'dTime',
+        'aTime': 'aTime',
+        'price': 'price',
+        'stops': 'stops'
     };
     
     // determines if form is in transit
@@ -255,7 +267,7 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
                     'returnDate': $scope.searchForm.inputs.returnDate,
                     'adults': $scope.searchForm.inputs.adults,
                     'typeFlight': $scope.searchForm.inputs.roundTripOrOneWay == 'round' ? 'round' : 'oneway',
-                    'preferredAirlines': ['DL'],
+                    'preferredAirlines': ['DL', 'AA', 'WN', 'F9', 'UA', 'NK', 'VX', 'B6', 'G4'],
                     'nonPreferredAirlines': [],
                     'nonStop': $scope.searchForm.inputs.nonStop ? 1 : 0
                 };
@@ -267,6 +279,15 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
                         // set the data
                         $scope.flights.flightListData = responseF;
                         $scope.flights.flightListTo = responseF.data;
+                        $scope.filteredFlights = responseF.data;
+
+                        // the airline filter models
+                        $scope.airlineFilterModels = { };
+
+                        // go through all airlines
+                        for(var x = 0; x < responseF.all_airlines.length; x++) {
+                            $scope.airlineFilterModels[x] = responseF.all_airlines[x];
+                        };
 
                         // show the form is no longer in transit
                         $scope.formInTransit = false;
@@ -371,14 +392,14 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
     $scope.getFlightDepartureTime = function (routes) {
         // get the first time stamp
         var time = routes[0].dTimeUTC;
-        return $rootScope.$root.formatTime($rootScope.$root.timeShort, time);
+        return $rootScope.$root.formatTime($rootScope.$root.timeShortNoSeconds, $rootScope.$root.formatFromUnixTimeStamp(time));
     };
 
     // get the flight arrival time
     $scope.getFlightArrivalTime = function (routes) {
         // get the first time stamp
         var time = routes[routes.length - 1].aTimeUTC;
-        return $rootScope.$root.formatTime($rootScope.$root.timeShort, time);
+        return $rootScope.$root.formatTime($rootScope.$root.timeShortNoSeconds, $rootScope.$root.formatFromUnixTimeStamp(time));
     };
 
     // get flight numbers
@@ -411,6 +432,33 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
         });
 
         return flightPath;
+    };
+
+    // get user flight price
+    $scope.getUserFlightPrice = function (origionalPrice) {
+        // holds the price
+        var price = origionalPrice;
+
+        // if user membership
+        if(userMembership) {
+            // get the discount and subtract from origional price
+            var discount = price * userMembership.discount * 0.01;
+            price -= discount;
+        }
+
+        return $rootScope.$root.formatFloat(price, 2);
+    };
+
+    // updates the filter
+    $scope.updateFilter = function (filterType) {
+        // change based on filter
+        switch(filterType) {
+            case $scope.flightFilters.airlines:
+                filterAirlines();
+                break;
+            default:
+                break;
+        }
     };
 
     // initialize page
@@ -609,11 +657,91 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
                             $window.href = '/account/hubs';
                         });
                     }
+                    else {
+                        // get the tiers
+                        TierFactory.getTiers().then(function (responseT) {
+                            // if returned a valid response
+                            if (responseT && !responseT.error) {
+                                // get user membership
+                                _.forEach(responseT, function(value) {
+                                    // if membership matches
+                                    if(window.user.membership.tierId == value._id) {
+                                        userMembership = _.cloneDeep(value);
+                                    }
+                                });
+                                
+                                // if membership not found
+                                if(!userMembership) {
+                                    // set no longer attempting to load hubs
+                                    $scope.loadingHubs = undefined;
 
-                    // set no longer loading hubs
-                    $scope.loadingHubs = false;
+                                    // show error
+                                    swal({
+                                        title: 'Error!',
+                                        text: 'Sorry! There was an error: Couldn\'t get your membeship information',
+                                        type: 'error',
+                                        confirmButtonClass: 'btn btn-theme-primary btn-cursor-pointer',
+                                        buttonsStyling: false
+                                    }).then(function () {},
+                                    // handling the promise rejection
+                                    function (dismiss) {});
+                                }
+                                else {
+                                    // set no longer loading hubs
+                                    $scope.loadingHubs = false;
+                                }
+                            }
+                            else {
+                                // set error
+                                $scope.pageTitle = responseT.title;
+                                $scope.error.error = true;
+                                $scope.error.title = responseT.title;
+                                $scope.error.status = responseT.status;
+                                $scope.error.message = responseT.message;
+
+                                // set no longer attempting to load hubs
+                                $scope.loadingHubs = undefined;
+
+                                // show error
+                                swal({
+                                    title: 'Error!',
+                                    text: 'Sorry! There was an error: ' + responseT.message,
+                                    type: 'error',
+                                    confirmButtonClass: 'btn btn-theme-primary btn-cursor-pointer',
+                                    buttonsStyling: false
+                                }).then(function () {},
+                                // handling the promise rejection
+                                function (dismiss) {});
+                            }
+                        })
+                        .catch(function (responseT) {
+                            // set error
+                            $scope.pageTitle = responseT.title;
+                            $scope.error.error = true;
+                            $scope.error.title = responseT.title;
+                            $scope.error.status = responseT.status;
+                            $scope.error.message = responseT.message;
+
+                            // set no longer loading attempting to load hubs
+                            $scope.loadingHubs = undefined;
+
+                            // show error
+                            swal({
+                                title: 'Error!',
+                                text: 'Sorry! There was an error: ' + responseT.message,
+                                type: 'error',
+                                confirmButtonClass: 'btn btn-theme-primary btn-cursor-pointer',
+                                buttonsStyling: false
+                            }).then(function () {},
+                            // handling the promise rejection
+                            function (dismiss) {});
+                        });
+                    }
                 }
                 else {
+                    // set no longer loading attempting to load hubs
+                    $scope.loadingHubs = undefined;
+                    
                     // show error
                     swal({
                         title: 'Error!',
@@ -627,6 +755,9 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
                 }
             })
             .catch(function (responseH) {
+                // set no longer loading attempting to load hubs
+                $scope.loadingHubs = undefined;
+
                 // show error
                 swal({
                     title: 'Error!',
@@ -679,5 +810,10 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
         if(!$scope.searchForm.inputs.arrive || $scope.searchForm.inputs.arrive.length == 0 || ($scope.hubDirection == 'arrive' && $scope.searchForm.inputs.arrive == $scope.initialText)) {
             $scope.searchForm.errors.arrive.message = $scope.searchForm.errors.arrive.optionalMessages[0];
         }
+    };
+
+    // filter airlines
+    function filterAirlines() {
+        // go through 
     };
 }]);

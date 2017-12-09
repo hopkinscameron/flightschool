@@ -101,11 +101,19 @@ headerModule.controller('HeaderController', ['$scope', '$rootScope', '$location'
             if(type == $rootScope.$root.timeShort) {
                 return date.toLocaleTimeString();
             }
-            
+            else if(type == $rootScope.$root.timeShortNoSeconds) {
+                return date.toLocaleTimeString([], { hour: '2-digit', minute:'2-digit' });
+            }
         }
         catch (e) {
             return timeToFormat;
         }
+    };
+
+    // format from UNIX timestamp
+    $rootScope.$root.formatFromUnixTimeStamp = function(timeInSeconds) {
+        // time is in a UNIX timestamp (which is in seconds), so need to multiply by 1000 to get to correct JS time
+        return new Date(timeInSeconds * 1000);
     };
 
     // get time since comment
@@ -369,6 +377,7 @@ headerModule.controller('HeaderController', ['$scope', '$rootScope', '$location'
         $rootScope.$root.shortNumeric = 'shortNumeric';
         $rootScope.$root.dateSkyPicker = 'dateSkyPicker';
         $rootScope.$root.timeShort = 'timeShort';
+        $rootScope.$root.timeShortNoSeconds = 'timeShortNoSeconds';
 
         // the notification types
         $rootScope.$root.notificationTypeSuccess = 'success';
