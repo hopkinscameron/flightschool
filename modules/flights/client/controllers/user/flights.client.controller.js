@@ -49,8 +49,8 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
         'inputs': {
             'depart': $scope.initialText,
             'arrive': 'Detroit Metro Wayne Co',
-            'departDate': new Date('12/11/17'),
-            'returnDate': threeDays,
+            'departDate': new Date('12/18/17'),
+            'returnDate': new Date('12/20/17'),
             'adults': 1,
             'roundTripOrOneWay': 'oneway',
             'nonStop': false
@@ -92,6 +92,14 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
         'aTime': 'aTime',
         'price': 'price',
         'stops': 'stops'
+    };
+
+    // time slider values
+    $scope.timeSlider = {
+        'min': 0,
+        'max': 0,
+        'value': 0,
+        'displayValue': '0 minutes'
     };
     
     // determines if form is in transit
@@ -279,15 +287,32 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
                         // set the data
                         $scope.flights.flightListData = responseF;
                         $scope.flights.flightListTo = responseF.data;
-                        $scope.filteredFlights = responseF.data;
+                        $scope.origionalFlightList = [];
+                        $scope.filteredFlights = [];
+
+                        // go through each filtered flight and remove any that don't start or end at the selected locations
+                        _.forEach(responseF.data, function(value) {
+                            if((value.flyFrom == foundDepart.iata || value.flyFrom == foundDepart.icao) 
+                                && (value.flyTo == foundArrive.iata || value.flyTo == foundArrive.icao)) {
+                                $scope.origionalFlightList.push(value);
+                            }
+                        });
 
                         // the airline filter models
                         $scope.airlineFilterModels = { };
+                        $scope.airlineFilterChecks = { };
 
                         // go through all airlines
                         for(var x = 0; x < responseF.all_airlines.length; x++) {
                             $scope.airlineFilterModels[x] = responseF.all_airlines[x];
+                            $scope.airlineFilterChecks[x] = x == 0 ? true : false;
                         };
+
+                        // set up time slider
+                        setUpTimeSlider();
+
+                        // apply filter
+                        $scope.updateSearchResults();
 
                         // show the form is no longer in transit
                         $scope.formInTransit = false;
@@ -426,8 +451,23 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
         var pos = 0;
         // go through each route
         _.forEach(routes, function(value) {
-            // tack on the fight number
-            pos == 0 ? flightPath += value.flyFrom + ' to ' + value.flyTo: flightPath += ',' + value.flyFrom + ' to ' + value.flyTo;
+            /*
+            // if the initial value
+            if(pos == 0) {
+                var from = `<div class="d-inline-flex align-items-center"><p class="mb-0 d-inline-block text-center">${value.flyFrom}<small class="d-block text-center">(${value.cityFrom})</small></p><p class="d-inline-block mb-0"> -> </p></div>`;
+                var to = `<div class="d-inline-flex align-items-center"><p class="mb-0 d-inline-block text-center">${value.flyTo}<small class="d-block text-center">(${value.cityTo})</small></p></div>`;
+
+                // tack on the fight number
+                flightPath += from + ' ' + to;
+            }
+            else {
+                var to = `<div class="d-inline-flex align-items-center"><p class="d-inline-block mb-0"> -> </p><p class="mb-0 d-inline-block text-center">${value.flyTo}<small class="d-block text-center">(${value.cityTo})</small></p></div>`;
+                
+                // tack on the fight number
+                flightPath += to;
+            }
+            */
+            pos == 0 ? flightPath += value.flyFrom + ' -> ' + value.flyTo : flightPath += ' -> ' + value.flyTo;
             pos++;
         });
 
@@ -449,6 +489,22 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
         return $rootScope.$root.formatFloat(price, 2);
     };
 
+    // get time slider value
+    $scope.getSliderValue = function () {
+        var currentHours = Math.floor($scope.timeSlider.value / 60);
+        var currentMins = $scope.timeSlider.value - (currentHours * 60);
+
+        // if there are hours
+        if(currentHours > 0) {
+            $scope.timeSlider.displayValue = currentHours + 'h';
+        }
+        
+        // if there are minutes
+        if(currentMins > 0) {
+            $scope.timeSlider.displayValue += currentHours > 0 ? ' ' + currentMins + 'm' : currentMins + 'm';
+        }
+    };
+
     // updates the filter
     $scope.updateFilter = function (filterType) {
         // change based on filter
@@ -459,6 +515,35 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
             default:
                 break;
         }
+    };
+
+    // updates search results
+    $scope.updateSearchResults = function () {
+        // get airline values
+        var airlineValues = [];
+
+        // checked values
+        var checkValues = Object.values($scope.airlineFilterChecks);
+        for(var x = 0; x < checkValues.length; x++) {
+            // if value is checked
+            if(checkValues[x]) {
+                airlineValues.push($scope.airlineFilterModels[x]);
+            }
+        }
+
+        // filter results
+        $scope.filteredFlights = _.filter($scope.origionalFlightList, function(o) {
+            // check if this flight matches any of the selected airline
+            var isAirline = airlineValues.some(function (v) {
+                return o.airlines.indexOf(v) != -1;
+            });
+
+            // check if this flight is withing time range
+            var flightLength = getMinutesFromFlight(o.fly_duration);
+            var isLessThanLength = flightLength < $scope.timeSlider.value;
+
+            return isAirline && isLessThanLength; 
+        });
     };
 
     // initialize page
@@ -812,8 +897,70 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
         }
     };
 
+    // set up the time slider
+    function setUpTimeSlider() {
+        // reset min/max
+        $scope.timeSlider.min = 0;
+        $scope.timeSlider.max = 0;
+
+        // go through each time length and find the min/max
+        _.forEach($scope.origionalFlightList, function(value) {
+            // convert to minutes and add to total minute values
+            var totalMins = getMinutesFromFlight(value.fly_duration);
+            
+            // check the min/max
+            $scope.timeSlider.min = $scope.timeSlider.min == 0 || totalMins <  $scope.timeSlider.min ? totalMins : $scope.timeSlider.min;
+            $scope.timeSlider.max = $scope.timeSlider.max == 0 || totalMins >  $scope.timeSlider.max ? totalMins : $scope.timeSlider.max;
+        });
+
+        // set the current value as the max value
+        $scope.timeSlider.value = $scope.timeSlider.max;
+        $scope.getSliderValue();
+    };
+
+    // get minutes from flight length
+    function getMinutesFromFlight(flightLength) {
+        var totalMins = 0;
+
+        // 18h 23m
+        var hm = flightLength;
+        hm = hm.toLowerCase();
+        hm = hm.split(' ');
+
+        // if there are two values
+        if(hm.length == 2) {
+            var hours = parseInt(hm[0].substring(0, hm[0].indexOf('h')));
+            var mins = parseInt(hm[1].substring(0, hm[1].indexOf('m')));
+
+            // convert to minutes and add to total minute values
+            totalMins = hours * 60 + mins;
+        }
+        else if(hm.length == 1) {
+            // get index of h or m
+            var hIndex = hm[0].substring(0, hm[0].indexOf('h'));
+            var mIndex = hm[0].substring(0, hm[0].indexOf('m'));
+
+            // if hours
+            if(hIndex != -1) {
+                var hours = parseInt(hm[0].substring(0, hIndex));
+
+                // convert to minutes and add to total minute values
+                totalMins = hours * 60;
+            }
+            // if minutes
+            else if(mIndex != -1) {
+                totalMins = parseInt(hm[1].substring(0, mIndex));
+            }
+        }
+        else {
+            console.log('why is there 3 spaces?!?!!?! (time slider');
+        }
+
+        return totalMins;
+    };
+
     // filter airlines
     function filterAirlines() {
-        // go through 
+        // go through each airline, and extract matching filter
     };
 }]);

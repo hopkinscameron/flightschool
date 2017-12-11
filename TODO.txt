@@ -4,6 +4,8 @@
 
 Next (Immediate)
 - implement flight search
+- implement all filters
+- implement sort on flights
 - find a way to force an update on the embeded user obj when profile is changed
 
 Later (After next is completed)

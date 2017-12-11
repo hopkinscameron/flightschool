@@ -130,20 +130,21 @@
                                 <div class="card-body bg-light">
                                     <h6 class="text-center">Filter Results</h6>
                                     <!-- Begin Airline Filters -->
-                                    <p class="text-center mb-0">Airline Filters</p>
                                     <div class="card--border--none card--border--top card--border--color-light">
+                                        <p class="text-center mb-0 font-weight-bold">Airline Filters</p>
                                         <div class="form-check" ng-repeat="airline in flights.flightListData.all_airlines">
                                             <label class="form-check-label">
-                                                <input class="form-check-input" type="checkbox" ng-value="{{airline}}" ng-model="airlineFilterModels[$index]" ng-change="updateFilter(flightFilters.airlines)">
+                                                <input class="form-check-input" type="checkbox" ng-value="{{airline}}" ng-model="airlineFilterChecks[$index]" ng-change="updateFilter(flightFilters.airlines)" ng-checked="airlineFilterChecks[$index]">
                                                 {{getAirlineName(airline)}}
                                             </label>
                                         </div>
                                     </div>
                                     <!-- End Airline Filters -->
                                     <!-- Begin Flight Air Time -->
-                                    <p class="text-center mb-0">Flight Length</p>
                                     <div class="card--border--none card--border--top card--border--color-light">
-                                        <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
+                                        <p class="text-center mb-0 font-weight-bold">Max Air Time</p>
+                                        <p class="mb-1 text-center">{{timeSlider.displayValue}}</p>
+                                        <input type="range" min="{{timeSlider.min}}" ng-min="timeSlider.min" max="{{timeSlider.max}}" ng-max="timeSlider.max" ng-value="timeSlider.value" ng-model="timeSlider.value" ng-change="getSliderValue()" class="slider" id="myRange">
                                     </div>
                                     <!-- End Flight Air Time -->
                                     <!-- Begin Flight Departure Time -->
@@ -154,6 +155,11 @@
                                     <!-- End Price -->
                                     <!-- Begin # of Stops -->
                                     <!-- End # of Stops -->
+                                    <!-- Begin Update Search Results Button -->
+                                    <div class="card--border--none card--border--top card--border--color-light">
+                                        <button class="btn btn-theme-primary btn-cursor-pointer" ng-click="updateSearchResults()">Update Results</button>
+                                    </div>
+                                    <!-- End Update Search Results Button -->
                                 </div>
                             </div>
                             <!-- Eng Filters -->
@@ -178,7 +184,7 @@
                                             <td>{{getFlightDepartureTime(flight.route)}}</td>
                                             <td>{{getFlightArrivalTime(flight.route)}}</td>
                                             <td>{{getRouteFlightNumbers(flight.route)}}</td>
-                                            <td>{{getFlightPath(flight.route)}}</td>
+                                            <td><span ng-bind-html="getFlightPath(flight.route) | trustHTML"></span></td>
                                             <td>{{flight.fly_duration}}</td>
                                             <td>${{$root.formatFloat(flight.price, 2)}}</td>
                                             <td>${{getUserFlightPrice(flight.price)}}</td>
