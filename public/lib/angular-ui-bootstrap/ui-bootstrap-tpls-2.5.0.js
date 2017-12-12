@@ -5020,7 +5020,7 @@ angular.module('ui.bootstrap.tooltip', ['ui.bootstrap.position', 'ui.bootstrap.s
             'content="' + startSym + 'content' + endSym + '" ') +
           'origin-scope="origScope" ' +
           'class="uib-position-measure ' + prefix + '" ' +
-          'tooltip-animation-class="fade"' +
+          'tooltip-animation-class="fade show"' +
           'uib-tooltip-classes ' +
           'ng-class="{ in: isOpen }" ' +
           '>' +

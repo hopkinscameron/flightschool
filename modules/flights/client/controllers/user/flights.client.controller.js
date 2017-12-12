@@ -101,9 +101,6 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
         'value': 0,
         'displayValue': '0 minutes'
     };
-    
-    // determines if form is in transit
-    $scope.formInTransit = false;
 
     // determines which direction user is going for their hub
     $scope.hubDirection = 'depart';
@@ -115,6 +112,17 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
         'textOptions': ['\<i class="fa fa-arrow-left" aria-hidden="true"></i> Switch to hub departure', 'Switch to hub arrival <i class="fa fa-arrow-right" aria-hidden="true"></i>'],
         'changeOptions': ['depart', 'arrive']
     };
+
+    // the sorting
+    $scope.sortDirection = {
+        'dTime': 'asc',
+        'aTime': 'asc',
+        'tTime': 'asc',
+        'price': 'asc'
+    };
+
+    // determines if form is in transit
+    $scope.formInTransit = false;
 
     // determines if the page is fully loaded
     $scope.pageFullyLoaded = false;
@@ -294,6 +302,7 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
                         _.forEach(responseF.data, function(value) {
                             if((value.flyFrom == foundDepart.iata || value.flyFrom == foundDepart.icao) 
                                 && (value.flyTo == foundArrive.iata || value.flyTo == foundArrive.icao)) {
+                                value.fly_duration_minutes = getMinutesFromFlight(value.fly_duration);
                                 $scope.origionalFlightList.push(value);
                             }
                         });
@@ -406,11 +415,32 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
         }
     };
 
-    // get the airline name
+    // get specific airline name
     $scope.getAirlineName = function (airlineCode) {
         // get the airline
         var airline = _.find($rootScope.$root.airlines, { 'id': airlineCode});
         return airline ? airline.name : airlineCode;
+    };
+
+    // get all airline names in array
+    $scope.getAllAirlineNames = function (airlineArr) {
+        var arr = [];
+
+        // go through each airline code and add
+        _.forEach(airlineArr, function(value) {
+            // get the airline
+            var airline = _.find($rootScope.$root.airlines, { 'id': value});
+            arr.push(airline ? airline.name : value);
+        });
+
+        return arr;
+    };
+
+    // gets airlines as a tool tip text
+    $scope.getAirlinesAsTooltip = function (airlineArr) {
+        // drop the first element and return as string
+        airlineArr = _.drop(airlineArr);
+        return airlineArr.join();
     };
 
     // get the flight departure time
@@ -487,6 +517,34 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
         }
 
         return $rootScope.$root.formatFloat(price, 2);
+    };
+
+    // sort flights
+    $scope.sortFlights = function (sortBy) {
+        // change based on filter
+        switch(sortBy) {
+            case 'dTime':
+                $scope.sortDirection.dTime = $scope.sortDirection.dTime == 'asc' ? 'desc' : 'asc';
+                $scope.filteredFlights =  _.orderBy($scope.filteredFlights, ['dTime'], [$scope.sortDirection.dTime]);
+                break;
+            case 'aTime':
+                $scope.sortDirection.aTime = $scope.sortDirection.aTime == 'asc' ? 'desc' : 'asc';
+                $scope.filteredFlights =  _.orderBy($scope.filteredFlights, ['aTime'], [$scope.sortDirection.aTime]);
+                break;
+            case 'tTime':
+                $scope.sortDirection.tTime = $scope.sortDirection.tTime == 'asc' ? 'desc' : 'asc';
+                $scope.filteredFlights =  _.orderBy($scope.filteredFlights, ['fly_duration_minutes'], [$scope.sortDirection.tTime]);
+                break;
+            case 'price':
+                $scope.sortDirection.price = $scope.sortDirection.price == 'asc' ? 'desc' : 'asc';
+                $scope.filteredFlights =  _.orderBy($scope.filteredFlights, ['price'], [$scope.sortDirection.price]);                
+                break;
+            default:
+                break;
+        }
+
+        // sort
+        //$scope.filteredFlights =  _.orderBy($scope.filteredFlights, ['dTime', 'aTime', 'fly_duration', 'price'], [$scope.sortDirection.dTime, $scope.sortDirection.aTime, $scope.sortDirection.tTime, $scope.sortDirection.price]);
     };
 
     // get time slider value
@@ -906,11 +964,11 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
         // go through each time length and find the min/max
         _.forEach($scope.origionalFlightList, function(value) {
             // convert to minutes and add to total minute values
-            var totalMins = getMinutesFromFlight(value.fly_duration);
+            //var totalMins = getMinutesFromFlight(value.fly_duration);
             
             // check the min/max
-            $scope.timeSlider.min = $scope.timeSlider.min == 0 || totalMins <  $scope.timeSlider.min ? totalMins : $scope.timeSlider.min;
-            $scope.timeSlider.max = $scope.timeSlider.max == 0 || totalMins >  $scope.timeSlider.max ? totalMins : $scope.timeSlider.max;
+            $scope.timeSlider.min = $scope.timeSlider.min == 0 || value.fly_duration_minutes <  $scope.timeSlider.min ? value.fly_duration_minutes : $scope.timeSlider.min;
+            $scope.timeSlider.max = $scope.timeSlider.max == 0 || value.fly_duration_minutes >  $scope.timeSlider.max ? value.fly_duration_minutes : $scope.timeSlider.max;
         });
 
         // set the current value as the max value

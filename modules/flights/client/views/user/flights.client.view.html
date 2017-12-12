@@ -35,6 +35,7 @@
                         <div class="row">
                             <!-- Begin One Way vs. Round Trip -->
                             <div class="col-md-6">
+                                <p class="mb-0">Are you looking for a round trip or just one way?</p>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label">
                                         <input class="form-check-input" type="radio" name="inlineRadioOptions" id="radioRoundTrip" value="round" ng-model="searchForm.inputs.roundTripOrOneWay" ng-change="changeRoundTripOption()"> Round Trip
@@ -52,6 +53,14 @@
                                 <h6 class="btn-cursor-pointer" ng-click="switchTo(directionText.changeTo)"><span ng-bind-html="directionText.current | trustHTML"></span></h6>       
                             </div>
                             <!-- End Switch Of Departure/Arrival -->
+                            <!-- Begin Non Stop Flight -->
+                            <div class="col-md-3 form-check">
+                                <label class="form-check-label">
+                                    <input class="form-check-input" type="checkbox" ng-model="searchForm.inputs.nonStop" ng-checked="searchForm.inputs.nonStop">
+                                    Are you looking for a direct flight?
+                                </label>
+                            </div>
+                            <!-- End Non Stop Flight -->
                         </div>
                     </div>
                     <!-- Begin Flight Search -->
@@ -169,18 +178,18 @@
                                     <thead>
                                         <tr>
                                             <th scope="col">Airline</th>
-                                            <th>Departure Time</th>
-                                            <th>Arrival Time</th>
+                                            <th>Departure Time <i class="fa btn-cursor-pointer" ng-class="{'fa-arrow-up': sortDirection.dTime == 'asc', 'fa-arrow-down': sortDirection.dTime == 'desc'}" ng-click="sortFlights('dTime')" aria-hidden="true"></i></th>
+                                            <th>Arrival Time <i class="fa btn-cursor-pointer" ng-class="{'fa-arrow-up': sortDirection.aTime == 'asc', 'fa-arrow-down': sortDirection.aTime == 'desc'}" ng-click="sortFlights('aTime')" aria-hidden="true"></i></th>
                                             <th>Flight #</th>
                                             <th>Route</th>
-                                            <th>Travel Time</th>
+                                            <th>Travel Time <i class="fa btn-cursor-pointer" ng-class="{'fa-arrow-up': sortDirection.tTime == 'asc', 'fa-arrow-down': sortDirection.tTime == 'desc'}" ng-click="sortFlights('tTime')" aria-hidden="true"></i></th>
                                             <th>Origional Price</th>
-                                            <th>Your Price</th>
+                                            <th>Your Price <i class="fa btn-cursor-pointer" ng-class="{'fa-arrow-up': sortDirection.price == 'asc', 'fa-arrow-down': sortDirection.price == 'desc'}" ng-click="sortFlights('price')" aria-hidden="true"></i></th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr ng-repeat="flight in filteredFlights">
-                                            <th scope="row">{{getAirlineName(flight.airlines[0])}}</th>
+                                            <th scope="row"><span uib-tooltip="Add'l Airlines: {{getAirlinesAsTooltip(getAllAirlineNames(flight.airlines))}}" tooltip-trigger="'mouseenter'" tooltip-enable="flight.airlines.length > 1" tooltip-placement="bottom">{{getAirlineName(flight.airlines[0])}}<span ng-if="flight.airlines.length > 1">*</span></span></th>
                                             <td>{{getFlightDepartureTime(flight.route)}}</td>
                                             <td>{{getFlightArrivalTime(flight.route)}}</td>
                                             <td>{{getRouteFlightNumbers(flight.route)}}</td>
@@ -191,6 +200,7 @@
                                         </tr>
                                     </tbody>
                                 </table>
+                                <small class="">Note: Any airline names that have an asterisk (*) next to its name, means that you possibly will be flying on different airlines between layovers.</small>
                             </div>
                             <!-- End Flights -->
                         </div>
