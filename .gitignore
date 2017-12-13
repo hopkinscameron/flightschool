@@ -62,5 +62,4 @@ node_modules/
 
 # build files
 
-# session files
-modules/account/server/models/db/sessions/sessions.tingo
+# session files modules/account/server/models/db/sessions/sessions.tingo
