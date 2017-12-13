@@ -36,16 +36,6 @@ headerModule.controller('HeaderController', ['$scope', '$rootScope', '$location'
     // get flight information
     getFlightInformation();
 
-    // get the airport codes
-    $.getJSON('/lib/airport-codes/airports.json', function(json) {
-        $rootScope.$root.airportCodes = json;
-    });
-
-    // get the airlines
-    $.ajax('https://api.skypicker.com/airlines', function(json) {
-        $rootScope.$root.airlines = json;
-    });
-
     // on refresh
     $rootScope.$on('refreshHeader', function (event, data) {
         // initialize variables
@@ -523,13 +513,25 @@ headerModule.controller('HeaderController', ['$scope', '$rootScope', '$location'
     function getFlightInformation() {
         // get airlines
         FlightsFactory.getAirlines().then(function (responseA) {
-            $rootScope.$root.airlines = responseA;
+            // if returned a valid response
+            if (responseA && !responseA.error) {
+                $rootScope.$root.airlines = responseA;
+            }
+            else {
+                $rootScope.$root.airlines = [];
+            }
         })
         .catch(function (responseA) {});
 
         // get airports
         FlightsFactory.getAirports().then(function (responseA) {
-            $rootScope.$root.airportCodes = responseA;
+            // if returned a valid response
+            if (responseA && !responseA.error) {
+                $rootScope.$root.airportCodes = responseA;
+            }
+            else {
+                $rootScope.$root.airportCodes = [];
+            }
         })
         .catch(function (responseA) {});
     };

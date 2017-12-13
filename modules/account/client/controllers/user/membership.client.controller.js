@@ -34,12 +34,18 @@ accountModule.controller('MembershipController', ['$scope', '$rootScope', '$loca
 
         // check if there is a card on file
         if(!$scope.membership.data.paymentInfo) {
+            // TODO: used for testing
+            var nextAvailableDate = new Date();
+            nextAvailableDate.setMonth(nextAvailableDate.getMonth() + 1);
+            var month = nextAvailableDate.getMonth() + 1;
+            month = month < 10 ? '0' + month.toString() : month.toString();
+
             swal({
                 title: 'Purchase subscription to \n' + membership.displayName,
                 html:
-                    '<input id="cc-number" class="swal2-input" placeholder="Card number" maxLength="16">' +
-                    '<input id="cc-exp" class="swal2-input" placeholder="MM/YY" maxLength="5">' + 
-                    '<input id="cc-ccv" class="swal2-input" placeholder="CCV" maxLength="3">',
+                    '<input id="cc-number" class="swal2-input" placeholder="Card number" maxLength="16" value="4716955713636688" disabled>' +
+                    '<input id="cc-exp" class="swal2-input" placeholder="MM/YY" maxLength="5" value="' + month + '/' + (nextAvailableDate.getFullYear()).toString().substring(2) + '" disabled>' + 
+                    '<input id="cc-ccv" class="swal2-input" placeholder="CCV" maxLength="3" value="123" disabled>',
                 focusConfirm: false,
                 confirmButtonText: 'Pay $' + membership.price,
                 confirmButtonClass: 'btn btn-theme-primary btn-cursor-pointer',
@@ -64,8 +70,14 @@ accountModule.controller('MembershipController', ['$scope', '$rootScope', '$loca
                             reject('Not a valid ccv');
                         }
                         else {
-                            // remove the forward slash
-                            purchaseData.expiration = purchaseData.expiration.substring(0, 2) + purchaseData.expiration.substring(4);
+                            // get position of forward slash
+                            var pos = purchaseData.expiration.indexOf('/');
+
+                            // if forward slash, remove
+                            if(pos != -1) {
+                                // remove the forward slash
+                                purchaseData.expiration = purchaseData.expiration.substring(0, 2) + purchaseData.expiration.substring(3);
+                            }
 
                             // update membership
                             AccountFactory.updateMembership(purchaseData).then(function (responseUM) {
@@ -171,6 +183,15 @@ accountModule.controller('MembershipController', ['$scope', '$rootScope', '$loca
                             reject('Not a valid ccv');
                         }
                         else {
+                            // get position of forward slash
+                            var pos = purchaseData.expiration.indexOf('/');
+                            
+                            // if forward slash, remove
+                            if(pos != -1) {
+                                // remove the forward slash
+                                purchaseData.expiration = purchaseData.expiration.substring(0, 2) + purchaseData.expiration.substring(3);
+                            }
+
                             // update membership
                             AccountFactory.updateMembership(purchaseData).then(function (responseUM) {
                                 // if returned a valid response
