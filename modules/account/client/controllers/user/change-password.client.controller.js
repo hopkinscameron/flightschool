@@ -48,14 +48,14 @@ accountModule.controller('ChangePasswordController', ['$scope', '$rootScope', '$
 
     // holds the last password changed
     $scope.lastPasswordChanged = {
-        'date': new Date('1/13/17, 10:03 AM'),
+        'date': null,
         'timeAgo': null,
         'format': null
     };
 
     // set the time ago and format
-    $scope.lastPasswordChanged.timeAgo = $rootScope.$root.getTimeSince($scope.lastPasswordChanged.date);
-    $scope.lastPasswordChanged.format = $rootScope.$root.formatDate($rootScope.$root.dateLocale, $scope.lastPasswordChanged.date);
+    $scope.lastPasswordChanged.timeAgo = $scope.lastPasswordChanged.date ? $rootScope.$root.getTimeSince($scope.lastPasswordChanged.date) : null;
+    $scope.lastPasswordChanged.format = $scope.lastPasswordChanged.date ? $rootScope.$root.formatDate($rootScope.$root.dateLocale, $scope.lastPasswordChanged.date) : null;
 
     // update password
     $scope.updatePassword = function () {

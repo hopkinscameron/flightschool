@@ -3,6 +3,7 @@
     might have to enter the text a different way (not in sweet alert)
 
 Next (Immediate)
+- add a way to read last password changed on the "change password screen"
 - find a way to force an update on the embeded user obj when profile is changed
 
 Later (After next is completed)

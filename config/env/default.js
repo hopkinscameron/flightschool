@@ -63,8 +63,8 @@ module.exports = {
         'type': process.env.ENCRYPTION_TYPE || 'aes192',
         'digest': process.env.ENCRYPTION_DIGEST || 'hex',
     }, 
-    logo: process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'developmentp' ? 'public/dist/img/logo.jpg' : 'modules/core/client/img/brand/favicon-32x32.png',
-    favicon: process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'developmentp' ? 'public/dist/img/favicon.ico' : 'modules/core/client/img/brand/favicon-32x32.png',
+    logo: process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'developmentp' ? 'public/dist/img/logo.jpg' : 'modules/core/client/img/brand/logo.png',
+    favicon: process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'developmentp' ? 'public/dist/img/favicon.ico' : 'modules/core/client/img/brand/favicon.ico',
     illegalUsernames: ['administrator', 'password', 'admin', 'user', 'unknown', 'anonymous', 'null', 'undefined', 'api'],
     uploads: {
         profile: {

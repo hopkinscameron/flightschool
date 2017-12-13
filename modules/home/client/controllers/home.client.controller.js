@@ -98,7 +98,7 @@ homeModule.controller('HomeController', ['$scope', '$rootScope', '$compile', '$l
                 $scope.home.data = responseH;
                 $scope.home.title = 'Home';
                 $scope.home.pageHeader = $scope.home.title;
-                $scope.home.pageSubHeader = 'Welcome, take a stroll through what WanderLust is all about!';
+                $scope.home.pageSubHeader = 'Welcome, take a stroll through what Wander Lust is all about!';
 
                 // holds the page title
                 $scope.pageTitle = $scope.home.title + ' | ' + ApplicationConfiguration.applicationName;

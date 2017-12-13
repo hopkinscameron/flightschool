@@ -203,11 +203,11 @@ accountModule.controller('EditProfileController', ['$scope', '$rootScope', '$loc
                 $scope.pageTitle = $scope.editProfile.title + ' | ' + ApplicationConfiguration.applicationName;
                 
                 // set form values
-                $scope.profileForm.inputs.first = $scope.editProfile.data.firstName;
-                $scope.profileForm.inputs.last = $scope.editProfile.data.lastName;
-                $scope.sexOptions.selected = $scope.editProfile.data.sex.charAt(0).toUpperCase() + $scope.editProfile.data.sex.slice(1);
-                $scope.profileForm.inputs.phone = $scope.editProfile.data.phone;
-                $scope.profileForm.inputs.email = $scope.editProfile.data.email;
+                $scope.profileForm.inputs.first = $scope.editProfile.data.firstName ? $scope.editProfile.data.firstName : '';
+                $scope.profileForm.inputs.last = $scope.editProfile.data.lastName ? $scope.editProfile.data.lastName : '';
+                $scope.sexOptions.selected = $scope.editProfile.data.sex ? $scope.editProfile.data.sex.charAt(0).toUpperCase() + $scope.editProfile.data.sex.slice(1) : $scope.initialText;
+                $scope.profileForm.inputs.phone = $scope.editProfile.data.phone ? $scope.editProfile.data.phone : '';
+                $scope.profileForm.inputs.email = $scope.editProfile.data.email ? $scope.editProfile.data.email : '';
 
                 // setup page
                 setUpPage();

@@ -41,7 +41,7 @@ exports.renderIndex = function (req, res) {
             role: validator.escape(req.user.role),
             lastLogin: req.user.lastLogin.toString(),
             membership: {
-                tierId: validator.escape(req.user.tierId),
+                tierId: typeof(req.user.tierId) === 'string' ? validator.escape(req.user.tierId) : req.user.tierId,
                 subscribed: req.user.subscribed,
                 billingCycle: req.user.billingCycle
             }
