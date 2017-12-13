@@ -89,7 +89,7 @@ flightsServiceModule.factory('FlightsFactory', ['$http', '$location', '$rootScop
 
         // send request
         return $http.get(endpoint, config).then(function (response) {
-            return response.data;
+            return response.data.d;
         })
         .catch(function (response) {
             // if the response was sent back with the custom data response
@@ -127,7 +127,7 @@ flightsServiceModule.factory('FlightsFactory', ['$http', '$location', '$rootScop
 
             // send request
             return $http.get(endpoint, { 'ignoreLoadingBar': true }).then(function (response) {
-                return response.data;
+                return response.data.d;
             })
             .catch(function (response) {
                 // if the response was sent back with the custom data response
