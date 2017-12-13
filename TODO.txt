@@ -1,0 +1,63 @@
+﻿In Progress
+- changes how hubs are added (so when entering the text, auto populate) -> can't quite figure this out yet inside a sweet alert input
+    might have to enter the text a different way (not in sweet alert)
+
+Next (Immediate)
+- add a way to read last password changed on the "change password screen"
+- find a way to force an update on the embeded user obj when profile is changed
+
+Later (After next is completed)
+- set up table for round trip
+- add in (next day arrival for flights that go to next day)
+- add in layover times
+
+- add an "error dashboard" so if there are errors in server, we can view them
+- if I have the html editor up on page load, and I exit out, I can't get the other content to show
+- remove credit card stuff and use Stripe.com instead
+- when payment doesn't go through or card is about to expire, show notification
+
+
+Future
+- after sign up, send an email to verify
+- when some request validations depend on one another find a way to not test each one, and instead, if one is validated, then test the other.
+    (if cc number needs to be string, 16 long and valid, then if its not a string, don't even test 16 long or valid)
+- use 'https://api.ipify.org?format=json' if can't use other tool to get ip address
+
+Done
+
+Testing
+- skypicker api docs -> 
+
+Browser Fixes
+
+Mobile Fixes
+
+Ideas
+- User can only change Hubs every so often (to prevent people from continuously changing)
+
+ $routeProvider.when('/someRoute', {
+    templateUrl: 'someTemplate.html',
+    resolve: {
+        factory: checkAuth
+    }
+ });
+
+
+var checkAuth = function ($q, $rootScope, $location) {
+    var deferred = $q.defer();
+
+    if authenticated
+        $location.path('/login');
+        deferred.resolve(true);
+    else
+        deferred.reject();
+        $location.path('/home');
+    return deferred.promise;
+ };
+
+ user if need input addons
+ <div class="form-row ml-0 mr-0">
+    <a class="col btn btn-theme-primary btn-cursor-pointer text-white input-radius--top-right-none input-radius--bottom-right-none" ng-click="searchAirline(p)"><i class="fa fa-search" aria-hidden="true"></i></a>
+    <input class="col-md-9 form-control input-radius--top-left-none input-radius--bottom-left-none" ng-class="{'is-invalid': p.error.isError}" ng-disabled="formInTransit" required>
+    <small class="invalid-feedback">{{p.error.message}}</small>  
+</div>

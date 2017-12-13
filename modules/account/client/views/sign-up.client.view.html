@@ -1,0 +1,80 @@
+<!-- Begin Sign Up Page -->
+<section ng-controller="SignUpController">
+    <!-- Begin Container -->
+    <div class="container">
+        <!-- Begin Page Fully Loaded With Errors -->
+        <div id="pageShow" class="collapse" ng-if="pageFullyLoaded && error.error">
+            <div ng-controller="ErrorController" ng-init="init(error.title, error.status, error.message)">
+                <div ng-include="'/modules/core/client/views/error.client.view.html'"></div>
+            </div>
+        </div>
+        <!-- End Page Fully Loaded With Errors -->
+        <!-- Begin Page Fully Loaded With No Errors -->
+        <div id="pageShow" class="animated animation-delay--sm fadeIn collapse" ng-if="pageFullyLoaded && !error.error">
+            <!-- Begin Content Header -->
+            <div class="jumbotron jumbotron-radius--none jumbotron-color--opacity-black jumbotron-fixed-height text-center mb-0">
+                <h1 class="font-fancy--2 text-white" ng-class="{'mb-0': signUp.pageSubHeader.length == 0}">{{signUp.pageHeader}}</h1>
+                <h5 class="mb-0 text-white">{{signUp.pageSubHeader}}</h5>
+            </div>
+            <!-- End Content Header -->
+            <!-- Begin Content Body -->
+            <div class="card card--border--none card--radius--none card-body box-shadow--sm card-min-height">
+                <!-- Begin Sign Up Form -->
+                <div id="signUp-form" class="col-md-12" ng-style="animationStyle" style="visibility: hidden;">
+                    <div ng-if="signUpForm.errors.generic.isError">
+                        <span style="color: red;">{{signUpForm.errors.generic.message}}</span>
+                    </div>
+                    <form class="form-group" ng-submit="signUp()" novalidate>
+                        <!-- Begin First Name -->
+                        <div class="form-group">
+                            <label class="col-form-label" for="firstName">First Name <span style="color: red;">*</span></label>
+                            <input class="form-control" ng-class="{'is-invalid': signUpForm.errors.firstName.isError}" type="text" name="firstName" placeholder="First Name" id="firstName" ng-model="signUpForm.inputs.firstName" ng-disabled="formInTransit" required>
+                            <small class="invalid-feedback">{{signUpForm.errors.firstName.message}}</small>
+                        </div>
+                        <!-- End First Name -->
+                        <!-- Begin Last Name -->
+                        <div class="form-group">
+                            <label class="col-form-label" for="lastName">Last Name <span style="color: red;">*</span></label>
+                            <input class="form-control" ng-class="{'is-invalid': signUpForm.errors.lastName.isError}" type="lastName" name="lastName" placeholder="Last Name" id="lastName" ng-model="signUpForm.inputs.lastName" ng-disabled="formInTransit" required>
+                            <small class="invalid-feedback">{{signUpForm.errors.lastName.message}}</small>
+                        </div>
+                        <!-- End Last Name -->
+                        <!-- Begin Email -->
+                        <div class="form-group">
+                            <label class="col-form-label" for="email">Email <span style="color: red;">*</span></label>
+                            <input class="form-control" ng-class="{'is-invalid': signUpForm.errors.email.isError}" type="email" name="email" placeholder="example@example.com" id="email" ng-model="signUpForm.inputs.email" ng-disabled="formInTransit" required>
+                            <small class="invalid-feedback">{{signUpForm.errors.email.message}}</small>
+                        </div>
+                        <!-- End Email -->
+                        <!-- Begin Password -->
+                        <div class="form-group">
+                            <label class="col-form-label" for="password">Password <span style="color: red;">*</span></label>
+                            <input class="form-control" ng-class="{'is-invalid': signUpForm.errors.password.isError}" type="password" name="password" placeholder="Password" id="password" ng-model="signUpForm.inputs.password" ng-disabled="formInTransit" required>
+                            <small class="invalid-feedback">{{signUpForm.errors.password.message}}</small>
+                        </div>
+                        <!-- End Password -->
+                        <!-- Begin Confirm Password -->
+                        <div class="form-group">
+                            <label class="col-form-label" for="confirm">Confirm Password <span style="color: red;">*</span></label>
+                            <input class="form-control" ng-class="{'is-invalid': signUpForm.errors.confirm.isError}" type="password" name="confirm" placeholder="Password" id="confirm" ng-model="signUpForm.inputs.confirm" ng-disabled="formInTransit" required>
+                            <small class="invalid-feedback">{{signUpForm.errors.confirm.message}}</small>
+                        </div>
+                        <!-- End Confirm Password -->
+                        <!-- Begin Sign Up Button -->
+                        <div class="row">
+                            <div class="col text-right">
+                                <button type="submit" class="btn btn-theme-primary btn-cursor-pointer" ng-class="{'w-100': $root.isDeviceWidthSmallerThan(426)}" ng-disabled="formInTransit">Sign Up</button>
+                            </div>
+                        </div>
+                        <!-- End Sign Up Button -->
+                    </form>
+                </div>
+                <!-- End Sign Up Form -->
+            </div>
+            <!-- End Content Body -->
+        </div>
+        <!-- End Page Fully Loaded With No Errors -->
+    </div>
+    <!-- End Container -->
+</section>
+<!-- End Sign Up Page -->

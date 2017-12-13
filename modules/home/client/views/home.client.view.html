@@ -1,0 +1,37 @@
+﻿<!-- Begin Home Page -->
+<section ng-controller="HomeController">
+    <!-- Begin Container -->
+    <div class="container">
+        <!-- Begin Page Fully Loaded With Errors -->
+        <div id="pageShow" class="collapse" ng-if="pageFullyLoaded && error.error">
+            <div ng-controller="ErrorController" ng-init="init(error.title, error.status, error.message)">
+                <div ng-include="'/modules/core/client/views/error.client.view.html'"></div>
+            </div>
+        </div>
+        <!-- End Page Fully Loaded With Errors -->
+        <!-- Begin Page Fully Loaded With No Errors -->
+        <div id="pageShow" class="animated animation-delay--md fadeIn collapse" ng-if="pageFullyLoaded && !error.error">
+            <!-- Begin Content Header -->
+            <div class="jumbotron jumbotron-radius--none jumbotron-color--opacity-black jumbotron-fixed-height text-center mb-0">
+                <h1 class="font-fancy--2 text-white" ng-class="{'mb-0': home.pageSubHeader.length == 0}">{{home.pageHeader}}</h1>
+                <h5 class="mb-0 text-white">{{home.pageSubHeader}}</h5>
+            </div>
+            <!-- End Content Header -->
+            <!-- Begin Content Body -->
+            <div class="card card--border--none card--radius--none card-body box-shadow--sm card-min-height">
+                <!-- Begin Search Flights Button -->
+                <div class="col-md-3 ml-auto text-right">
+                    <a href="/flights" class="btn btn-theme-primary btn-cursor-pointer decoration--never">Search Flights</a>
+                </div>
+                <!-- End Search Flights Button -->
+                <!-- TODO: REMOVE ME, USED FOR TESTING -->
+                <span ng-bind-html="baconGoodness | trustHTML"></span>
+                <!-- TODO: REMOVE ME, USED FOR TESTING -->
+            </div>
+            <!-- End Content Body -->
+        </div>
+        <!-- End Page Fully Loaded With No Errors -->
+    </div>
+    <!-- End Container -->
+</section>
+<!-- End Home Page -->

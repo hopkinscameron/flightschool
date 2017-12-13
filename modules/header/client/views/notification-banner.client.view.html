@@ -1,0 +1,12 @@
+<!-- Begin Notification Banner -->
+<section id="notificationBanner" class="p-2 collapse" ng-class="{ 'bg-danger text-white': $root.notificationType == $root.notificationTypeDanger }" ng-if="$root.showNotificationBanner">
+    <div class="row">
+        <div class="col-lg-11 text-center">
+            <p class="mb-0">{{$root.notificationText}}</p>
+        </div>
+        <div class="col-lg-1 text-right">
+            <i class="fa fa-times btn-cursor-pointer" aria-hidden="true" ng-click="$root.closeBanner()"></i>
+        </div>
+    </div>
+</section>
+<!-- End Notification Banner -->

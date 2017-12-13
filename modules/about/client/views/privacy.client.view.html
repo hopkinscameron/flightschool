@@ -1,0 +1,30 @@
+<!-- Begin Privacy Page -->
+<section ng-controller="PrivacyController">
+    <!-- Begin Container -->
+    <div class="container">
+        <!-- Begin Page Fully Loaded With Errors -->
+        <div id="pageShow" class="collapse" ng-if="pageFullyLoaded && error.error">
+            <div ng-controller="ErrorController" ng-init="init(error.title, error.status, error.message)">
+                <div ng-include="'/modules/core/client/views/error.client.view.html'"></div>
+            </div>
+        </div>
+        <!-- End Page Fully Loaded With Errors -->
+        <!-- Begin Page Fully Loaded With No Errors -->
+        <div id="pageShow" class="animated animation-delay--md fadeIn collapse" ng-if="pageFullyLoaded && !error.error">
+            <!-- Begin Content Body -->
+            <div class="card card--border--none card--radius--none card-body box-shadow--sm">
+                <!-- Begin Body -->
+                <div id="privacy-body" class="col-md-12" ng-style="animationStyle" style="visibility: hidden;">
+                    <h2 class="pt-3 pb-3 mb-0 font-weight-bold">Privacy Policy</h2>
+                    <p class="text-right">Effective as of: {{privacy.data.effectiveDate}}</p>
+                    <span ng-bind-html="privacy.data.body | trustHTML"></span>
+                </div>
+                <!-- End Body -->
+            </div>
+            <!-- End Content Body -->
+        </div>
+        <!-- End Page Fully Loaded With No Errors -->
+    </div>
+    <!-- End Container -->
+</section>
+<!-- End Privacy Page -->

@@ -1,0 +1,29 @@
+{
+	"headliner": "WanderLust",
+	"headlinerLink": "/",
+	"headlinerImage": "",
+	"navigation": [
+        {
+            "title": "Home",
+            "pageLink": ""
+        }
+	],
+    "secondaryNavigation": 
+    [
+        {
+			"title": "Admin",
+			"pageLink": "admin",
+			"dropdown": [
+                {
+					"title": "Dashboard",
+					"pageLink": "dashboard"
+                },
+				{
+					"title": "Sign Out",
+					"pageLink": "logout",
+					"logout": true
+				}
+			]
+		}
+    ]
+}

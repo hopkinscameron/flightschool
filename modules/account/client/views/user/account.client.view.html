@@ -1,0 +1,49 @@
+<!-- Begin Account Page -->
+<section ng-controller="AccountController">
+    <!-- Begin Container -->
+    <div class="container">
+        <!-- Begin Page Fully Loaded With Errors -->
+        <div id="pageShow" class="collapse" ng-if="pageFullyLoaded && error.error">
+            <div ng-controller="ErrorController" ng-init="init(error.title, error.status, error.message)">
+                <div ng-include="'/modules/core/client/views/error.client.view.html'"></div>
+            </div>
+        </div>
+        <!-- End Page Fully Loaded With Errors -->
+        <!-- Begin Page Fully Loaded With No Errors -->
+        <div id="pageShow" class="" ng-if="pageFullyLoaded && !error.error">
+            <!-- Begin Content Header -->
+            <div class="jumbotron jumbotron-radius--none jumbotron-color--opacity-black jumbotron-fixed-height text-center mb-0">
+                <h1 class="font-fancy--2 text-white" ng-class="{'mb-0': account.pageHeader.length == 0}">{{account.pageHeader}}</h1>
+                <h5 class="mb-0 text-white">{{account.pageSubHeader}}</h5>
+            </div>
+            <!-- End Content Header -->
+            <!-- Begin Content Body -->
+            <div class="container-fluid">
+                <div class="row pl-0 pr-0">
+                    <!-- Begin Tabs -->
+                    <div class="col-sm-3 pl-0 pr-0">
+                        <div class="nav flex-column card card--radius--none card--border--remove-right">
+                            <div class="nav-item" ng-repeat="navigation in account.navigation">
+                                <a class="nav-link decoration--never tab btn-cursor-pointer" ng-class="{'active tab--active': $root.isActive('account/' + navigation.pageLink)}" ng-click="navigateToTab('account/' + navigation.pageLink)">{{navigation.title}}</a>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- End Tabs -->
+                    <!-- Begin Tab Content -->
+                    <div class="col pl-0 pr-0">
+                        <div class="card card--radius--none card-min-height">
+                            <!-- Begin Load Correct View -->
+                            <div ng-include="partialView.view"></div>
+                            <!-- End Load Correct View -->
+                        </div>
+                    </div>
+                    <!-- End Tab Content -->
+                </div>
+            </div>
+            <!-- End Content Body -->
+        </div>
+        <!-- End Page Fully Loaded With No Errors -->
+    </div>
+    <!-- End Container -->
+</section>
+<!-- End Account Page -->

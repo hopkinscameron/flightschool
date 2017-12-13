@@ -1,0 +1,41 @@
+<!-- Begin Contact Page -->
+<section ng-controller="ContactController">
+    <!-- Begin Container -->
+    <div class="container">
+        <!-- Begin Page Fully Loaded With Errors -->
+        <div id="pageShow" class="collapse" ng-if="pageFullyLoaded && error.error">
+            <div ng-controller="ErrorController" ng-init="init(error.title, error.status, error.message)">
+                <div ng-include="'/modules/core/client/views/error.client.view.html'"></div>
+            </div>
+        </div>
+        <!-- End Page Fully Loaded With Errors -->
+        <!-- Begin Page Fully Loaded With No Errors -->
+        <div id="pageShow" class="animated animation-delay--md fadeIn collapse" ng-if="pageFullyLoaded && !error.error">
+            <!-- Begin Content Header -->
+            <div class="jumbotron jumbotron-radius--none jumbotron-color--opacity-black jumbotron-fixed-height text-center mb-0">
+                <h1 class="font-fancy--2 text-white" ng-class="{'mb-0': contact.pageSubHeader.length == 0}">{{contact.pageHeader}}</h1>
+                <h5 class="mb-0 text-white">{{contact.pageSubHeader}}</h5>
+            </div>
+            <!-- End Content Header -->
+            <!-- Begin Content Body -->
+            <div class="card card--border--none card--radius--none card-body box-shadow--sm card-min-height">
+                <!-- Begin Body -->
+                <div id="contact-body" class="col-md-12" ng-style="animationStyle" style="visibility: hidden;">
+                    If you don’t find your question answered on our <a href="/about/faq">FAQ page</a>, or if you have suggestions or feedback, please contact us by e-mail (support@wanderlust.com). We will answer your question as soon as possible.
+                </div>
+                <!-- End Body -->
+                <!-- Begin Contact -->
+                <div id="contact-customer-service" class="col-md-12 text-center mt-3" ng-style="animationStyle" style="visibility: hidden;">
+                    <i class="fa fa-headphones fa-3x" aria-hidden="true"></i>
+                    <p class="mb-1">Need some help?</p>
+                    <button class="btn btn-theme-primary btn-cursor-pointer" ng-click="showPhoneNumber()">Contact Us Directly</button>
+                </div>
+                <!-- End Contact -->
+            </div>
+            <!-- End Content Body -->
+        </div>
+        <!-- End Page Fully Loaded With No Errors -->
+    </div>
+    <!-- End Container -->
+</section>
+<!-- End Contact Page -->

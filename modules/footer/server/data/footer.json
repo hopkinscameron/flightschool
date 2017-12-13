@@ -1,0 +1,55 @@
+{
+    "footerNote": "Copyright &copy; 2017 Wander Lust LLC",
+    "navigation": [
+        {
+            "title": "About Us",
+            "dropdown": [
+                {
+                    "title": "Who are we? What do we do?",
+					"pageLink": "about"
+                }
+			]
+        },
+        {
+            "title": "Legal",
+            "dropdown": [
+                {
+                    "title": "Privacy",
+					"pageLink": "about/legal/privacy"
+                },
+				{
+					"title": "Terms",
+                    "pageLink": "about/legal/terms-and-conditions"
+				}
+			]
+        },
+        {
+            "title": "Support",
+            "dropdown": [
+                {
+                    "title": "FAQ",
+					"pageLink": "support/faq"
+                },
+				{
+					"title": "Contact",
+                    "pageLink": "support/contact"
+				}
+			]
+        },
+        {
+            "title": "Social Life",
+            "dropdown": [
+                {
+                    "title": "Twitter",
+                    "pageLink": "https://twitter.com/",
+                    "openNewTab": true
+                },
+				{
+					"title": "YouTube",
+                    "pageLink": "https://www.youtube.com/",
+                    "openNewTab": true
+				}
+			]
+        }
+    ]
+}

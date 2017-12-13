@@ -1,0 +1,37 @@
+[
+    {
+        "title": "Edit Profile",
+        "pageLink": "edit",
+        "view": "/modules/account/client/views/user/edit-profile.client.view.html"
+    },
+    {
+        "title": "Change Password",
+        "pageLink": "password",
+        "view": "/modules/account/client/views/user/change-password.client.view.html"
+    },
+    {
+        "title": "Payment Information",
+        "pageLink": "payment",
+        "view": "/modules/account/client/views/user/payment-information.client.view.html"
+    },
+    {
+        "title": "Edit Hubs",
+        "pageLink": "hubs",
+        "view": "/modules/account/client/views/user/hub.client.view.html"
+    },
+    {
+        "title": "Airline Preferences",
+        "pageLink": "airlines",
+        "view": "/modules/account/client/views/user/airline-preferences.client.view.html"
+    },
+    {
+        "title": "Membership",
+        "pageLink": "membership",
+        "view": "/modules/account/client/views/user/membership.client.view.html"
+    },
+    {
+        "title": "Email and SMS",
+        "pageLink": "notifications",
+        "view": "/modules/account/client/views/user/notifications.client.view.html"
+    }
+]
