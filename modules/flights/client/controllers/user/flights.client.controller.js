@@ -904,12 +904,12 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
                             buttonsStyling: false
                         }).then(function () {
                             // go to account page
-                            $window.href = '/account/hubs';
+                            $window.location.href = '/account/hubs';
                         },
                         // handling the promise rejection
                         function (dismiss) {
                             // go to account page
-                            $window.href = '/account/hubs';
+                            $window.location.href = '/account/hubs';
                         });
                     }
                     else {
