@@ -152,7 +152,7 @@ body {
     top: 0; }
 
 .body-error {
-  background-color: #F5F7F9;
+  background-color: #0076FF;
   background-image: url(""); }
 
 body::-webkit-scrollbar {
