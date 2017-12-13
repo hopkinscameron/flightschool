@@ -10,7 +10,7 @@ var // the path
     // the flights policy
 	flightsPolicy = require('../policies/flights.server.policy'),
     // the flights controller to handle routes
-    flightsController = require('../controllers/flights.server.controller')
+    flightsController = require('../controllers/flights.server.controller');
 
 module.exports = function (app) {
     // GET gets flight page information
@@ -18,5 +18,15 @@ module.exports = function (app) {
 	// format /api/flights
     app.route('/api/flights').all([ipLogger.log, flightsController.readDB])
     .get(flightsController.read)
-    .post(flightsPolicy.isAllowed, flightsController.searchFlights);
+    //.post(flightsPolicy.isAllowed, flightsController.searchFlights);
+
+    // GET gets airlines
+	// format /api/airlines
+    app.route('/api/airlines').all([ipLogger.log, flightsController.readDB])
+    .get(flightsController.readAirlines);
+
+    // GET gets airports
+	// format /api/airports
+    app.route('/api/airports').all([ipLogger.log, flightsController.readDB])
+    .get(flightsController.readAirports);
 };
