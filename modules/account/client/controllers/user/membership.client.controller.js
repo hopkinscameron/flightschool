@@ -111,6 +111,7 @@ accountModule.controller('MembershipController', ['$scope', '$rootScope', '$loca
                     $scope.membership.data.tierId = savedMembership.tierId;
                     $scope.membership.data.subscribed = savedMembership.subscribed;
                     $scope.membership.data.billingCycle = savedMembership.billingCycle;
+                    $scope.membership.data.nextBillingDate = savedMembership.nextBillingDate;
 
                     // go through each membership and find the corresponding value
                     _.forEach($scope.membershipOptions.options, function(value) {
@@ -133,6 +134,7 @@ accountModule.controller('MembershipController', ['$scope', '$rootScope', '$loca
                     $scope.membership.data.tierId = savedMembership.tierId;
                     $scope.membership.data.subscribed = savedMembership.subscribed;
                     $scope.membership.data.billingCycle = savedMembership.billingCycle;
+                    $scope.membership.data.nextBillingDate = savedMembership.nextBillingDate;
 
                     // go through each membership and find the corresponding value
                     _.forEach($scope.membershipOptions.options, function(value) {
@@ -224,6 +226,7 @@ accountModule.controller('MembershipController', ['$scope', '$rootScope', '$loca
                     $scope.membership.data.tierId = savedMembership.tierId;
                     $scope.membership.data.subscribed = savedMembership.subscribed;
                     $scope.membership.data.billingCycle = savedMembership.billingCycle;
+                    $scope.membership.data.nextBillingDate = savedMembership.nextBillingDate;
 
                     // go through each membership and find the corresponding value
                     _.forEach($scope.membershipOptions.options, function(value) {
@@ -246,6 +249,7 @@ accountModule.controller('MembershipController', ['$scope', '$rootScope', '$loca
                     $scope.membership.data.tierId = savedMembership.tierId;
                     $scope.membership.data.subscribed = savedMembership.subscribed;
                     $scope.membership.data.billingCycle = savedMembership.billingCycle;
+                    $scope.membership.data.nextBillingDate = savedMembership.nextBillingDate;
 
                     // go through each membership and find the corresponding value
                     _.forEach($scope.membershipOptions.options, function(value) {
@@ -322,6 +326,7 @@ accountModule.controller('MembershipController', ['$scope', '$rootScope', '$loca
                 $scope.membership.data.tierId = canceledMembership.tierId;
                 $scope.membership.data.subscribed = canceledMembership.subscribed;
                 $scope.membership.data.billingCycle = canceledMembership.billingCycle;
+                $scope.membership.data.nextBillingDate = canceledMembership.nextBillingDate;
 
                 // check membership expiration
                 checkMembershipExpiration();
@@ -335,6 +340,7 @@ accountModule.controller('MembershipController', ['$scope', '$rootScope', '$loca
                 $scope.membership.data.tierId = canceledMembership.tierId;
                 $scope.membership.data.subscribed = canceledMembership.subscribed;
                 $scope.membership.data.billingCycle = canceledMembership.billingCycle;
+                $scope.membership.data.nextBillingDate = canceledMembership.nextBillingDate;
 
                 // check membership expiration
                 checkMembershipExpiration();
