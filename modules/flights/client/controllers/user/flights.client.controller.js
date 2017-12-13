@@ -22,6 +22,9 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
         'message': ''
     };
 
+    // TODO: removed, used for testing
+    $scope.forceDisable = true;
+
     // user membership
     var userMembership = undefined;
 
@@ -41,16 +44,16 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
 
     // the hub options
     $scope.hubOptions = {
-        'options': [$scope.initialText]
+        'options': []
     };
 
     // holds the sign up form data
     $scope.searchForm = {
         'inputs': {
             'depart': $scope.initialText,
-            'arrive': 'Detroit Metro Wayne Co',
-            'departDate': new Date('12/18/17'),
-            'returnDate': new Date('12/20/17'),
+            'arrive': '',//'Los Angeles Intl',
+            'departDate': today,
+            'returnDate': threeDays,
             'adults': 1,
             'roundTripOrOneWay': 'oneway',
             'nonStop': false
@@ -100,6 +103,38 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
         'max': 0,
         'value': 0,
         'displayValue': '0 minutes'
+    };
+
+    // departure slider values
+    $scope.departSlider = {
+        'min': 0,
+        'max': 0,
+        'value': 0,
+        'displayValue': '12:00 AM'
+    };
+
+    // arrival slider values
+    $scope.arriveSlider = {
+        'min': 0,
+        'max': 0,
+        'value': 0,
+        'displayValue': '12:00 AM'
+    };
+
+    // price slider values
+    $scope.priceSlider = {
+        'min': 0,
+        'max': 0,
+        'value': 0,
+        'displayValue': '$0.00'
+    };
+
+    // layover slider values
+    $scope.layoverSlider = {
+        'min': 0,
+        'max': 0,
+        'value': 0,
+        'displayValue': '0'
     };
 
     // determines which direction user is going for their hub
@@ -314,11 +349,23 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
                         // go through all airlines
                         for(var x = 0; x < responseF.all_airlines.length; x++) {
                             $scope.airlineFilterModels[x] = responseF.all_airlines[x];
-                            $scope.airlineFilterChecks[x] = x == 0 ? true : false;
+                            $scope.airlineFilterChecks[x] = true; // x == responseF.all_airlines.length - 1 ? true : false//
                         };
 
                         // set up time slider
                         setUpTimeSlider();
+
+                        // set up depart slider
+                        setUpDepartSlider();
+
+                        // set up arrive slider
+                        setUpArriveSlider();
+
+                        // set up price slider
+                        setUpPriceSlider();
+
+                        // set up layover slider
+                        setUpLayoverSlider();
 
                         // apply filter
                         $scope.updateSearchResults();
@@ -447,14 +494,32 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
     $scope.getFlightDepartureTime = function (routes) {
         // get the first time stamp
         var time = routes[0].dTimeUTC;
-        return $rootScope.$root.formatTime($rootScope.$root.timeShortNoSeconds, $rootScope.$root.formatFromUnixTimeStamp(time));
+
+        // create the options for specific timezone
+        var options = {
+            'lat': routes[0].latFrom,
+            'long': routes[0].lngFrom,
+            'timestamp': time,
+            'timeZone': 'America/' + (routes[0].cityFrom).replace(/ /g, '_')
+        };
+
+        return $rootScope.$root.formatTime($rootScope.$root.locationBasedProvided, $rootScope.$root.formatFromUnixTimeStamp(time), options);
     };
 
     // get the flight arrival time
     $scope.getFlightArrivalTime = function (routes) {
-        // get the first time stamp
+        // get the last time stamp
         var time = routes[routes.length - 1].aTimeUTC;
-        return $rootScope.$root.formatTime($rootScope.$root.timeShortNoSeconds, $rootScope.$root.formatFromUnixTimeStamp(time));
+
+        // create the options for specific timezone
+        var options = {
+            'lat': routes[routes.length - 1].latTo,
+            'long': routes[routes.length - 1].lngTo,
+            'timestamp': time,
+            'timeZone': 'America/' + (routes[routes.length - 1].cityTo).replace(/ /g, '_')
+        };
+
+        return $rootScope.$root.formatTime($rootScope.$root.locationBasedProvided, $rootScope.$root.formatFromUnixTimeStamp(time), options);
     };
 
     // get flight numbers
@@ -524,12 +589,12 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
         // change based on filter
         switch(sortBy) {
             case 'dTime':
-                $scope.sortDirection.dTime = $scope.sortDirection.dTime == 'asc' ? 'desc' : 'asc';
-                $scope.filteredFlights =  _.orderBy($scope.filteredFlights, ['dTime'], [$scope.sortDirection.dTime]);
+                $scope.sortDirection.dTimeUTC = $scope.sortDirection.dTimeUTC == 'asc' ? 'desc' : 'asc';
+                $scope.filteredFlights =  _.orderBy($scope.filteredFlights, ['dTime'], [$scope.sortDirection.dTimeUTC]);
                 break;
             case 'aTime':
-                $scope.sortDirection.aTime = $scope.sortDirection.aTime == 'asc' ? 'desc' : 'asc';
-                $scope.filteredFlights =  _.orderBy($scope.filteredFlights, ['aTime'], [$scope.sortDirection.aTime]);
+                $scope.sortDirection.aTimeUTC = $scope.sortDirection.aTimeUTC == 'asc' ? 'desc' : 'asc';
+                $scope.filteredFlights =  _.orderBy($scope.filteredFlights, ['aTime'], [$scope.sortDirection.aTimeUTC]);
                 break;
             case 'tTime':
                 $scope.sortDirection.tTime = $scope.sortDirection.tTime == 'asc' ? 'desc' : 'asc';
@@ -544,11 +609,11 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
         }
 
         // sort
-        //$scope.filteredFlights =  _.orderBy($scope.filteredFlights, ['dTime', 'aTime', 'fly_duration', 'price'], [$scope.sortDirection.dTime, $scope.sortDirection.aTime, $scope.sortDirection.tTime, $scope.sortDirection.price]);
+        //$scope.filteredFlights =  _.orderBy($scope.filteredFlights, ['dTime', 'aTime', 'fly_duration', 'price'], [$scope.sortDirection.dTimeUTC, $scope.sortDirection.aTimeUTC, $scope.sortDirection.tTime, $scope.sortDirection.price]);
     };
 
-    // get time slider value
-    $scope.getSliderValue = function () {
+    // update time slider value
+    $scope.updateTimeSliderValue = function () {
         var currentHours = Math.floor($scope.timeSlider.value / 60);
         var currentMins = $scope.timeSlider.value - (currentHours * 60);
 
@@ -563,15 +628,32 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
         }
     };
 
-    // updates the filter
-    $scope.updateFilter = function (filterType) {
-        // change based on filter
-        switch(filterType) {
-            case $scope.flightFilters.airlines:
-                filterAirlines();
-                break;
-            default:
-                break;
+    // update depart slider value
+    $scope.updateDepartSliderValue = function () {
+        $scope.departSlider.displayValue = $rootScope.$root.formatTime($rootScope.$root.timeShortNoSeconds, $rootScope.$root.formatFromUnixTimeStamp($scope.departSlider.value));
+    };
+
+    // update arrival slider value
+    $scope.updateArriveSliderValue = function () {
+        $scope.arriveSlider.displayValue = $rootScope.$root.formatTime($rootScope.$root.timeShortNoSeconds, $rootScope.$root.formatFromUnixTimeStamp($scope.arriveSlider.value));        
+    };
+
+    // update price slider value
+    $scope.updatePriceSliderValue = function () {
+        $scope.priceSlider.displayValue = '$' + $scope.priceSlider.value;
+    };
+
+    // update layover slider value
+    $scope.updateLayoverSliderValue = function () {
+        // if zero
+        if($scope.layoverSlider.value == 0) {
+            $scope.layoverSlider.displayValue = 'Nonstop';            
+        }
+        else if($scope.layoverSlider.value == 1) {
+            $scope.layoverSlider.displayValue = $scope.layoverSlider.value + ' stop';            
+        }
+        else {
+            $scope.layoverSlider.displayValue = $scope.layoverSlider.value + ' stops';            
         }
     };
 
@@ -596,12 +678,37 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
                 return o.airlines.indexOf(v) != -1;
             });
 
-            // check if this flight is withing time range
+            // check if this flight length is within time range
             var flightLength = getMinutesFromFlight(o.fly_duration);
-            var isLessThanLength = flightLength < $scope.timeSlider.value;
+            var isFlightTimeLessThan = flightLength <= $scope.timeSlider.value;
 
-            return isAirline && isLessThanLength; 
+            // check if this flight depart/arrive time is within range
+            var isFlightDepartTimeGreaterThan = o.route[0].dTimeUTC >= $scope.departSlider.value;
+            var isFlightArriveTimeLessThan = o.route[o.route.length - 1].aTimeUTC <= $scope.arriveSlider.value;
+
+            // check if this flight price is within range
+            var isFlightPriceLessThan = o.price <= $scope.priceSlider.value;
+
+            // check if this flight layovers is within range
+            var isFlightLayoverLessThan = o.route.length <= $scope.layoverSlider.value;
+
+            return isAirline && isFlightTimeLessThan && isFlightDepartTimeGreaterThan && isFlightArriveTimeLessThan && isFlightPriceLessThan && isFlightLayoverLessThan; 
         });
+    };
+
+    // selects the flight
+    $scope.selectFlight = function (flight) {
+        // TODO: implement
+        swal({
+            title: 'Sorry!',
+            text: 'This feature isn\'t available yet',
+            type: 'info',
+            confirmButtonClass: 'btn btn-theme-primary btn-cursor-pointer',
+            buttonsStyling: false,
+            timer: 2500
+        }).then(function () {},
+        // handling the promise rejection
+        function (dismiss) {});
     };
 
     // initialize page
@@ -726,7 +833,7 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
     function checkLoggedIn() {
         // if user not logged in, open up drop down to tell user to login
         if(!$rootScope.$root.isLoggedIn) {
-            // show info
+            // show not signed in
             swal({
                 title: 'Not Signed In!',
                 text: 'Please sign in to view flights',
@@ -764,6 +871,9 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
                     // set the data
                     $scope.hub.data = responseH;
 
+                    // add initial text
+                    $scope.hubOptions.options.push($scope.initialText);
+
                     // add all available hubs and home locations
                     _.forEach(responseH.hubs, function(value) {
                         // get the airport code
@@ -773,13 +883,15 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
                         if(value.main) {
                             // set main
                             $scope.hubOptions.options.push(`${value.name} (Main)`);
-                            $scope.searchForm.inputs.depart = `${value.name} (Main)`;
                         }
                         else {
                             // set hub
                             $scope.hubOptions.options.push(value.name);
                         }
                     });
+
+                    // TODO: remove me, used for testing
+                    //$scope.searchForm.inputs.depart = $scope.hubOptions.options[$scope.hubOptions.options.length - 1];
 
                     // if the user doesn't have hubs
                     if(responseH.hubs.length == 0) {
@@ -973,7 +1085,7 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
 
         // set the current value as the max value
         $scope.timeSlider.value = $scope.timeSlider.max;
-        $scope.getSliderValue();
+        $scope.updateTimeSliderValue();
     };
 
     // get minutes from flight length
@@ -1017,8 +1129,84 @@ flightsModule.controller('FlightsController', ['$scope', '$rootScope', '$compile
         return totalMins;
     };
 
-    // filter airlines
-    function filterAirlines() {
-        // go through each airline, and extract matching filter
+    // set up depart slider
+    function setUpDepartSlider() {
+        // reset min/max
+        $scope.departSlider.min = 0;
+        $scope.departSlider.max = 0;
+
+        // go through each time length and find the min/max
+        _.forEach($scope.origionalFlightList, function(value) {
+            // check the min/max
+            $scope.departSlider.min = $scope.departSlider.min == 0 || value.route[0].dTimeUTC <  $scope.departSlider.min ? value.route[0].dTimeUTC : $scope.departSlider.min;
+            $scope.departSlider.max = $scope.departSlider.max == 0 || value.route[0].dTimeUTC >  $scope.departSlider.max ? value.route[0].dTimeUTC : $scope.departSlider.max;
+        });
+
+        // set the current value as the min value
+        $scope.departSlider.value = $scope.departSlider.min;
+        $scope.updateDepartSliderValue();
+    };
+
+    // set up arrive slider
+    function setUpArriveSlider() {
+        // reset min/max
+        $scope.arriveSlider.min = 0;
+        $scope.arriveSlider.max = 0;
+
+        // go through each time length and find the min/max
+        _.forEach($scope.origionalFlightList, function(value) {
+            // check the min/max
+            $scope.arriveSlider.min = $scope.arriveSlider.min == 0 || value.route[value.route.length - 1].aTimeUTC <  $scope.arriveSlider.min ? value.route[value.route.length - 1].aTimeUTC : $scope.arriveSlider.min;
+            $scope.arriveSlider.max = $scope.arriveSlider.max == 0 || value.route[value.route.length - 1].aTimeUTC >  $scope.arriveSlider.max ? value.route[value.route.length - 1].aTimeUTC : $scope.arriveSlider.max;
+        });
+
+        // set the current value as the max value
+        $scope.arriveSlider.value = $scope.arriveSlider.max;
+        $scope.updateArriveSliderValue();
+    };
+
+    // set up price slider
+    function setUpPriceSlider() {
+        // reset min/max
+        $scope.priceSlider.min = 0;
+        $scope.priceSlider.max = 0;
+
+        // go through each time length and find the min/max
+        _.forEach($scope.origionalFlightList, function(value) {
+            // get the user price
+            var userPrice = $scope.getUserFlightPrice(value.price);
+            userPrice = parseFloat(userPrice);
+
+            // check the min/max
+            $scope.priceSlider.min = $scope.priceSlider.min == 0 || userPrice <  $scope.priceSlider.min ? userPrice : $scope.priceSlider.min;
+            $scope.priceSlider.max = $scope.priceSlider.max == 0 || userPrice >  $scope.priceSlider.max ? userPrice : $scope.priceSlider.max;
+        });
+
+        // round up to nearest 100
+        $scope.priceSlider.min = Math.floor($scope.priceSlider.min / 100) * 100;
+
+        // round up to nearest 100
+        $scope.priceSlider.max = Math.ceil($scope.priceSlider.max / 100) * 100;
+
+        // set the current value as the max value
+        $scope.priceSlider.value = $scope.priceSlider.max;
+        $scope.updatePriceSliderValue();
+    };
+
+    // set up layover slider
+    function setUpLayoverSlider() {
+        // reset min/max
+        $scope.layoverSlider.min = 0;
+        $scope.layoverSlider.max = 0;
+
+        // go through each time length and find the min/max
+        _.forEach($scope.origionalFlightList, function(value) {
+            // check the max
+            $scope.layoverSlider.max = $scope.layoverSlider.max == 0 || value.route.length >  $scope.layoverSlider.max ? value.route.length : $scope.layoverSlider.max;
+        });
+
+        // set the current value as the max value
+        $scope.layoverSlider.value = $scope.layoverSlider.max;
+        $scope.updateLayoverSliderValue();
     };
 }]);

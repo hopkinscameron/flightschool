@@ -54,7 +54,7 @@ flightsServiceModule.factory('FlightsFactory', ['$http', '$location', '$rootScop
 
         // holds the from/to date
         var fromDate = $rootScope.$root.formatDate($rootScope.$root.dateSkyPicker, data.departDate);
-        var toDate = $rootScope.$root.formatDate($rootScope.$root.dateSkyPicker, data.departDate);
+        var toDate = $rootScope.$root.formatDate($rootScope.$root.dateSkyPicker, data.returnDate);
 
         // holds the preferred/non preferred airlines
         var preferredAirlines = '';
@@ -73,8 +73,12 @@ flightsServiceModule.factory('FlightsFactory', ['$http', '$location', '$rootScop
         });
 
         // set the endpoint
-        var endpoint = `https://api.skypicker.com/flights?flyFrom=${from}&to=${to}&dateFrom=${fromDate}&dateTo=${toDate}&typeFlight=${data.typeFlight}&adults=${data.adults}&directFlights=${data.nonStop}&partner=picky&partner_market=us&curr=USD&selectedAirlines=${preferredAirlines}`; //&limit=10
+        var endpoint = `https://api.skypicker.com/flights?flyFrom=${from}&to=${to}&dateFrom=${fromDate}&dateTo=${fromDate}&typeFlight=${data.typeFlight}&adults=${data.adults}&directFlights=${data.nonStop}&partner=picky&partner_market=us&curr=USD&selectedAirlines=${preferredAirlines}`; //&limit=10
 
+        // if round trip 
+        if(data.typeFlight == 'round') {
+            //endpoint += `&returnFrom=${toDate}&returnTo=${toDate}`;
+        }
         // the configuration for the http call
         var config = {
             'ignoreLoadingBar': true,

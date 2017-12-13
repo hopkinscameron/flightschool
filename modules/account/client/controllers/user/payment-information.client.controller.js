@@ -14,6 +14,11 @@ accountModule.controller('PaymentInformationController', ['$scope', '$rootScope'
     // set the range for expiration date
     setAcceptableExpDateRange();
 
+    // TODO: used for testing
+    $scope.forceDisable = true;
+    var nextAvailableDate = new Date();
+    nextAvailableDate.setMonth(nextAvailableDate.getMonth() + 1);
+
     // holds the payment information form data
     $scope.paymentInformationForm = {
         'inputs': {
@@ -24,11 +29,11 @@ accountModule.controller('PaymentInformationController', ['$scope', '$rootScope'
             'expirationYY': undefined,
             'ccv': undefined
             */
-            'name': 'John Doe',
+            'name': '',
             'number': 4716955713636688,
-            'expirationMM': 12,
-            'expirationYY': 17,
-            'ccv': undefined //123
+            'expirationMM': nextAvailableDate.getMonth() + 1,
+            'expirationYY': parseInt((nextAvailableDate.getFullYear()).toString().substring(2)),
+            'ccv': 123 //123 undefined
         },
         'errors': {
             'generic': {

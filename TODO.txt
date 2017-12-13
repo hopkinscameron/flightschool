@@ -3,14 +3,18 @@
     might have to enter the text a different way (not in sweet alert)
 
 Next (Immediate)
-- implement all filters
 - find a way to force an update on the embeded user obj when profile is changed
 
 Later (After next is completed)
+- set up table for round trip
+- add in (next day arrival for flights that go to next day)
+- add in layover times
+
 - add an "error dashboard" so if there are errors in server, we can view them
 - if I have the html editor up on page load, and I exit out, I can't get the other content to show
 - remove credit card stuff and use Stripe.com instead
 - when payment doesn't go through or card is about to expire, show notification
+
 
 Future
 - after sign up, send an email to verify
@@ -20,7 +24,6 @@ Future
 
 Done
 
-
 Testing
 - skypicker api docs -> 
 
@@ -29,11 +32,6 @@ Browser Fixes
 Mobile Fixes
 
 Ideas
-- make login a popup from the top (like southwest.com)
-    - remove the errors when a user leaves the form, only show error if the submit button is hit
-    - when logging in, remove form and put a spinner instead
-    - when correct login, login like normal
-    - when incorrect login, show form with error
 - User can only change Hubs every so often (to prevent people from continuously changing)
 
  $routeProvider.when('/someRoute', {

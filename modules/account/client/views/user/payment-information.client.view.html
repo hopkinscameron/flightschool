@@ -59,7 +59,7 @@
                 <!-- Begin Credit Card Number -->
                 <div class="form-group">
                     <label class="col-form-label" for="number">Credit Card Number <span style="color: red;">*</span></label>
-                    <input class="form-control" ng-class="{'is-invalid': paymentInformationForm.errors.number.isError}" type="number" name="number" id="number" ng-model="paymentInformationForm.inputs.number" ng-disabled="formInTransit" required>
+                    <input class="form-control" ng-class="{'is-invalid': paymentInformationForm.errors.number.isError}" type="number" name="number" id="number" ng-model="paymentInformationForm.inputs.number" ng-disabled="formInTransit || forceDisable" required>
                     <small class="invalid-feedback">{{paymentInformationForm.errors.number.message}}</small>
                 </div>
                 <!-- End Credit Card Number -->
@@ -68,12 +68,12 @@
                     <div class="form-row">
                         <div class="col">
                             <label class="col-form-label" for="expirationMM">Expiration Month <span style="color: red;">*</span></label>
-                            <input class="form-control" ng-class="{'is-invalid': paymentInformationForm.errors.expirationMM.isError}" type="number" name="expirationMM" id="expirationMM" placeholder="MM" ng-min="1" ng-max="12" ng-model="paymentInformationForm.inputs.expirationMM" ng-disabled="formInTransit" required>
+                            <input class="form-control" ng-class="{'is-invalid': paymentInformationForm.errors.expirationMM.isError}" type="number" name="expirationMM" id="expirationMM" placeholder="MM" ng-min="1" ng-max="12" ng-model="paymentInformationForm.inputs.expirationMM" ng-disabled="formInTransit || forceDisable" required>
                             <small class="invalid-feedback">{{paymentInformationForm.errors.expirationMM.message}}</small>
                         </div>
                         <div class="col">
                             <label class="col-form-label" for="expirationYY">Expiration Year <span style="color: red;">*</span></label>
-                            <input class="form-control" ng-class="{'is-invalid': paymentInformationForm.errors.expirationYY.isError}" type="number" name="expirationYY" id="expirationYY" placeholder="YY" ng-min="acceptableDateRangeForExpiration.minYear" ng-max="acceptableDateRangeForExpiration.maxYear" ng-model="paymentInformationForm.inputs.expirationYY" ng-disabled="formInTransit" required>
+                            <input class="form-control" ng-class="{'is-invalid': paymentInformationForm.errors.expirationYY.isError}" type="number" name="expirationYY" id="expirationYY" placeholder="YY" ng-min="acceptableDateRangeForExpiration.minYear" ng-max="acceptableDateRangeForExpiration.maxYear" ng-model="paymentInformationForm.inputs.expirationYY" ng-disabled="formInTransit || forceDisable" required>
                             <small class="invalid-feedback">{{paymentInformationForm.errors.expirationYY.message}}</small>
                         </div>
                     </div>
@@ -82,7 +82,7 @@
                 <!-- Begin CCV -->
                 <div class="form-group">
                     <label class="col-form-label" for="ccv">CCV <span style="color: red;">*</span></label>
-                    <input class="form-control" ng-class="{'is-invalid': paymentInformationForm.errors.ccv.isError}" type="number" name="ccv" id="ccv" min="000" max="999" ng-model="paymentInformationForm.inputs.ccv" ng-disabled="formInTransit" required>
+                    <input class="form-control" ng-class="{'is-invalid': paymentInformationForm.errors.ccv.isError}" type="number" name="ccv" id="ccv" min="000" max="999" ng-model="paymentInformationForm.inputs.ccv" ng-disabled="formInTransit || forceDisable" required>
                     <small class="invalid-feedback">{{paymentInformationForm.errors.ccv.message}}</small>
                 </div>
                 <!-- End CCV -->

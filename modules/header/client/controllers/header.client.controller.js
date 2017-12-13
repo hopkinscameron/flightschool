@@ -93,7 +93,7 @@ headerModule.controller('HeaderController', ['$scope', '$rootScope', '$location'
     };
 
     // format time
-    $rootScope.$root.formatTime = function(type, timeToFormat) {
+    $rootScope.$root.formatTime = function(type, timeToFormat, locationOptions) {
         try {
             var date = new Date(timeToFormat);
 
@@ -102,7 +102,20 @@ headerModule.controller('HeaderController', ['$scope', '$rootScope', '$location'
                 return date.toLocaleTimeString();
             }
             else if(type == $rootScope.$root.timeShortNoSeconds) {
-                return date.toLocaleTimeString([], { hour: '2-digit', minute:'2-digit' });
+                return date.toLocaleTimeString('en-us', { hour: '2-digit', minute:'2-digit' }); //, timeZone: 'America/New_York'
+            }
+            else if(type == $rootScope.$root.locationBasedProvided) {
+                return date.toLocaleTimeString('en-us', { hour: '2-digit', minute:'2-digit', timeZone: locationOptions.timeZone });
+            }
+            else if(type == $rootScope.$root.locationBasedSearched) {
+                // get the time based on location
+                HeaderFactory.getTimeZoneInformation(locationOptions).then(function (responseTZ) {
+                    return date.toLocaleTimeString('en-us', { hour: '2-digit', minute:'2-digit', timeZone: responseTZ.timeZoneId });                 
+                })
+                .catch(function (responseTZ) {
+                    console.log(responseTZ);
+                    return date.toLocaleTimeString('en-us', { hour: '2-digit', minute:'2-digit' });
+                });
             }
         }
         catch (e) {
@@ -378,12 +391,17 @@ headerModule.controller('HeaderController', ['$scope', '$rootScope', '$location'
         $rootScope.$root.dateSkyPicker = 'dateSkyPicker';
         $rootScope.$root.timeShort = 'timeShort';
         $rootScope.$root.timeShortNoSeconds = 'timeShortNoSeconds';
+        $rootScope.$root.locationBasedProvided = 'locationBasedProvided';
+        $rootScope.$root.locationBasedSearched = 'locationBasedSearched';
 
         // the notification types
         $rootScope.$root.notificationTypeSuccess = 'success';
         $rootScope.$root.notificationTypeWarning = 'warning';
         $rootScope.$root.notificationTypeDanger = 'danger';
         $rootScope.$root.notificationTypeInfo = 'info';
+
+        // the google timezone api key
+        $rootScope.$root.timeZoneKey = window.sharedConfig.googleMapsTimeZone;
 
         // holds the header backend data
         $scope.header = {};

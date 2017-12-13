@@ -83,7 +83,8 @@ module.exports = {
             minLength: 10,
             minPhraseLength: 20,
             minOptionalTestsToPass: 4
-        }
+        },
+        googleMapsTimeZone: process.env.GOOGLE_MAPS_TIMEZONE_API_KEY
     },
     socialMedia: {
         facebook: {

@@ -1,5 +1,5 @@
 ﻿<!-- Begin Home Page -->
-<section ng-controller="HomeController" ng-if="!$root.isLoggedIn">
+<section ng-controller="HomeController">
     <!-- Begin Container -->
     <div class="container">
         <!-- Begin Page Fully Loaded With Errors -->
@@ -24,6 +24,9 @@
                     <a href="/flights" class="btn btn-theme-primary btn-cursor-pointer decoration--never">Search Flights</a>
                 </div>
                 <!-- End Search Flights Button -->
+                <!-- TODO: REMOVE ME, USED FOR TESTING -->
+                <span ng-bind-html="baconGoodness | trustHTML"></span>
+                <!-- TODO: REMOVE ME, USED FOR TESTING -->
             </div>
             <!-- End Content Body -->
         </div>

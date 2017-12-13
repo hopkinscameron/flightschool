@@ -95,6 +95,11 @@ tripsModule.controller('TripsController', ['$scope', '$rootScope', '$compile', '
                 // set the data
                 $scope.trips = responseT;
                 $scope.trips.title = 'Trips';
+                $scope.trips.pageHeader = $scope.trips.title;
+                $scope.trips.pageSubHeader = 'Let\'s take a look at your upcoming trips';
+
+                // TODO: used for testing
+                $scope.trips.trips = [];
 
                 // holds the animation time
                 $scope.animationStyle = $rootScope.$root.getAnimationDelay();
@@ -167,7 +172,7 @@ tripsModule.controller('TripsController', ['$scope', '$rootScope', '$compile', '
 
         // initialize the waypoint list
         var waypointList = [
-            { id: 'trips-bio', offset: startOffset, class: 'animated fadeIn' }
+            { id: 'trips-list', offset: startOffset, class: 'animated fadeIn' }
         ];
 
         // set up waypoints

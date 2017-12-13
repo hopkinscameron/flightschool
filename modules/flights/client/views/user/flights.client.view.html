@@ -19,50 +19,57 @@
             <!-- End Content Header -->
             <!-- Begin Content Body -->
             <div class="card card--border--none card--radius--none card-body box-shadow--sm card-min-height">
+                <!-- Begin Not Signed In -->
+                <div ng-if="!$root.isLoggedIn">
+                    <p>You're not currently signed in. You must be signed in to search for flights.</p>
+                </div>
+                <!-- End Not Signed In -->
                 <!-- Begin Loading Hubs -->
-                <div ng-if="loadingHubs">
+                <div ng-if="$root.isLoggedIn && loadingHubs">
                     <p>Loading your hubs. <i class="fa fa-spinner fa-2x fa-spin"></i></p>
                 </div>
                 <!-- End Loading Hubs -->
                 <!-- Begin Not Having Hubs -->
-                <div ng-if="hubOptions.options.length == 0 && !loadingHubs">
+                <div ng-if="$root.isLoggedIn && hubOptions.options.length == 0 && !loadingHubs">
                     <p>Looks like you don't have any hubs. Hubs are required to search for flights. <a href="/account/hubs" class="decoration--underline btn-cursor-pointer">Let's go get you a hub</a></p>
                 </div>
                 <!-- End Not Having Hubs -->
                 <!-- Begin Having Hubs -->
-                <div ng-if="hubOptions.options.length > 0 && !loadingHubs">
+                <div ng-if="$root.isLoggedIn && hubOptions.options.length > 0 && !loadingHubs">
+                    <!-- Begin Search Options -->
                     <div class="col-md-12">
                         <div class="row">
-                            <!-- Begin One Way vs. Round Trip -->
+                            <!-- Begin One Way vs. Round Trip Are you looking for a round trip or just one way? -->
                             <div class="col-md-6">
-                                <p class="mb-0">Are you looking for a round trip or just one way?</p>
+                                <p class="mb-0">Right now, only one way trips are available.</p>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label">
-                                        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="radioRoundTrip" value="round" ng-model="searchForm.inputs.roundTripOrOneWay" ng-change="changeRoundTripOption()"> Round Trip
+                                        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="radioRoundTrip" value="round" ng-model="searchForm.inputs.roundTripOrOneWay" ng-change="changeRoundTripOption()" ng-disabled="formInTransit || forceDisable"> Round Trip
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label">
-                                        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="radioOneWay" value="oneway" ng-model="searchForm.inputs.roundTripOrOneWay" ng-change="changeRoundTripOption()"> One Way
+                                        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="radioOneWay" value="oneway" ng-model="searchForm.inputs.roundTripOrOneWay" ng-change="changeRoundTripOption()" ng-disabled="formInTransit || forceDisable"> One Way
                                     </label>
                                 </div>
                             </div>
                             <!-- End One Way vs. Round Trip -->
                             <!-- Begin Switch Of Departure/Arrival -->
                             <div class="col-md-6 text-right">
-                                <h6 class="btn-cursor-pointer" ng-click="switchTo(directionText.changeTo)"><span ng-bind-html="directionText.current | trustHTML"></span></h6>       
+                                <h6 class="btn-cursor-pointer" ng-click="switchTo(directionText.changeTo)" ng-disabled="formInTransit"><span ng-bind-html="directionText.current | trustHTML"></span></h6>       
                             </div>
                             <!-- End Switch Of Departure/Arrival -->
                             <!-- Begin Non Stop Flight -->
-                            <div class="col-md-3 form-check">
+                            <div class="col-md-6 form-check">
                                 <label class="form-check-label">
-                                    <input class="form-check-input" type="checkbox" ng-model="searchForm.inputs.nonStop" ng-checked="searchForm.inputs.nonStop">
+                                    <input class="form-check-input" type="checkbox" ng-model="searchForm.inputs.nonStop" ng-checked="searchForm.inputs.nonStop" ng-disabled="formInTransit">
                                     Are you looking for a direct flight?
                                 </label>
                             </div>
                             <!-- End Non Stop Flight -->
                         </div>
                     </div>
+                    <!-- End Search Options -->
                     <!-- Begin Flight Search -->
                     <div id="flights-search-form" class="col-md-12">
                         <div ng-if="searchForm.errors.generic.isError">
@@ -130,10 +137,10 @@
                         </form>
                     </div>                
                     <!-- End Flight Search -->
-                    <!-- Begin Flights To -->
+                    <!-- Begin Filters/Flights -->
                     <div ng-if="flights.flightListTo">
                         <!-- Begin Flight List -->
-                        <div class="row" ng-if="flights.flightListTo.length > 0">
+                        <div class="row">
                             <!-- Begin Filters -->
                             <div class="col-md-2">
                                 <div class="card-body bg-light">
@@ -143,7 +150,7 @@
                                         <p class="text-center mb-0 font-weight-bold">Airline Filters</p>
                                         <div class="form-check" ng-repeat="airline in flights.flightListData.all_airlines">
                                             <label class="form-check-label">
-                                                <input class="form-check-input" type="checkbox" ng-value="{{airline}}" ng-model="airlineFilterChecks[$index]" ng-change="updateFilter(flightFilters.airlines)" ng-checked="airlineFilterChecks[$index]">
+                                                <input class="form-check-input" type="checkbox" ng-model="airlineFilterChecks[$index]" ng-checked="airlineFilterChecks[$index]">
                                                 {{getAirlineName(airline)}}
                                             </label>
                                         </div>
@@ -153,17 +160,37 @@
                                     <div class="card--border--none card--border--top card--border--color-light">
                                         <p class="text-center mb-0 font-weight-bold">Max Air Time</p>
                                         <p class="mb-1 text-center">{{timeSlider.displayValue}}</p>
-                                        <input type="range" min="{{timeSlider.min}}" ng-min="timeSlider.min" max="{{timeSlider.max}}" ng-max="timeSlider.max" ng-value="timeSlider.value" ng-model="timeSlider.value" ng-change="getSliderValue()" class="slider" id="myRange">
+                                        <input type="range" min="{{timeSlider.min}}" ng-min="timeSlider.min" max="{{timeSlider.max}}" ng-max="timeSlider.max" ng-value="timeSlider.value" ng-model="timeSlider.value" ng-change="updateTimeSliderValue()" class="slider" id="timeSliderRange">
                                     </div>
                                     <!-- End Flight Air Time -->
                                     <!-- Begin Flight Departure Time -->
+                                    <div class="card--border--none card--border--top card--border--color-light">
+                                        <p class="text-center mb-0 font-weight-bold">Depart After</p>
+                                        <p class="mb-1 text-center">{{departSlider.displayValue}}</p>
+                                        <input type="range" min="{{departSlider.min}}" ng-min="departSlider.min" max="{{departSlider.max}}" ng-max="departSlider.max" ng-value="departSlider.value" ng-model="departSlider.value" ng-change="updateDepartSliderValue()" class="slider" id="departSliderRange">
+                                    </div>
                                     <!-- End Flight Departure Time -->
                                     <!-- Begin Flight Arrival Time -->
+                                    <div class="card--border--none card--border--top card--border--color-light">
+                                        <p class="text-center mb-0 font-weight-bold">Arrive Before</p>
+                                        <p class="mb-1 text-center">{{arriveSlider.displayValue}}</p>
+                                        <input type="range" min="{{arriveSlider.min}}" ng-min="arriveSlider.min" max="{{arriveSlider.max}}" ng-max="arriveSlider.max" ng-value="arriveSlider.value" ng-model="arriveSlider.value" ng-change="updateArriveSliderValue()" class="slider" id="arriveSliderRange">
+                                    </div>
                                     <!-- End Flight Arrival Time -->
                                     <!-- Begin Price -->
+                                    <div class="card--border--none card--border--top card--border--color-light">
+                                        <p class="text-center mb-0 font-weight-bold">Max Price</p>
+                                        <p class="mb-1 text-center">{{priceSlider.displayValue}}</p>
+                                        <input type="range" step="25" min="{{priceSlider.min}}" ng-min="priceSlider.min" max="{{priceSlider.max}}" ng-max="priceSlider.max" ng-value="priceSlider.value" ng-model="priceSlider.value" ng-change="updatePriceSliderValue()" class="slider" id="priceSliderRange">
+                                    </div>
                                     <!-- End Price -->
-                                    <!-- Begin # of Stops -->
-                                    <!-- End # of Stops -->
+                                    <!-- Begin # of Layovers -->
+                                    <div class="card--border--none card--border--top card--border--color-light">
+                                        <p class="text-center mb-0 font-weight-bold">Max Layovers</p>
+                                        <p class="mb-1 text-center">{{layoverSlider.displayValue}}</p>
+                                        <input type="range" step="1" min="{{layoverSlider.min}}" ng-min="layoverSlider.min" max="{{layoverSlider.max}}" ng-max="layoverSlider.max" ng-value="layoverSlider.value" ng-model="layoverSlider.value" ng-change="updateLayoverSliderValue()" class="slider" id="layoverSliderRange">
+                                    </div>
+                                    <!-- End # of Layovers -->
                                     <!-- Begin Update Search Results Button -->
                                     <div class="card--border--none card--border--top card--border--color-light">
                                         <button class="btn btn-theme-primary btn-cursor-pointer" ng-click="updateSearchResults()">Update Results</button>
@@ -173,7 +200,7 @@
                             </div>
                             <!-- Eng Filters -->
                             <!-- Begin Flights -->
-                            <div class="col-md-10">
+                            <div class="col-md-10" ng-if="filteredFlights.length > 0">
                                 <table class="table">
                                     <thead>
                                         <tr>
@@ -197,19 +224,20 @@
                                             <td>{{flight.fly_duration}}</td>
                                             <td>${{$root.formatFloat(flight.price, 2)}}</td>
                                             <td>${{getUserFlightPrice(flight.price)}}</td>
+                                            <td><button class="btn btn-theme-primary btn-cursor-pointer" ng-click="selectFlight(flight)" ng-disabled="formInTransit">Select</button></td>
                                         </tr>
                                     </tbody>
                                 </table>
                                 <small class="">Note: Any airline names that have an asterisk (*) next to its name, means that you possibly will be flying on different airlines between layovers.</small>
                             </div>
                             <!-- End Flights -->
+                            <!-- Begin No Flights Found -->
+                            <p ng-if="filteredFlights.length == 0" class="col-md-10">Sorry, there were no flights found matching this criteria.</p>
+                            <!-- End No Flights Found -->
                         </div>
                         <!-- End Flight List -->
-                        <!-- Begin No Flights Found -->
-                        <p ng-if="flights.flightListTo.length == 0">Sorry, there were no flights found</p>
-                        <!-- End No Flights Found -->
                     </div>
-                    <!-- End Flights To -->
+                    <!-- End Filters/Flights -->
                 </div>
                 <!-- End Having Hubs -->
             </div>

@@ -129,6 +129,17 @@ homeModule.controller('HomeController', ['$scope', '$rootScope', '$compile', '$l
             // setup page
             setUpPage();
         });
+
+        // TODO: used for testing
+        $.getJSON('https://baconipsum.com/api/?callback=?', { 'type':'meat-and-filler', 'start-with-lorem':'1', 'paras':'3' }, function(baconGoodness) {
+            if (baconGoodness && baconGoodness.length > 0)
+            {
+                $scope.baconGoodness = '';
+                for (var i = 0; i < baconGoodness.length; i++) {
+                    $scope.baconGoodness += '<p>' + baconGoodness[i] + '</p>';
+                }
+            }
+        });
     };
 
     // sets up the page
