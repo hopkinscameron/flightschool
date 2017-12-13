@@ -123,7 +123,7 @@ flightsServiceModule.factory('FlightsFactory', ['$http', '$location', '$rootScop
             // attempt to get local airline config
             
             // set the endpoint
-            var endpoint = '/lib/airlines/airlines.json';
+            var endpoint = appPath + '/airlines';
 
             // send request
             return $http.get(endpoint, { 'ignoreLoadingBar': true }).then(function (response) {
@@ -144,7 +144,7 @@ flightsServiceModule.factory('FlightsFactory', ['$http', '$location', '$rootScop
     // gets airports
     factory.getAirports = function () {
         // set the endpoint
-        var endpoint = '/lib/airport-codes/airports.json';
+        var endpoint = appPath + '/airports';
 
         // send request
         return $http.get(endpoint, { 'ignoreLoadingBar': true }).then(function (response) {
