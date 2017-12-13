@@ -50,8 +50,6 @@
 /* Begin Custom Styles */
 /* Begin Import All Custom Styles */
 /* Begin Custom Animation Delays */
-@import url("https://fonts.googleapis.com/css?family=Marck+Script");
-@import url("https://fonts.googleapis.com/css?family=Audiowide");
 .animation-delay--xxs {
   animation-delay: 0.125s !important;
   -webkit-animation-delay: 0.125s !important;
@@ -154,7 +152,7 @@ body {
     top: 0; }
 
 .body-error {
-  background-color: #F5F7F9;
+  background-color: #0076FF;
   background-image: url(""); }
 
 body::-webkit-scrollbar {
@@ -321,15 +319,17 @@ body::-webkit-scrollbar-thumb {
 /* End Custom Containers */
 /* Begin Custom Fonts */
 /*
-@font-face {
-    font-family: 'Pacifico Local';
-    src: url(./fonts//Pacifico-Regular.ttf);
-}
-@font-face {
-    font-family: 'Bree Serif Local';
-    src: url(./fonts//BreeSerif-Regular.ttf);
-}
+@import url('https://fonts.googleapis.com/css?family=Marck+Script');
+@import url('https://fonts.googleapis.com/css?family=Audiowide');
 */
+@font-face {
+  font-family: 'Audiowide';
+  src: url(./fonts//Audiowide-Regular.ttf); }
+
+@font-face {
+  font-family: 'Marck Script';
+  src: url(./fonts//MarckScript-Regular.ttf); }
+
 .font-fancy--1 {
   font-family: 'Marck Script', cursive; }
 
